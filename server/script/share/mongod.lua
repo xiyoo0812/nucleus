@@ -79,8 +79,8 @@ function mongod:update(coll_name, obj, selector, upsert, multi)
     return false
 end
 
-function mongod:delete(dbid, coll_name, selector, single)
-    local coll = self:get_coll(dbid, coll_name)
+function mongod:delete(coll_name, selector, single)
+    local coll = self:get_coll(coll_name)
     if coll then
         local _, err = coll:delete(selector, single, 1)
         return (err == nil)
