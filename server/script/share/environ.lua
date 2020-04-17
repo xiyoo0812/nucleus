@@ -1,14 +1,14 @@
 --environ.lua
-local pairs       = pairs
-local tonumber    = tonumber
-local ogetenv     = os.getenv
-local tunpack     = table.unpack
-local sformat     = string.format
-local ssplit      = string_ex.split
+local pairs         = pairs
+local tonumber      = tonumber
+local ogetenv       = os.getenv
+local log_debug     = logger.debug
+local tunpack       = table.unpack
+local ssplit        = string_ex.split
 
 local ENV = {
     -- mongo group
-    ENV_MONGO_GROUP         = "1",
+    ENV_MONGO_ADDR         = "pm_admin@10.72.17.44",
 }
 
 environ = {}
@@ -21,11 +21,11 @@ function environ.init(env_file)
             ENV[key] = value
         end
     end
-    ngix.log(ngix.DEBUG, "---------------------environ value dump-------------------")
+    log_debug("---------------------environ value dump-------------------")
     for key, _ in pairs(ENV) do
-        ngix.log(ngix.DEBUG, sformat("%s ----> %s", key, environ.get(key)))
+        log_debug("%s ----> %s", key, environ.get(key))
     end
-    ngix.log(ngix.DEBUG, "----------------------------------------------------------")
+    log_debug("----------------------------------------------------------")
 end
 
 function environ.get(key)
@@ -49,4 +49,12 @@ end
 
 function environ.table(key, str)
     return ssplit(ogetenv(key) or ENV[key] or "", str or ",")
+end
+
+function environ.db(key)
+    local db_host, port = environ.addr(key)
+    if db_host then
+        local db, host = tunpack(ssplit(db_host, "@"))
+        return db, host, port
+    end
 end

@@ -1,7 +1,8 @@
 self=false
 stds.nucleus = {
     globals = {
-         --common
+        --common
+        "ngx",
         "tonubmer", "lfs",
         "string_ex", "table_ex", "math_ex", "util", "coroutine",
         "nucleus", "environ", "signal", "http", "guid", "luabt", "service", "logger", "utility", "platform",

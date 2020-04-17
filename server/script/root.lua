@@ -4,10 +4,13 @@
 --注意这里是整个系统的初始化
 
 --定义全局命名空间
-nucleus = {} 
+nucleus = {}
 
 --common
 require ("common.base")
 --share
 require ("share.environ")
-require ("share.mongo_mgr")
+require ("share.mongod")
+
+--初始化环境变量
+environ.init("config.nucleus")
