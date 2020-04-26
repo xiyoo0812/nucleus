@@ -15,6 +15,8 @@ static/
 /server/.vs/
 /server/runtime/
 /server/resource/
+/client/dist/
+/client/node_modules/
 
 
 # Prerequisites
@@ -58,4 +60,13 @@ static/
 *.opendb
 *.sdf
 *.opensdf
+
+#vue
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
