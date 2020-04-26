@@ -34,7 +34,11 @@ const router = new Router({
         },
         {
             path: '/login',
-            component: () => import(/* webpackChunkName: "login" */ '../views/Login.vue')
+            component: () => import(/* webpackChunkName: "login" */ '../views/login/Login.vue')
+        },
+        {
+            path: '/register',
+            component: () => import(/* webpackChunkName: "login" */ '../views/login/Register.vue')
         },
         {
             path: '*',
@@ -44,6 +48,10 @@ const router = new Router({
 })
 
 router.beforeEach((route, redirect, next) => {
+    if (route.path == '/register') {
+        next();
+        return
+    }
     var tokenData = getToken()
     if (route.path !== '/login') {
         if (!tokenData){
@@ -53,8 +61,7 @@ router.beforeEach((route, redirect, next) => {
             })
             return
         }
-    }
-    if (route.path == '/login') {
+    } else {
         if (tokenData){
             next('/')
             return

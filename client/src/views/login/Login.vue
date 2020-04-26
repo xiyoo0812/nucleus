@@ -13,27 +13,28 @@
                         <el-button slot="prepend" icon="el-icon-lx-lock"></el-button>
                     </el-input>
                 </el-form-item>
-                <el-row>
-                    <el-col :span="12">
-                        <div class="login-btn">
-                            <el-button type="primary" @click="login()" plain>登录</el-button>
-                        </div>
-                    </el-col>
-                    <el-col :span="12">
-                        <div class="login-btn">
-                            <el-button type="success" @click="register()" plain>注册</el-button>
-                        </div>
-                    </el-col>
-                </el-row>
+                <div class="login-btn">
+                    <el-button type="primary" @click="login()">登录</el-button>
+                </div>
                 <el-row>
                     <el-col :span="8">
-                        <el-checkbox v-model="form.is_remember">记住我</el-button>
+                        <div class="login-btn">
+                            <router-link :to="{ path: '/register' }">
+                                <el-button type="text">注册账号</el-button>
+                            </router-link>
+                        </div>
                     </el-col>
                     <el-col :span="8">
-                        <el-link href="https://element.eleme.io">飞书登录</el-link>
+                        <div class="login-btn">
+                            <el-button @click="feishu()" type="text">飞书登录</el-button>
+                        </div>
                     </el-col>
                     <el-col :span="8">
-                        <el-link href="https://element.eleme.io">忘记密码?</el-link>
+                        <div class="login-btn">
+                            <router-link :to="{ path: '/reset' }">
+                                <el-button type="text"> 忘记密码?</el-button>
+                            </router-link>
+                        </div>
                     </el-col>
                 </el-row>
             </el-form>
@@ -42,8 +43,8 @@
 </template>
 
 <script>
-import { login } from '../api/login';
-import { showSuccess, showFailed } from '../utils/index';
+import { login } from '../../api/login';
+import { showSuccess, showFailed } from '../../utils/index';
 
 export default {
     name: 'login',
@@ -74,7 +75,7 @@ export default {
                                 this.$router.push("/")
                             }
                         } else if (res.code == -1){
-                            showFailed(this, "数据库错误，登录失败")
+                            showFailed(this, "数据库错误，登录失败，请联系管理员")
                         } else if (res.code == -2){
                             showFailed(this, "账号不存在")
                         } else if (res.code == -3){
@@ -87,8 +88,6 @@ export default {
                 }
             })
         },
-        register() {
-        },
     },
 };
 </script>
@@ -98,7 +97,7 @@ export default {
     position: relative;
     width: 100%;
     height: 100%;
-    background-image: url(../assets/img/login-bg.jpg);
+    background-image: url(../../assets/img/login-bg.jpg);
     background-size: 100%;
 }
 .ms-title {

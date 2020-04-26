@@ -2,7 +2,7 @@ import request from '@/utils/webreq'
 
 export function login(username, password) {
     return request({
-        url: '/login',
+        url: '/login/login',
         method: 'post',
         params : {
             username,
@@ -13,7 +13,21 @@ export function login(username, password) {
 
 export function logout() {
     return request({
-        url: '/logout',
+        url: '/login/logout',
+        method: 'post'
+    })
+}
+
+export function register() {
+    return request({
+        url: '/login/register',
+        method: 'post'
+    })
+}
+
+export function reset() {
+    return request({
+        url: '/login/reset',
         method: 'post'
     })
 }
