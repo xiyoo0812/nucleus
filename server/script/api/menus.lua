@@ -1,13 +1,18 @@
--- controller/menus.lua
-local json  = require "cjson"
+-- api/menus.lua
 local menus = require "config.menus"
-
-local jencode   = json.encode
 
 local log_debug = logger.debug
 local serialize = logger.serialize
+local apidoer   = utility.apidoer
 
-local args = ngx.req.get_uri_args()
-log_debug("/menus params: %s", serialize(args))
+--定义接口
+local menus_doers = {
+    GET = function(req)
+        local args = req.get_uri_args()
+        log_debug("/menus params: %s", serialize(args))
+        return { menus = menus }
+    end,
+}
 
-ngx.say(jencode({ menus = menus }))
+--执行
+apidoer(ngx.req, menus_doers)

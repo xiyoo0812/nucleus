@@ -5,6 +5,7 @@ import {getToken} from "../utils/auth";
 Vue.use(Router);
 
 const router = new Router({
+    mode: 'history',
     routes : [
         {
             path: '/',
@@ -59,11 +60,6 @@ router.beforeEach((route, redirect, next) => {
                 path: "/login",
                 query: {redirect: route.path }
             })
-            return
-        }
-    } else {
-        if (tokenData){
-            next('/')
             return
         }
     }

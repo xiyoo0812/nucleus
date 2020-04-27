@@ -43,8 +43,9 @@
 </template>
 
 <script>
-import { login } from '../../api/login';
-import { showSuccess, showFailed } from '../../utils/index';
+import { getToken } from "../../utils/auth";
+import { login, feishu } from '../../api/login';
+import { showSuccess, showFailed, getBaseUrl } from '../../utils/index';
 
 export default {
     name: 'login',
@@ -55,11 +56,41 @@ export default {
                 password: '123123',
                 is_remember: false,
             },
+            interval: null,
             rules: {
                 username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
                 password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
             },
         };
+    },
+    watch: {
+        feishu_success() {
+            console.log(this.feishu_success)
+             if (this.feishu_success) {
+            }
+        }
+    },
+    mounted() {
+        this.$router.onReady(() => {
+            var tokenData = getToken()
+            if (tokenData) {
+                this.$router.push({ path: this.$route.query.redirect || '/' })
+                return
+            }
+            if (this.$route.query.ticket) {
+                this.$nextTick(() => {
+                    feishu(this.$route.query.ticket).then(res => {
+                        if (res.code == 0){
+                            showSuccess(this, '登录成功')
+                            this.$store.dispatch("Login", this.form)
+                            this.$router.push({ path: this.$route.query.redirect || '/' })
+                        } else if (res.code == -1){
+                            showFailed(this, "飞书登录验证失败")
+                        }
+                    });
+                })
+            }
+        })
     },
     methods: {
         login() {
@@ -67,13 +98,9 @@ export default {
                 if (valid) {
                     login(this.form.username, this.form.password).then(res => {
                         if (res.code == 0){
-                            this.$store.dispatch("Login", this.form)
                             showSuccess(this, '登录成功')
-                            if (this.$route.query.redirect){
-                                this.$router.push(this.$route.query.redirect)
-                            } else {
-                                this.$router.push("/")
-                            }
+                            this.$store.dispatch("Login", this.form)
+                            this.$router.push({ path: this.$route.query.redirect || '/' })
                         } else if (res.code == -1){
                             showFailed(this, "数据库错误，登录失败，请联系管理员")
                         } else if (res.code == -2){
@@ -88,8 +115,12 @@ export default {
                 }
             })
         },
+        feishu() {
+            var url = getBaseUrl(window.location.href)
+            window.location.href = "http://ex.idreamsky.com:40008/login?redirect_url=" + url + "/login"
+        }
     },
-};
+}
 </script>
 
 <style scoped>

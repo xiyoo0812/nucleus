@@ -11,6 +11,7 @@ require ("common.base")
 --share
 require ("share.environ")
 require ("share.mongod")
+require ("share.utility")
 
 --初始化环境变量
 environ.init("config.nucleus")

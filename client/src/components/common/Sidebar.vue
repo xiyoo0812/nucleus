@@ -33,7 +33,7 @@
 
 <script>
     import bus from './bus'
-    import { getMenus } from '../../api/login'
+    import { getMenus } from '../../api/menus'
     export default {
         data() {
             return {

@@ -2,8 +2,8 @@ import request from '@/utils/webreq'
 
 export function login(username, password) {
     return request({
-        url: '/login/login',
-        method: 'post',
+        url: '/api/login',
+        method: 'get',
         params : {
             username,
             password,
@@ -13,28 +13,31 @@ export function login(username, password) {
 
 export function logout() {
     return request({
-        url: '/login/logout',
-        method: 'post'
+        url: '/api/login',
+        method: 'delete'
     })
 }
 
 export function register() {
     return request({
-        url: '/login/register',
-        method: 'post'
+        url: '/api/login',
+        method: 'put'
     })
 }
 
 export function reset() {
     return request({
-        url: '/login/reset',
+        url: '/api/reset',
         method: 'post'
     })
 }
 
-export function getMenus() {
+export function feishu(ticket) {
     return request({
-        url: '/menus',
-        method: 'get'
+        url: '/api/feishu',
+        method: 'get',
+        params : {
+            ticket,
+        },
     })
 }
