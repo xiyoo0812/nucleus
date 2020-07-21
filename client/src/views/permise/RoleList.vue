@@ -166,7 +166,7 @@ export default {
         handleUpdate() {
             this.dialogVisible = false
             this.$refs.form.validate(valid => {
-                this.form.resources = this.$refs.resource.getCheckedKeys();
+                this.form.resources = this.$refs.resource.getCheckedKeys(true);
                 role_api.roleUpdate(this.form).then(res => {
                     if (res.code != 0){
                         utils.showFailed(this, res.msg);
@@ -181,7 +181,7 @@ export default {
             this.dialogVisible = false
             this.$refs.form.validate(valid => {
                 this.form.id = utils.newGuid()
-                this.form.resources = this.$refs.resource.getCheckedKeys(false);
+                this.form.resources = this.$refs.resource.getCheckedKeys(true);
                 role_api.roleAdd(this.form).then(res => {
                     if (res.code != 0){
                         utils.showFailed(this, res.msg);
