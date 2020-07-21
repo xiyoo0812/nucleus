@@ -18,10 +18,14 @@ export function logout() {
     })
 }
 
-export function register() {
+export function register(username, password) {
     return request({
         url: '/api/login',
-        method: 'put'
+        method: 'put',
+        params : {
+            username,
+            password,
+        },
     })
 }
 

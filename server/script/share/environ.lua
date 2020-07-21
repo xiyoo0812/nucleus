@@ -8,7 +8,7 @@ local ssplit        = string_ex.split
 
 local ENV = {
     -- mongo group
-    ENV_MONGO_ADDR         = "pm_admin@10.72.17.44",
+    ENV_MONGO_ADDR         = "pm_admin@10.100.0.19",
 }
 
 environ = {}

@@ -157,7 +157,7 @@ end
 function to_bson(ob)
 	-- Find out if ob if an array; string->value map; or general table
 	local onlyarray = true
-	local seen_n , high_n = { } , 0
+	local seen_n , high_n = { } , 1
 	local onlystring = true
 	for k , v in pairs ( ob ) do
 		local t_k = type ( k )
@@ -186,8 +186,8 @@ function to_bson(ob)
 	elseif onlyarray then
 		local r = { }
 
-		local low = 0
-		--if seen_n [ 0 ] then low = 0 end
+		local low = 1
+		--if seen_n [ 1 ] then low = 1 end
 		for i=low , high_n do
 			r [ i ] = pack ( i , seen_n [ i ] )
 		end

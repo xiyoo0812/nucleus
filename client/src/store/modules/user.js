@@ -2,12 +2,12 @@
 
 import { getToken, setToken, removeToken } from '@/utils/auth'
 
-function getUsername(){
+function getName(){
     var token = getToken()
     if (token) {
-        return token.username
+        return token.name
     }
-    return ''
+    return 'TEST'
 }
 
 function getAvatar(){
@@ -15,15 +15,14 @@ function getAvatar(){
     if (token) {
         return token.avatar
     }
-    return ''
+    return require("../../assets/img/img.jpg")
 }
 
 const user = {
     state:  {
-        name: getUsername(),
+        name: getName(),
         avatar: getAvatar(),
     },
-
     mutations: {
         SET_NAME: (state, name) => {
             state.name = name
@@ -36,9 +35,8 @@ const user = {
     actions: {
         // 用户名登录
         Login(context, data) {
-            data.avatar = require("../../assets/img/img.jpg")
             context.commit('SET_AVATAR', data.avatar)
-            context.commit('SET_NAME', data.username)
+            context.commit('SET_NAME', data.name)
             setToken(data)
         },
         // 登出

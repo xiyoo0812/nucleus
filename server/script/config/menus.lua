@@ -110,6 +110,25 @@ local MENUS = {
                 title = "在线日志"
             }
         }
+    },
+    {
+        index = 4,
+        icon = "el-icon-lx-service",
+        title = "权限管理",
+        subs =  {
+            {
+                index = "resource",
+                title = "资源管理"
+            },
+            {
+                index = "rolelist",
+                title = "角色管理"
+            },
+            {
+                index = "userlist",
+                title = "用户管理"
+            },
+        }
     }
 }
 

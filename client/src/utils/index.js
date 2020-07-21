@@ -124,3 +124,25 @@ export function showSuccess(view, msg) {
 export function showFailed(view, msg) {
     view.$notify({title: '失败', message: msg, type: 'success', duration: 2000 })
 }
+
+export function confirm(view, msg, func) {
+    view.$confirm(msg, '提示', {confirmButtonText: '确定',cancelButtonText: '取消',type: 'warning'}).then(func);
+}
+
+export function array_remove(array, value, key) {
+    for (let i = 0, len = array.length; i < len; i++) {
+        if(array[i][key] == value) {
+            array.splice(i, 1)
+            break;
+        }
+    }
+}
+
+export function array_update(array, value, key) {
+    for (let i = 0, len = array.length; i < len; i++) {
+        if(array[i][key] == value[key]) {
+            array.splice(i, 1, value)
+            break;
+        }
+    }
+}

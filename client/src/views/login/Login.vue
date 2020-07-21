@@ -17,19 +17,12 @@
                     <el-button type="primary" @click="login()">登录</el-button>
                 </div>
                 <el-row>
-                    <el-col :span="8">
-                        <div class="login-btn">
-                            <router-link :to="{ path: '/register' }">
-                                <el-button type="text">注册账号</el-button>
-                            </router-link>
-                        </div>
-                    </el-col>
-                    <el-col :span="8">
+                    <el-col :span="12">
                         <div class="login-btn">
                             <el-button @click="feishu()" type="text">飞书登录</el-button>
                         </div>
                     </el-col>
-                    <el-col :span="8">
+                    <el-col :span="12">
                         <div class="login-btn">
                             <router-link :to="{ path: '/reset' }">
                                 <el-button type="text"> 忘记密码?</el-button>
@@ -43,9 +36,9 @@
 </template>
 
 <script>
-import { getToken } from "../../utils/auth";
-import { login, feishu } from '../../api/login';
-import { showSuccess, showFailed, getBaseUrl } from '../../utils/index';
+import * as auth from "../../utils/auth";
+import * as utils from '../../utils/index';
+import * as login_api from '../../api/login';
 
 export default {
     name: 'login',
@@ -63,60 +56,57 @@ export default {
             },
         };
     },
+
     watch: {
-        feishu_success() {
-            console.log(this.feishu_success)
-             if (this.feishu_success) {
-            }
+        $route: {
+            handler: function(route) {
+                if (route.query.ticket) {
+                    login_api.feishu(route.query.ticket).then(res => {
+                        if (res.code == 0){
+                            utils.showSuccess(this, '登录成功')
+                            this.$store.dispatch("Login", res.user)
+                            this.$router.push({ path: this.$route.query.redirect || '/' })
+                        } else if (res.code == -1){
+                            utils.showFailed(this, "飞书登录验证失败")
+                        }
+                    });
+                }
+            },
+            immediate: true
         }
     },
     mounted() {
-        this.$router.onReady(() => {
-            var tokenData = getToken()
-            if (tokenData) {
-                this.$router.push({ path: this.$route.query.redirect || '/' })
-                return
-            }
-            if (this.$route.query.ticket) {
-                this.$nextTick(() => {
-                    feishu(this.$route.query.ticket).then(res => {
-                        if (res.code == 0){
-                            showSuccess(this, '登录成功')
-                            this.$store.dispatch("Login", this.form)
-                            this.$router.push({ path: this.$route.query.redirect || '/' })
-                        } else if (res.code == -1){
-                            showFailed(this, "飞书登录验证失败")
-                        }
-                    });
-                })
-            }
-        })
+        var tokenData = auth.getToken()
+        if (tokenData) {
+            this.$router.push({ path: this.$route.query.redirect || '/' })
+            return
+        }
     },
     methods: {
         login() {
             this.$refs.login.validate(valid => {
                 if (valid) {
-                    login(this.form.username, this.form.password).then(res => {
+                    login_api.login(this.form.username, this.form.password).then(res => {
                         if (res.code == 0){
-                            showSuccess(this, '登录成功')
+                            utils.showSuccess(this, '登录成功')
                             this.$store.dispatch("Login", this.form)
                             this.$router.push({ path: this.$route.query.redirect || '/' })
                         } else if (res.code == -1){
-                            showFailed(this, "数据库错误，登录失败，请联系管理员")
+                            utils.showFailed(this, "数据库错误，登录失败，请联系管理员")
                         } else if (res.code == -2){
-                            showFailed(this, "账号不存在")
+                            utils.showFailed(this, "账号不存在")
                         } else if (res.code == -3){
-                            showFailed(this, "密码错误")
+                            utils.showFailed(this, "密码错误")
                         }
                     });
                 } else {
-                    showFailed(this, '请输入账号和密码')
+                    utils.showFailed(this, '请输入账号和密码')
                     return false
                 }
             })
         },
         feishu() {
-            var url = getBaseUrl(window.location.href)
+            var url = utils.getBaseUrl(window.location.href)
             window.location.href = "http://ex.idreamsky.com:40008/login?redirect_url=" + url + "/login"
         }
     },

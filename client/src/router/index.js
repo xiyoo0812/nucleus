@@ -22,6 +22,21 @@ const router = new Router({
                     meta: { title: '系统首页' }
                 },
                 {
+                    path: '/resource',
+                    component: () => import(/* webpackChunkName: "404" */ '../views/permise/Resource.vue'),
+                    meta: { title: '资源管理' }
+                },
+                {
+                    path: '/rolelist',
+                    component: () => import(/* webpackChunkName: "404" */ '../views/permise/RoleList.vue'),
+                    meta: { title: '角色管理' }
+                },
+                {
+                    path: '/userlist',
+                    component: () => import(/* webpackChunkName: "404" */ '../views/permise/UserList.vue'),
+                    meta: { title: '用户管理' }
+                },
+                {
                     path: '/404',
                     component: () => import(/* webpackChunkName: "404" */ '../views/404.vue'),
                     meta: { title: '404' }
@@ -35,11 +50,13 @@ const router = new Router({
         },
         {
             path: '/login',
-            component: () => import(/* webpackChunkName: "login" */ '../views/login/Login.vue')
+            component: () => import(/* webpackChunkName: "login" */ '../views/login/Login.vue'),
+            meta: { requireAuth: false}
         },
         {
-            path: '/register',
-            component: () => import(/* webpackChunkName: "login" */ '../views/login/Register.vue')
+            path: '/feishu',
+            component: () => import(/* webpackChunkName: "feishu" */ '../views/login/Feishu.vue'),
+            meta: { requireAuth: false}
         },
         {
             path: '*',
@@ -49,7 +66,7 @@ const router = new Router({
 })
 
 router.beforeEach((route, redirect, next) => {
-    if (route.path == '/register') {
+    if (route.meta.requireAuth == false) {
         next();
         return
     }
@@ -63,6 +80,7 @@ router.beforeEach((route, redirect, next) => {
             return
         }
     }
+    
     next();
 })
 
