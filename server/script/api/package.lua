@@ -22,20 +22,6 @@ local package_doers = {
         end
         return { package = 0, data = records, total = #records }
     end,
-    POST = function(req, args)
-        log_debug("/package POST params: %s", serialize(args))
-        local name = args.name
-        local db_project = mongod:find_one("packages", {name = name})
-        if not db_project then
-            return {package = -1, msg = "package not exist"}
-        end
-        db_project.packages = args.packages
-        local ok, err = mongod:update("packages", db_project, { name = name })
-        if not ok then
-            return {package = -1, msg = sformat("db update failed: %s", err)}
-        end
-        return { package = 0, data = db_project.packages }
-    end,
     DELETE = function(req, args)
         log_debug("/package DELETE params: %s", serialize(args))
         local packages = args.packages

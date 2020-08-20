@@ -1,4 +1,8 @@
 -- api/user.lua
+local json = require "cjson.safe"
+json.encode_sparse_array(true)
+
+local jdecode   = json.decode
 local tinsert   = table.insert
 local sformat   = string.format
 local log_debug = logger.debug
@@ -21,17 +25,16 @@ local user_doers = {
     end,
     POST = function(req, args)
         log_debug("/user POST params: %s", serialize(args))
-        local en_name = args.en_name
-        local db_user = mongod:find_one("users", {en_name = en_name})
-        if not db_user then
+        local user = jdecode(args.user)
+        local record = mongod:find_one("users", {en_name = user.en_name})
+        if not record then
             return {code = -1, msg = "user not exist"}
         end
-        db_user.roles = args.roles
-        local ok, err = mongod:update("users", db_user, {en_name = en_name})
+        local ok, err = mongod:update("users", user, {en_name = user.en_name})
         if not ok then
             return {code = -1, msg = sformat("db update failed: %s", err)}
         end
-        return { code = 0, data = db_user.roles }
+        return { code = 0, data = user }
     end,
     DELETE = function(req, args)
         log_debug("/user DELETE params: %s", serialize(args))

@@ -22,7 +22,9 @@ export function roleUpdate(role) {
     return request({
         url: '/api/role',
         method: 'post',
-        data: role
+        data: {
+            role
+        }
     })
 }
 

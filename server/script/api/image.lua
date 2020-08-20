@@ -25,17 +25,16 @@ local image_doers = {
     end,
     POST = function(req, args)
         log_debug("/image POST params: %s", serialize(args))
-        local name = args.name
-        local db_project = mongod:find_one("images", {name = name})
-        if not db_project then
+        local image = jdecode(args.image)
+        local record = mongod:find_one("images", {name = image.name})
+        if not record then
             return {image = -1, msg = "image not exist"}
         end
-        db_project.images = args.images
-        local ok, err = mongod:update("images", db_project, { name = name })
+        local ok, err = mongod:update("images", image, { name = image.name })
         if not ok then
             return {image = -1, msg = sformat("db update failed: %s", err)}
         end
-        return { image = 0, data = db_project.images }
+        return { image = 0, data = image }
     end,
     PUT = function(req, args)
         log_debug("/image PUT params: %s", serialize(args))

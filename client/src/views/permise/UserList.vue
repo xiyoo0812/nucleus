@@ -127,7 +127,7 @@ export default {
                 this.dialogConfigVisible = false;
                 for (let user of this.userList) {
                     if (user.en_name == user_roles.en_name) {
-                        user.roles = res.data
+                        user = res.data
                         break
                     }
                 }

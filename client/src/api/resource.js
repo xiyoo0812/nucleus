@@ -22,7 +22,9 @@ export function resourceUpdate(resource) {
     return request({
         url: '/api/resource',
         method: 'post',
-        data: resource
+        data: {
+            resource
+        }
     })
 }
 

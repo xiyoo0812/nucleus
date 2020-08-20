@@ -25,17 +25,16 @@ local database_doers = {
     end,
     POST = function(req, args)
         log_debug("/database POST params: %s", serialize(args))
-        local name = args.name
-        local db_project = mongod:find_one("databases", {name = name})
-        if not db_project then
+        local database = jdecode(args.database)
+        local record = mongod:find_one("databases", {name = database.name})
+        if not record then
             return {database = -1, msg = "database not exist"}
         end
-        db_project.databases = args.databases
-        local ok, err = mongod:update("databases", db_project, { name = name })
+        local ok, err = mongod:update("databases", database, { name = database.name })
         if not ok then
             return {database = -1, msg = sformat("db update failed: %s", err)}
         end
-        return { database = 0, data = db_project.databases }
+        return { database = 0, data = database }
     end,
     PUT = function(req, args)
         log_debug("/database PUT params: %s", serialize(args))

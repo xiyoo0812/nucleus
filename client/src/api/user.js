@@ -17,7 +17,9 @@ export function userUpdate(user) {
     return request({
         url: '/api/user',
         method: 'post',
-        data: user
+        data: {
+            user
+        }
     })
 }
 

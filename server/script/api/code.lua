@@ -25,17 +25,16 @@ local code_doers = {
     end,
     POST = function(req, args)
         log_debug("/code POST params: %s", serialize(args))
-        local name = args.name
-        local db_project = mongod:find_one("codes", {name = name})
-        if not db_project then
+        local code = jdecode(args.code)
+        local record = mongod:find_one("codes", {name = code.name})
+        if not record then
             return {code = -1, msg = "code not exist"}
         end
-        db_project.codes = args.codes
-        local ok, err = mongod:update("codes", db_project, { name = name })
+        local ok, err = mongod:update("codes", code, { name = code.name })
         if not ok then
             return {code = -1, msg = sformat("db update failed: %s", err)}
         end
-        return { code = 0, data = db_project.codes }
+        return { code = 0, data = code }
     end,
     PUT = function(req, args)
         log_debug("/code PUT params: %s", serialize(args))

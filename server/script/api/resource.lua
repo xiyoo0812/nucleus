@@ -25,9 +25,9 @@ local resource_doers = {
     end,
     POST = function(req, args)
         log_debug("/resource POST params: %s", serialize(args))
-        local resource = args
-        local db_resource = mongod:find_one("resources", {id = resource.id})
-        if not db_resource then
+        local resource = jdecode(args.resource)
+        local record = mongod:find_one("resources", {id = resource.id})
+        if not record then
             return {code = -1, msg = "resource not exist"}
         end
         local ok, err = mongod:update("resources", resource, {id = resource.id})

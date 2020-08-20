@@ -25,17 +25,16 @@ local host_doers = {
     end,
     POST = function(req, args)
         log_debug("/host POST params: %s", serialize(args))
-        local name = args.name
-        local db_project = mongod:find_one("hosts", {name = name})
-        if not db_project then
+        local host = jdecode(args.host)
+        local record = mongod:find_one("hosts", {name = host.name})
+        if not record then
             return {host = -1, msg = "host not exist"}
         end
-        db_project.hosts = args.hosts
-        local ok, err = mongod:update("hosts", db_project, { name = name })
+        local ok, err = mongod:update("hosts", host, { name = host.name })
         if not ok then
             return {host = -1, msg = sformat("db update failed: %s", err)}
         end
-        return { host = 0, data = db_project.hosts }
+        return { host = 0, data = host }
     end,
     PUT = function(req, args)
         log_debug("/host PUT params: %s", serialize(args))

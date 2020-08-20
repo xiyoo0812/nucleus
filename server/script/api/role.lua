@@ -25,9 +25,9 @@ local role_doers = {
     end,
     POST = function(req, args)
         log_debug("/role POST params: %s", serialize(args))
-        local role = args
-        local db_role = mongod:find_one("roles", {id = role.id})
-        if not db_role then
+        local role = jdecode(args.role)
+        local record = mongod:find_one("roles", {id = role.id})
+        if not record then
             return {code = -1, msg = "role not exist"}
         end
         local ok, err = mongod:update("roles", role, {id = role.id})

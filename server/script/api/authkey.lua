@@ -25,17 +25,16 @@ local authkey_doers = {
     end,
     POST = function(req, args)
         log_debug("/authkey POST params: %s", serialize(args))
-        local name = args.name
-        local db_project = mongod:find_one("authkeys", {name = name})
-        if not db_project then
+        local authkey = jdecode(args.authkey)
+        local record = mongod:find_one("authkeys", {name = authkey.name})
+        if not record then
             return {authkey = -1, msg = "authkey not exist"}
         end
-        db_project.authkeys = args.authkeys
-        local ok, err = mongod:update("authkeys", db_project, { name = name })
+        local ok, err = mongod:update("authkeys", authkey, { name = authkey.name })
         if not ok then
             return {authkey = -1, msg = sformat("db update failed: %s", err)}
         end
-        return { authkey = 0, data = db_project.authkeys }
+        return { authkey = 0, data = authkey }
     end,
     PUT = function(req, args)
         log_debug("/authkey PUT params: %s", serialize(args))

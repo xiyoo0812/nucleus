@@ -2,6 +2,7 @@
 local json = require "cjson.safe"
 json.encode_sparse_array(true)
 
+local jdecode   = json.decode
 local tinsert   = table.insert
 local sformat   = string.format
 local log_debug = logger.debug
@@ -24,17 +25,16 @@ local task_doers = {
     end,
     POST = function(req, args)
         log_debug("/task POST params: %s", serialize(args))
-        local name = args.name
-        local db_project = mongod:find_one("tasks", {name = name})
-        if not db_project then
+        local task = jdecode(args.task)
+        local record = mongod:find_one("tasks", {name = task.name})
+        if not record then
             return {task = -1, msg = "task not exist"}
         end
-        db_project.tasks = args.tasks
-        local ok, err = mongod:update("tasks", db_project, { name = name })
+        local ok, err = mongod:update("tasks", task, { name = task.name })
         if not ok then
             return {task = -1, msg = sformat("db update failed: %s", err)}
         end
-        return { task = 0, data = db_project.tasks }
+        return { task = 0, data = task }
     end,
     DELETE = function(req, args)
         log_debug("/task DELETE params: %s", serialize(args))
