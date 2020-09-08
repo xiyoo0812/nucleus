@@ -5,7 +5,7 @@ stds.nucleus = {
         "ngx",
         "tonubmer", "lfs",
         "string_ex", "table_ex", "math_ex", "util", "coroutine",
-        "nucleus", "environ", "signal", "http", "guid", "luabt", "service", "logger", "utility", "data_pack",
+        "nucleus", "environ", "signal", "http", "guid", "luabt", "service", "logger", "utility", "data_pack", "shell",
         "import", "class", "interface", "property", "singleton", "super", "implemented", "classof", "is_class", "is_subclass", "instanceof", "conv_class",
     }
 }

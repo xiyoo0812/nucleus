@@ -10,6 +10,7 @@ nucleus = {}
 require ("common.base")
 --share
 require ("share.environ")
+require ("share.shell")
 require ("share.mongod")
 require ("share.utility")
 require ("share.data_pack")
