@@ -10,13 +10,13 @@ local serialize = logger.serialize
 local packhost  = data_pack.host
 
 local apidoer   = utility.apidoer
-local mongod    = nucleus.mongod
+local admin_db  = nucleus.admin_db
 
 --定义接口
 local host_doers = {
     GET = function(req, args)
         log_debug("/host GET params: %s", serialize(args))
-        local res = mongod:find("hosts", {})
+        local res = admin_db:find("hosts", {})
         local records = {}
         for k, v in pairs(res) do
             tinsert(records, packhost(v))
@@ -26,11 +26,11 @@ local host_doers = {
     POST = function(req, args)
         log_debug("/host POST params: %s", serialize(args))
         local host = jdecode(args.host)
-        local record = mongod:find_one("hosts", {name = host.name})
+        local record = admin_db:find_one("hosts", {name = host.name})
         if not record then
             return {host = -1, msg = "host not exist"}
         end
-        local ok, err = mongod:update("hosts", host, { name = host.name })
+        local ok, err = admin_db:update("hosts", host, { name = host.name })
         if not ok then
             return {host = -1, msg = sformat("db update failed: %s", err)}
         end
@@ -39,11 +39,11 @@ local host_doers = {
     PUT = function(req, args)
         log_debug("/host PUT params: %s", serialize(args))
         local host = jdecode(args.host)
-        local res = mongod:find_one("hosts", { name = host.name })
+        local res = admin_db:find_one("hosts", { name = host.name })
         if res then
             return { host = -1, msg = "name aready exist!" }
         end
-        local ok, err = mongod:insert("hosts", { host })
+        local ok, err = admin_db:insert("hosts", { host })
         if not ok then
             return { host = -1, msg = sformat("db insert failed:%s", err)}
         end
@@ -53,13 +53,13 @@ local host_doers = {
         log_debug("/host DELETE params: %s", serialize(args))
         local hosts = args.hosts
         if type(hosts) == "string" then
-            local ok, err = mongod:delete("hosts", { name = hosts })
+            local ok, err = admin_db:delete("hosts", { name = hosts })
             if not ok then
                 return {host = -1, msg = sformat("db delete failed: %s", err)}
             end
         else
             for _, cname in pairs(hosts) do
-                local ok, err = mongod:delete("hosts", { name = cname })
+                local ok, err = admin_db:delete("hosts", { name = cname })
                 if not ok then
                     return {host = -1, msg = sformat("db delete failed: %s", err)}
                 end

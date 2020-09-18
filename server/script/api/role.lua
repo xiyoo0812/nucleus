@@ -9,14 +9,14 @@ local log_debug = logger.debug
 local serialize = logger.serialize
 local packrole  = data_pack.role
 
-local mongod    = nucleus.mongod
+local admin_db  = nucleus.admin_db
 local apidoer   = utility.apidoer
 
 --定义接口
 local role_doers = {
     GET = function(req, args)
         log_debug("/role GET params: %s", serialize(args))
-        local res = mongod:find("roles", {})
+        local res = admin_db:find("roles", {})
         local records = {}
         for _, record in pairs(res) do
             tinsert(records, packrole(record))
@@ -26,11 +26,11 @@ local role_doers = {
     POST = function(req, args)
         log_debug("/role POST params: %s", serialize(args))
         local role = jdecode(args.role)
-        local record = mongod:find_one("roles", {id = role.id})
+        local record = admin_db:find_one("roles", {id = role.id})
         if not record then
             return {code = -1, msg = "role not exist"}
         end
-        local ok, err = mongod:update("roles", role, {id = role.id})
+        local ok, err = admin_db:update("roles", role, {id = role.id})
         if not ok then
             return {code = -1, msg = sformat("db update failed:%s", err)}
         end
@@ -39,11 +39,11 @@ local role_doers = {
     PUT = function(req, args)
         log_debug("/role PUT params: %s", serialize(args))
         local role = jdecode(args.role)
-        local res = mongod:find_one("roles", {["$or"] = {{name = role.name}, {en_name = role.en_name}}})
+        local res = admin_db:find_one("roles", {["$or"] = {{name = role.name}, {en_name = role.en_name}}})
         if res then
             return { code = -1, msg = "name aready exist!" }
         end
-        local ok, err = mongod:insert("roles", { role })
+        local ok, err = admin_db:insert("roles", { role })
         if not ok then
             return { code = -1, msg = sformat("db insert failed:%s", err)}
         end
@@ -53,13 +53,13 @@ local role_doers = {
         log_debug("/role DELETE params: %s", serialize(args))
         local roles = args.roles
         if type(roles) == "string" then
-            local ok, err = mongod:delete("roles", {id = roles })
+            local ok, err = admin_db:delete("roles", {id = roles })
             if not ok then
                 return {code = -1, msg = sformat("db delete failed: %s", err)}
             end
         else
             for _, id in pairs(roles) do
-                local ok, err = mongod:delete("roles", { id = id })
+                local ok, err = admin_db:delete("roles", { id = id })
                 if not ok then
                     return {code = -1, msg = sformat("db delete failed: %s", err)}
                 end

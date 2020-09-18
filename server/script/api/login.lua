@@ -5,13 +5,13 @@ local log_debug = logger.debug
 local serialize = logger.serialize
 local apidoer   = utility.apidoer
 
-local mongod    = nucleus.mongod
+local admin_db  = nucleus.admin_db
 
 --定义接口
 local login_doers = {
     GET = function(req, args)
         log_debug("/login GET params: %s", serialize(args))
-        local res = mongod:find_one("users", args)
+        local res = admin_db:find_one("users", args)
         if not res then
             log_err("/login %s mongo query failed", args.username)
             return { code = -1, msg = "mongo query failed" }
@@ -24,14 +24,14 @@ local login_doers = {
     end,
     PUT = function(req, args)
         log_debug("/login PUT params: %s", serialize(args))
-        local res = mongod:find_one("users", {username=args.username})
+        local res = admin_db:find_one("users", {username=args.username})
         if res then
             return {code = -2}
         end
         args.type = "costom"
-        res = mongod:insert("users", {args})
+        res = admin_db:insert("users", {args})
         if not res then
-            log_err("/login PUT mongod:insert failed")
+            log_err("/login PUT admin_db:insert failed")
             return { code = -1 }
         end
 

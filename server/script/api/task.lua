@@ -10,13 +10,13 @@ local serialize = logger.serialize
 local packtask = data_pack.task
 
 local apidoer   = utility.apidoer
-local mongod    = nucleus.mongod
+local admin_db  = nucleus.admin_db
 
 --定义接口
 local task_doers = {
     GET = function(req, args)
         log_debug("/task GET params: %s", serialize(args))
-        local res = mongod:find("tasks", {})
+        local res = admin_db:find("tasks", {})
         local records = {}
         for k, v in pairs(res) do
             tinsert(records, packtask(v))
@@ -26,11 +26,11 @@ local task_doers = {
     POST = function(req, args)
         log_debug("/task POST params: %s", serialize(args))
         local task = jdecode(args.task)
-        local record = mongod:find_one("tasks", {name = task.name})
+        local record = admin_db:find_one("tasks", {name = task.name})
         if not record then
             return {task = -1, msg = "task not exist"}
         end
-        local ok, err = mongod:update("tasks", task, { name = task.name })
+        local ok, err = admin_db:update("tasks", task, { name = task.name })
         if not ok then
             return {task = -1, msg = sformat("db update failed: %s", err)}
         end
@@ -40,13 +40,13 @@ local task_doers = {
         log_debug("/task DELETE params: %s", serialize(args))
         local tasks = args.tasks
         if type(tasks) == "string" then
-            local ok, err = mongod:delete("tasks", { name = tasks })
+            local ok, err = admin_db:delete("tasks", { name = tasks })
             if not ok then
                 return {task = -1, msg = sformat("db delete failed: %s", err)}
             end
         else
             for _, cname in pairs(tasks) do
-                local ok, err = mongod:delete("tasks", { name = cname })
+                local ok, err = admin_db:delete("tasks", { name = cname })
                 if not ok then
                     return {task = -1, msg = sformat("db delete failed: %s", err)}
                 end

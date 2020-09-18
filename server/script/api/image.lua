@@ -10,13 +10,13 @@ local serialize = logger.serialize
 local packimage = data_pack.image
 
 local apidoer   = utility.apidoer
-local mongod    = nucleus.mongod
+local admin_db  = nucleus.admin_db
 
 --定义接口
 local image_doers = {
     GET = function(req, args)
         log_debug("/image GET params: %s", serialize(args))
-        local res = mongod:find("images", {})
+        local res = admin_db:find("images", {})
         local records = {}
         for k, v in pairs(res) do
             tinsert(records, packimage(v))
@@ -26,11 +26,11 @@ local image_doers = {
     POST = function(req, args)
         log_debug("/image POST params: %s", serialize(args))
         local image = jdecode(args.image)
-        local record = mongod:find_one("images", {name = image.name})
+        local record = admin_db:find_one("images", {name = image.name})
         if not record then
             return {image = -1, msg = "image not exist"}
         end
-        local ok, err = mongod:update("images", image, { name = image.name })
+        local ok, err = admin_db:update("images", image, { name = image.name })
         if not ok then
             return {image = -1, msg = sformat("db update failed: %s", err)}
         end
@@ -39,11 +39,11 @@ local image_doers = {
     PUT = function(req, args)
         log_debug("/image PUT params: %s", serialize(args))
         local image = jdecode(args.image)
-        local res = mongod:find_one("images", { name = image.name })
+        local res = admin_db:find_one("images", { name = image.name })
         if res then
             return { image = -1, msg = "name aready exist!" }
         end
-        local ok, err = mongod:insert("images", { image })
+        local ok, err = admin_db:insert("images", { image })
         if not ok then
             return { image = -1, msg = sformat("db insert failed:%s", err)}
         end
@@ -53,13 +53,13 @@ local image_doers = {
         log_debug("/image DELETE params: %s", serialize(args))
         local images = args.images
         if type(images) == "string" then
-            local ok, err = mongod:delete("images", { name = images })
+            local ok, err = admin_db:delete("images", { name = images })
             if not ok then
                 return {image = -1, msg = sformat("db delete failed: %s", err)}
             end
         else
             for _, cname in pairs(images) do
-                local ok, err = mongod:delete("images", { name = cname })
+                local ok, err = admin_db:delete("images", { name = cname })
                 if not ok then
                     return {image = -1, msg = sformat("db delete failed: %s", err)}
                 end

@@ -10,13 +10,13 @@ local serialize = logger.serialize
 local packcode  = data_pack.code
 
 local apidoer   = utility.apidoer
-local mongod    = nucleus.mongod
+local admin_db  = nucleus.admin_db
 
 --定义接口
 local code_doers = {
     GET = function(req, args)
         log_debug("/code GET params: %s", serialize(args))
-        local res = mongod:find("codes", {})
+        local res = admin_db:find("codes", {})
         local records = {}
         for k, v in pairs(res) do
             tinsert(records, packcode(v))
@@ -26,11 +26,11 @@ local code_doers = {
     POST = function(req, args)
         log_debug("/code POST params: %s", serialize(args))
         local code = jdecode(args.code)
-        local record = mongod:find_one("codes", {name = code.name})
+        local record = admin_db:find_one("codes", {name = code.name})
         if not record then
             return {code = -1, msg = "code not exist"}
         end
-        local ok, err = mongod:update("codes", code, { name = code.name })
+        local ok, err = admin_db:update("codes", code, { name = code.name })
         if not ok then
             return {code = -1, msg = sformat("db update failed: %s", err)}
         end
@@ -39,11 +39,11 @@ local code_doers = {
     PUT = function(req, args)
         log_debug("/code PUT params: %s", serialize(args))
         local code = jdecode(args.code)
-        local res = mongod:find_one("codes", { name = code.name })
+        local res = admin_db:find_one("codes", { name = code.name })
         if res then
             return { code = -1, msg = "name aready exist!" }
         end
-        local ok, err = mongod:insert("codes", { code })
+        local ok, err = admin_db:insert("codes", { code })
         if not ok then
             return { code = -1, msg = sformat("db insert failed:%s", err)}
         end
@@ -53,13 +53,13 @@ local code_doers = {
         log_debug("/code DELETE params: %s", serialize(args))
         local codes = args.codes
         if type(codes) == "string" then
-            local ok, err = mongod:delete("codes", { name = codes })
+            local ok, err = admin_db:delete("codes", { name = codes })
             if not ok then
                 return {code = -1, msg = sformat("db delete failed: %s", err)}
             end
         else
             for _, cname in pairs(codes) do
-                local ok, err = mongod:delete("codes", { name = cname })
+                local ok, err = admin_db:delete("codes", { name = cname })
                 if not ok then
                     return {code = -1, msg = sformat("db delete failed: %s", err)}
                 end

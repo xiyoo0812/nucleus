@@ -10,13 +10,13 @@ local serialize = logger.serialize
 local packikey  = data_pack.authkey
 
 local apidoer   = utility.apidoer
-local mongod    = nucleus.mongod
+local admin_db  = nucleus.admin_db
 
 --定义接口
 local authkey_doers = {
     GET = function(req, args)
         log_debug("/authkey GET params: %s", serialize(args))
-        local res = mongod:find("authkeys", {})
+        local res = admin_db:find("authkeys", {})
         local records = {}
         for k, v in pairs(res) do
             tinsert(records, packikey(v))
@@ -26,11 +26,11 @@ local authkey_doers = {
     POST = function(req, args)
         log_debug("/authkey POST params: %s", serialize(args))
         local authkey = jdecode(args.authkey)
-        local record = mongod:find_one("authkeys", {name = authkey.name})
+        local record = admin_db:find_one("authkeys", {name = authkey.name})
         if not record then
             return {authkey = -1, msg = "authkey not exist"}
         end
-        local ok, err = mongod:update("authkeys", authkey, { name = authkey.name })
+        local ok, err = admin_db:update("authkeys", authkey, { name = authkey.name })
         if not ok then
             return {authkey = -1, msg = sformat("db update failed: %s", err)}
         end
@@ -39,11 +39,11 @@ local authkey_doers = {
     PUT = function(req, args)
         log_debug("/authkey PUT params: %s", serialize(args))
         local authkey = jdecode(args.authkey)
-        local res = mongod:find_one("authkeys", { name = authkey.name })
+        local res = admin_db:find_one("authkeys", { name = authkey.name })
         if res then
             return { authkey = -1, msg = "name aready exist!" }
         end
-        local ok, err = mongod:insert("authkeys", { authkey })
+        local ok, err = admin_db:insert("authkeys", { authkey })
         if not ok then
             return { authkey = -1, msg = sformat("db insert failed:%s", err)}
         end
@@ -53,13 +53,13 @@ local authkey_doers = {
         log_debug("/authkey DELETE params: %s", serialize(args))
         local authkeys = args.authkeys
         if type(authkeys) == "string" then
-            local ok, err = mongod:delete("authkeys", { name = authkeys })
+            local ok, err = admin_db:delete("authkeys", { name = authkeys })
             if not ok then
                 return {authkey = -1, msg = sformat("db delete failed: %s", err)}
             end
         else
             for _, cname in pairs(authkeys) do
-                local ok, err = mongod:delete("authkeys", { name = cname })
+                local ok, err = admin_db:delete("authkeys", { name = cname })
                 if not ok then
                     return {authkey = -1, msg = sformat("db delete failed: %s", err)}
                 end

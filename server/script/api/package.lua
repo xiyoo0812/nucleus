@@ -9,13 +9,13 @@ local serialize = logger.serialize
 local packpack  = data_pack.package
 
 local apidoer   = utility.apidoer
-local mongod    = nucleus.mongod
+local admin_db  = nucleus.admin_db
 
 --定义接口
 local package_doers = {
     GET = function(req, args)
         log_debug("/package GET params: %s", serialize(args))
-        local res = mongod:find("packages", {})
+        local res = admin_db:find("packages", {})
         local records = {}
         for k, v in pairs(res) do
             tinsert(records, packpack(v))
@@ -26,13 +26,13 @@ local package_doers = {
         log_debug("/package DELETE params: %s", serialize(args))
         local packages = args.packages
         if type(packages) == "string" then
-            local ok, err = mongod:delete("packages", { name = packages })
+            local ok, err = admin_db:delete("packages", { name = packages })
             if not ok then
                 return {package = -1, msg = sformat("db delete failed: %s", err)}
             end
         else
             for _, cname in pairs(packages) do
-                local ok, err = mongod:delete("packages", { name = cname })
+                local ok, err = admin_db:delete("packages", { name = cname })
                 if not ok then
                     return {package = -1, msg = sformat("db delete failed: %s", err)}
                 end

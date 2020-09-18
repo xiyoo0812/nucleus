@@ -10,46 +10,42 @@ local serialize = logger.serialize
 local packuser  = data_pack.user
 
 local apidoer   = utility.apidoer
-local mongod    = nucleus.mongod
+local proj_db   = nucleus.proj_db
 
 --定义接口
 local user_doers = {
-    GET = function(req, args)
-        log_debug("/user GET params: %s", serialize(args))
-        local res = mongod:find("users", {})
+    GET = function(req, params)
+        log_debug("/user GET params: %s", serialize(params))
+        local res = proj_db:find("users", {})
         local records = {}
         for k, v in pairs(res) do
             tinsert(records, packuser(v))
         end
         return { code = 0, data = records, total = #records }
     end,
-    POST = function(req, args)
-        log_debug("/user POST params: %s", serialize(args))
-        local user = jdecode(args.user)
-        local record = mongod:find_one("users", {en_name = user.en_name})
+    POST = function(req, params)
+        log_debug("/user POST params: %s", serialize(params))
+        local user = jdecode(params.args)
+        local record = proj_db:find_one("users", {en_name = user.en_name})
         if not record then
             return {code = -1, msg = "user not exist"}
         end
-        local ok, err = mongod:update("users", user, {en_name = user.en_name})
+        local ok, err = proj_db:update("users", user, {en_name = user.en_name})
         if not ok then
             return {code = -1, msg = sformat("db update failed: %s", err)}
         end
         return { code = 0, data = user }
     end,
-    DELETE = function(req, args)
-        log_debug("/user DELETE params: %s", serialize(args))
-        local users = args.users
+    DELETE = function(req, params)
+        log_debug("/user DELETE params: %s", serialize(params))
+        local users = params.args
         if type(users) == "string" then
-            local ok, err = mongod:delete("users", {en_name = users })
+            users = { users }
+        end
+        for _, en_name in pairs(users) do
+            local ok, err = proj_db:delete("users", {en_name = en_name })
             if not ok then
                 return {code = -1, msg = sformat("db delete failed: %s", err)}
-            end
-        else
-            for _, en_name in pairs(users) do
-                local ok, err = mongod:delete("users", {en_name = en_name })
-                if not ok then
-                    return {code = -1, msg = sformat("db delete failed: %s", err)}
-                end
             end
         end
         return { code = 0 }

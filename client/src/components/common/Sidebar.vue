@@ -33,7 +33,8 @@
 
 <script>
     import bus from './bus'
-    import { getMenus } from '../../api/menus'
+    import * as driver from '../../api/driver'
+    import * as utils from '../../utils/index';
     export default {
         data() {
             return {
@@ -55,8 +56,10 @@
         },
         methods: {
             getData() {
-                getMenus().then(res => {
-                    this.menus = res.menus
+                driver.load("menus").then(res => {
+                    utils.showNetRes(this, res, () => {
+                        this.menus = res.menus
+                    })
                 });
             },
         }

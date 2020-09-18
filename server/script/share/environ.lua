@@ -6,13 +6,9 @@ local log_debug     = logger.debug
 local tunpack       = table.unpack
 local ssplit        = string_ex.split
 
-local ENV = {
-    -- mongo group
-    ENV_MONGO_ADDR         = "pm_admin@10.100.0.19",
-}
-
 environ = {}
 
+local ENV = {}
 --custom_env: --env=env/router
 function environ.init(env_file)
     if env_file then

@@ -12,18 +12,16 @@ function data_pack.user(data)
         empCode    = data.empCode or "",
         dept       = data.dept or "",
         type       = data.type or 0,
-        roles      = data.roles or {},
         remarks    = data.remarks or "",
     }
 end
 
-function data_pack.role(data)
+function data_pack.project(data)
     return {
         id          = data.id,
-        project     = data.project or 0,
         name        = data.name or "",
-        en_name     = data.en_name or "",
-        resources   = data.resources or {},
+        admin       = data.admin or "",
+        desc        = data.desc or "",
     }
 end
 

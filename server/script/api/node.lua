@@ -10,13 +10,13 @@ local serialize = logger.serialize
 local packnode  = data_pack.node
 
 local apidoer   = utility.apidoer
-local mongod    = nucleus.mongod
+local admin_db  = nucleus.admin_db
 
 --定义接口
 local node_doers = {
     GET = function(req, args)
         log_debug("/node GET params: %s", serialize(args))
-        local res = mongod:find("nodes", {})
+        local res = admin_db:find("nodes", {})
         local records = {}
         for k, v in pairs(res) do
             tinsert(records, packnode(v))
@@ -26,11 +26,11 @@ local node_doers = {
     POST = function(req, args)
         log_debug("/node POST params: %s", serialize(args))
         local node = jdecode(args.node)
-        local record = mongod:find_one("nodes", {name = node.name})
+        local record = admin_db:find_one("nodes", {name = node.name})
         if not record then
             return {node = -1, msg = "node not exist"}
         end
-        local ok, err = mongod:update("nodes", node, { name = node.name })
+        local ok, err = admin_db:update("nodes", node, { name = node.name })
         if not ok then
             return {node = -1, msg = sformat("db update failed: %s", err)}
         end
@@ -39,11 +39,11 @@ local node_doers = {
     PUT = function(req, args)
         log_debug("/node PUT params: %s", serialize(args))
         local node = jdecode(args.node)
-        local res = mongod:find_one("nodes", { name = node.name })
+        local res = admin_db:find_one("nodes", { name = node.name })
         if res then
             return { node = -1, msg = "name aready exist!" }
         end
-        local ok, err = mongod:insert("nodes", { node })
+        local ok, err = admin_db:insert("nodes", { node })
         if not ok then
             return { node = -1, msg = sformat("db insert failed:%s", err)}
         end
@@ -53,13 +53,13 @@ local node_doers = {
         log_debug("/node DELETE params: %s", serialize(args))
         local nodes = args.nodes
         if type(nodes) == "string" then
-            local ok, err = mongod:delete("nodes", { name = nodes })
+            local ok, err = admin_db:delete("nodes", { name = nodes })
             if not ok then
                 return {node = -1, msg = sformat("db delete failed: %s", err)}
             end
         else
             for _, cname in pairs(nodes) do
-                local ok, err = mongod:delete("nodes", { name = cname })
+                local ok, err = admin_db:delete("nodes", { name = cname })
                 if not ok then
                     return {node = -1, msg = sformat("db delete failed: %s", err)}
                 end

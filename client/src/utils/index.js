@@ -125,23 +125,34 @@ export function showFailed(view, msg) {
     view.$notify({title: '失败', message: msg, type: 'success', duration: 2000 })
 }
 
+export function showNetRes(view, res, func) {
+    if (res.code == 0) {
+        func()
+    } else if (res.code == -2) {
+        view.$store.dispatch("LogOut", res.user)
+        view.$router.push({ path: '/login' })
+    } else {
+        showFailed(view, res.msg)
+    }
+}
+
 export function confirm(view, msg, func) {
     view.$confirm(msg, '提示', {confirmButtonText: '确定',cancelButtonText: '取消',type: 'warning'}).then(func);
 }
 
-export function array_remove(array, value, key) {
+export function array_remove(array, obj_key, key) {
     for (let i = 0, len = array.length; i < len; i++) {
-        if(array[i][key] == value) {
+        if(array[i][key] == obj_key) {
             array.splice(i, 1)
             break;
         }
     }
 }
 
-export function array_update(array, value, key) {
+export function array_update(array, obj, key) {
     for (let i = 0, len = array.length; i < len; i++) {
-        if(array[i][key] == value[key]) {
-            array.splice(i, 1, value)
+        if(array[i][key] == obj[key]) {
+            array.splice(i, 1, obj)
             break;
         }
     }

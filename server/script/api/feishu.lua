@@ -9,7 +9,7 @@ local log_err   = logger.err
 local serialize = logger.serialize
 
 local apidoer   = utility.apidoer
-local mongod    = nucleus.mongod
+local admin_db  = nucleus.admin_db
 local jdecode   = json.decode
 
 local feishu_url = "http://ex.idreamsky.com:40008/userInfo"
@@ -17,17 +17,17 @@ local avatar_url = "https://exs.idreamsky.com:40000/commonapi/oa/avatar"
 
 --定义接口
 local feishu_doers = {
-    GET = function(req, args)
-        log_debug("/feishu params: %s", serialize(args))
+    GET = function(req, params)
+        log_debug("/feishu params: %s", serialize(params))
 
         local httpc = http.new()
-        local check_url = sformat("%s?ticket=%s", feishu_url, args.ticket)
+        local check_url = sformat("%s?ticket=%s", feishu_url, params.ticket)
         local res, err = httpc:request_uri(check_url, { method = "GET" })
         if not res then
             return { code = -1, err = err }
         end
         local data = jdecode(res.body).data
-        local db_res = mongod:find_one("users", {en_name = data.en_name})
+        local db_res = admin_db:find_one("users", {en_name = data.en_name})
         local user = {
             type = "feishu",
             name = data.name,
@@ -39,16 +39,15 @@ local feishu_doers = {
             roles = {},
         }
         if not db_res then
-            local ok = mongod:insert("users", {user})
+            local ok = admin_db:insert("users", {user})
             if not ok then
-                log_err("/feishu mongod:insert failed")
-                return { code = -1, msg = "mongod insert failed" }
+                log_err("/feishu admin_db:insert failed")
+                return { code = -1, msg = "admin_db insert failed" }
             end
         end
         --保存会话
         local new_session = session.start()
-        new_session.data.name = data.en_name
-        new_session.data.name = data.en_name
+        new_session.data.user = user
         new_session:save()
         return { code = 0, user = user }
     end,

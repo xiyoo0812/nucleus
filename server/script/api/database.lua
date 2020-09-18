@@ -10,13 +10,13 @@ local serialize = logger.serialize
 local packdb    = data_pack.database
 
 local apidoer   = utility.apidoer
-local mongod    = nucleus.mongod
+local admin_db  = nucleus.admin_db
 
 --定义接口
 local database_doers = {
     GET = function(req, args)
         log_debug("/database GET params: %s", serialize(args))
-        local res = mongod:find("databases", {})
+        local res = admin_db:find("databases", {})
         local records = {}
         for k, v in pairs(res) do
             tinsert(records, packdb(v))
@@ -26,11 +26,11 @@ local database_doers = {
     POST = function(req, args)
         log_debug("/database POST params: %s", serialize(args))
         local database = jdecode(args.database)
-        local record = mongod:find_one("databases", {name = database.name})
+        local record = admin_db:find_one("databases", {name = database.name})
         if not record then
             return {database = -1, msg = "database not exist"}
         end
-        local ok, err = mongod:update("databases", database, { name = database.name })
+        local ok, err = admin_db:update("databases", database, { name = database.name })
         if not ok then
             return {database = -1, msg = sformat("db update failed: %s", err)}
         end
@@ -39,11 +39,11 @@ local database_doers = {
     PUT = function(req, args)
         log_debug("/database PUT params: %s", serialize(args))
         local database = jdecode(args.database)
-        local res = mongod:find_one("databases", { name = database.name })
+        local res = admin_db:find_one("databases", { name = database.name })
         if res then
             return { database = -1, msg = "name aready exist!" }
         end
-        local ok, err = mongod:insert("databases", { database })
+        local ok, err = admin_db:insert("databases", { database })
         if not ok then
             return { database = -1, msg = sformat("db insert failed:%s", err)}
         end
@@ -53,13 +53,13 @@ local database_doers = {
         log_debug("/database DELETE params: %s", serialize(args))
         local databases = args.databases
         if type(databases) == "string" then
-            local ok, err = mongod:delete("databases", { name = databases })
+            local ok, err = admin_db:delete("databases", { name = databases })
             if not ok then
                 return {database = -1, msg = sformat("db delete failed: %s", err)}
             end
         else
             for _, cname in pairs(databases) do
-                local ok, err = mongod:delete("databases", { name = cname })
+                local ok, err = admin_db:delete("databases", { name = cname })
                 if not ok then
                     return {database = -1, msg = sformat("db delete failed: %s", err)}
                 end

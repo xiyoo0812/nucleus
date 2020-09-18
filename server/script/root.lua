@@ -8,12 +8,14 @@ nucleus = {}
 
 --common
 require ("common.base")
---share
+
+--初始化环境变量
 require ("share.environ")
+environ.init("config.nucleus")
+
+--share
 require ("share.shell")
 require ("share.mongod")
 require ("share.utility")
 require ("share.data_pack")
 
---初始化环境变量
-environ.init("config.nucleus")

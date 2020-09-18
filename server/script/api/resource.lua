@@ -9,14 +9,14 @@ local log_debug     = logger.debug
 local serialize     = logger.serialize
 local packresource  = data_pack.resource
 
-local mongod        = nucleus.mongod
+local admin_db      = nucleus.admin_db
 local apidoer       = utility.apidoer
 
 --定义接口
 local resource_doers = {
     GET = function(req, args)
         log_debug("/resource GET params: %s", serialize(args))
-        local res = mongod:find("resources", {})
+        local res = admin_db:find("resources", {})
         local records = {}
         for _, record in pairs(res) do
             tinsert(records, packresource(record))
@@ -26,11 +26,11 @@ local resource_doers = {
     POST = function(req, args)
         log_debug("/resource POST params: %s", serialize(args))
         local resource = jdecode(args.resource)
-        local record = mongod:find_one("resources", {id = resource.id})
+        local record = admin_db:find_one("resources", {id = resource.id})
         if not record then
             return {code = -1, msg = "resource not exist"}
         end
-        local ok, err = mongod:update("resources", resource, {id = resource.id})
+        local ok, err = admin_db:update("resources", resource, {id = resource.id})
         if not ok then
             return {code = -1, msg = sformat("db update failed:%s", err)}
         end
@@ -39,11 +39,11 @@ local resource_doers = {
     PUT = function(req, args)
         log_debug("/resource PUT params: %s", serialize(args))
         local resource = jdecode(args.resource)
-        local res = mongod:find_one("resources", {["$or"] = {{name = resource.name}, {path = resource.path}}})
+        local res = admin_db:find_one("resources", {["$or"] = {{name = resource.name}, {path = resource.path}}})
         if res then
             return { code = -1, msg = "name aready exist!" }
         end
-        local ok, err = mongod:insert("resources", { resource })
+        local ok, err = admin_db:insert("resources", { resource })
         if not ok then
             return { code = -1, msg = sformat("db insert failed:%s", err)}
         end
@@ -53,13 +53,13 @@ local resource_doers = {
         log_debug("/resource DELETE params: %s", serialize(args))
         local resources = args.resources
         if type(resources) == "string" then
-            local ok, err = mongod:delete("resources", {id = resources })
+            local ok, err = admin_db:delete("resources", {id = resources })
             if not ok then
                 return {code = -1, msg = sformat("db delete failed: %s", err)}
             end
         else
             for _, id in pairs(resources) do
-                local ok, err = mongod:delete("resources", {id = id })
+                local ok, err = admin_db:delete("resources", {id = id })
                 if not ok then
                     return {code = -1, msg = sformat("db delete failed: %s", err)}
                 end

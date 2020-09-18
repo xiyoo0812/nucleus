@@ -9,7 +9,7 @@ local apidoer   = utility.apidoer
 local menus_doers = {
     GET = function(req, args)
         log_debug("/menus params: %s", serialize(args))
-        return { menus = menus }
+        return { code = 0, menus = menus }
     end,
 }
 

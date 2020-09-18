@@ -12,33 +12,29 @@ local MENUS = {
         title = "资源管理",
         subs =  {
             {
-                index = "host",
+                index = "hosts",
                 title = "主机管理"
             },
             {
-                index = "database",
+                index = "databases",
                 title = "数据库管理"
             },
             {
-                index = "key",
+                index = "keys",
                 title = "密钥管理"
             },
             {
-                index = "code",
+                index = "codes",
                 title = "代码管理"
             },
             {
-                index = "node",
+                index = "nodes",
                 title = "节点管理"
             },
             {
-                index = "image",
+                index = "images",
                 title = "镜像管理"
             },
-            {
-                index = "route_cfg_mgr",
-                title = "路由配置管理"
-            }
         }
     },
     {
@@ -114,15 +110,15 @@ local MENUS = {
     {
         index = 4,
         icon = "el-icon-lx-service",
-        title = "权限管理",
+        title = "项目管理",
         subs =  {
             {
-                index = "resource",
-                title = "资源管理"
+                index = "projlist",
+                title = "项目管理"
             },
             {
-                index = "rolelist",
-                title = "角色管理"
+                index = "authlist",
+                title = "权限管理"
             },
             {
                 index = "userlist",
