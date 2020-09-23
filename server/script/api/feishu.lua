@@ -1,7 +1,6 @@
 -- api/feishu.lua
 local json      = require("cjson")
 local http      = require("resty.http")
-local session   = require("resty.session")
 
 local sformat   = string.format
 local log_debug = logger.debug
@@ -17,7 +16,7 @@ local avatar_url = "https://exs.idreamsky.com:40000/commonapi/oa/avatar"
 
 --定义接口
 local feishu_doers = {
-    GET = function(req, params)
+    GET = function(req, params, session)
         log_debug("/feishu params: %s", serialize(params))
 
         local httpc = http.new()
@@ -27,15 +26,16 @@ local feishu_doers = {
             return { code = -1, err = err }
         end
         local data = jdecode(res.body).data
-        local db_res = admin_db:find_one("users", {en_name = data.en_name})
+        local en_name = data.en_name
+        local db_res = admin_db:find_one("users", {en_name = en_name})
         local user = {
             type = "feishu",
+            en_name = en_name,
             name = data.name,
             email = data.email,
-            en_name = data.en_name,
             empCode = data.empCode,
             dept = data.dept:sub(data.dept:find("/") + 1),
-            avatar = sformat("%s/%s", avatar_url, data.en_name),
+            avatar = sformat("%s/%s", avatar_url, en_name),
             roles = {},
         }
         if not db_res then
@@ -45,10 +45,9 @@ local feishu_doers = {
                 return { code = -1, msg = "admin_db insert failed" }
             end
         end
-        --保存会话
-        local new_session = session.start()
-        new_session.data.user = user
-        new_session:save()
+        --缓存user到session
+        session.data.user = user
+        session:save()
         return { code = 0, user = user }
     end,
 }

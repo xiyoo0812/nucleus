@@ -7,7 +7,7 @@ function getName(){
     if (token) {
         return token.name
     }
-    return 'TEST'
+    return ""
 }
 
 function getAvatar(){
@@ -18,10 +18,17 @@ function getAvatar(){
     return require("../../assets/img/img.jpg")
 }
 
+function getUser(){
+    return getToken()
+}
+
 const user = {
     state:  {
+        proj: null,
+        user: getUser(),
         name: getName(),
         avatar: getAvatar(),
+        meprojs : [{name : "测试项目", desc : "这是一个测试项目", id : "123456"}],
     },
     mutations: {
         SET_NAME: (state, name) => {
@@ -30,6 +37,15 @@ const user = {
         SET_AVATAR: (state, avatar) => {
             state.avatar = avatar
         },
+        SET_USER: (state, user) => {
+            state.user = user
+        },
+        SET_PROJ: (state, proj) => {
+            state.proj = proj
+        },
+        SET_ME_PROJS: (state, meprojs) => {
+            state.meprojs = meprojs
+        },
     },
 
     actions: {
@@ -37,6 +53,7 @@ const user = {
         Login(context, data) {
             context.commit('SET_AVATAR', data.avatar)
             context.commit('SET_NAME', data.name)
+            context.commit('SET_USER', data)
             setToken(data)
         },
         // 登出
@@ -44,6 +61,14 @@ const user = {
             context.commit('SET_NAME', '')
             context.commit('SET_AVATAR', '')
             removeToken()
+        },
+        // 当前项目
+        CurProj(context, data) {
+            context.commit('SET_PROJ', data.proj)
+        },
+        // 当前项目
+        MeProjs(context, data) {
+            context.commit('SET_ME_PROJS', data.projs)
         },
     }
 }

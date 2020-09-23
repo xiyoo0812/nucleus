@@ -37,17 +37,25 @@
             // 关闭单个标签
             closeTags(index) {
                 const delItem = this.tagsList.splice(index, 1)[0];
-                const item = this.tagsList[index] ? this.tagsList[index] : this.tagsList[index - 1];
-                if (item) {
-                    delItem.path === this.$route.fullPath && this.$router.push(item.path);
-                }else{
-                    this.$router.push('/');
+                if (delItem.path === '/dashboard') {
+                    this.tagsList = [delItem];
+                } else {
+                    const item = this.tagsList[index] ? this.tagsList[index] : this.tagsList[index - 1];
+                    if (item) {
+                        delItem.path === this.$route.fullPath && this.$router.push(item.path);
+                    }else{
+                        this.$router.push('/');
+                    }
                 }
             },
             // 关闭全部标签
             closeAll(){
-                this.tagsList = [];
-                this.$router.push('/');
+                if (this.$route.fullPath === '/dashboard') {
+                    this.closeOther()
+                } else {
+                    this.tagsList = [];
+                    this.$router.push('/');
+                }
             },
             // 关闭其他标签
             closeOther(){

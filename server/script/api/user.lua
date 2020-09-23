@@ -14,7 +14,7 @@ local proj_db   = nucleus.proj_db
 
 --定义接口
 local user_doers = {
-    GET = function(req, params)
+    GET = function(req, params, session)
         log_debug("/user GET params: %s", serialize(params))
         local res = proj_db:find("users", {})
         local records = {}
@@ -23,7 +23,7 @@ local user_doers = {
         end
         return { code = 0, data = records, total = #records }
     end,
-    POST = function(req, params)
+    POST = function(req, params, session)
         log_debug("/user POST params: %s", serialize(params))
         local user = jdecode(params.args)
         local record = proj_db:find_one("users", {en_name = user.en_name})
@@ -36,7 +36,7 @@ local user_doers = {
         end
         return { code = 0, data = user }
     end,
-    DELETE = function(req, params)
+    DELETE = function(req, params, session)
         log_debug("/user DELETE params: %s", serialize(params))
         local users = params.args
         if type(users) == "string" then

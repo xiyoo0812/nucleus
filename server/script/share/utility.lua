@@ -1,5 +1,6 @@
 --utility.lua
-local json = require "cjson.safe"
+local json      = require "cjson.safe"
+local session   = require("resty.session")
 json.encode_sparse_array(true)
 
 local log_err   = logger.err
@@ -25,7 +26,8 @@ utility.apidoer = function(req, doers)
         else
             params = req.get_uri_args()
         end
-        local ok, res = pcall(func, req, params)
+        local cur_session = session.start()
+        local ok, res = pcall(func, req, params, cur_session)
         if not ok then
             log_err("[utility][apidoer] url(%s) doer failed: %s", url, res)
             return ngx.say(jencode({ code = -1, msg = res }))

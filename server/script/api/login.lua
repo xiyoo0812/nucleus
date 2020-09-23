@@ -9,27 +9,27 @@ local admin_db  = nucleus.admin_db
 
 --定义接口
 local login_doers = {
-    GET = function(req, args)
-        log_debug("/login GET params: %s", serialize(args))
-        local res = admin_db:find_one("users", args)
+    GET = function(req, params, session)
+        log_debug("/login GET params: %s", serialize(params))
+        local res = admin_db:find_one("users", params)
         if not res then
-            log_err("/login %s mongo query failed", args.username)
+            log_err("/login %s mongo query failed", params.username)
             return { code = -1, msg = "mongo query failed" }
         end
         return { code = 0 }
     end,
-    POST = function(req, args)
-        log_debug("/login params: %s", serialize(args))
+    POST = function(req, params, session)
+        log_debug("/login params: %s", serialize(params))
         return { code = 0 }
     end,
-    PUT = function(req, args)
-        log_debug("/login PUT params: %s", serialize(args))
-        local res = admin_db:find_one("users", {username=args.username})
+    PUT = function(req, params, session)
+        log_debug("/login PUT params: %s", serialize(params))
+        local res = admin_db:find_one("users", {username=params.username})
         if res then
             return {code = -2}
         end
-        args.type = "costom"
-        res = admin_db:insert("users", {args})
+        params.type = "costom"
+        res = admin_db:insert("users", {params})
         if not res then
             log_err("/login PUT admin_db:insert failed")
             return { code = -1 }
@@ -37,8 +37,8 @@ local login_doers = {
 
         return { code = 0 }
     end,
-    DELETE = function(req, args)
-        log_debug("/login params: %s", serialize(args))
+    DELETE = function(req, params, session)
+        log_debug("/login params: %s", serialize(params))
         return { code = 0 }
     end,
 }

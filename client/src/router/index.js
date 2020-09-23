@@ -19,7 +19,7 @@ const router = new Router({
                 {
                     path: '/dashboard',
                     component: () => import(/* webpackChunkName: "dashboard" */ '../views/Dashboard.vue'),
-                    meta: { title: '系统首页' }
+                    meta: { title: '我的主页' }
                 },
                 {
                     path: '/projlist',

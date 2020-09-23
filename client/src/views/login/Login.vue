@@ -89,7 +89,7 @@ export default {
                     login_api.login(this.form.username, this.form.password).then(res => {
                         if (res.code == 0){
                             utils.showSuccess(this, '登录成功')
-                            this.$store.dispatch("Login", this.form)
+                            this.$store.dispatch("Login", res.user)
                             this.$router.push({ path: this.$route.query.redirect || '/' })
                         } else if (res.code == -1){
                             utils.showFailed(this, "数据库错误，登录失败，请联系管理员")

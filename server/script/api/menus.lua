@@ -7,8 +7,8 @@ local apidoer   = utility.apidoer
 
 --定义接口
 local menus_doers = {
-    GET = function(req, args)
-        log_debug("/menus params: %s", serialize(args))
+    GET = function(req, params, session)
+        log_debug("/menus params: %s", serialize(params))
         return { code = 0, menus = menus }
     end,
 }

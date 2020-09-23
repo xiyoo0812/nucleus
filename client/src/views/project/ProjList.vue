@@ -153,7 +153,9 @@ export default {
         },
     },
     created(){
-        this.loadProj();
+        if (this.$store.getters.projs.length == 0) {
+            this.loadProj();
+        }
     }
 }
 </script>

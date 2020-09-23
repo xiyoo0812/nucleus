@@ -5,7 +5,13 @@
             <i v-if="!collapse" class="el-icon-s-fold"></i>
             <i v-else class="el-icon-s-unfold"></i>
         </div>
-        <div class="logo">后台管理系统</div>
+        <div class="logo">聚变|Nucleus</div>
+        <div class="header-left">
+            <div class="header-user-con">
+                <!-- 当前项目 -->
+                <Selecter :attr="project_id" :objs="this.$store.getters.meprojs" holder="请选择项目" @change="selectProj"/>
+            </div>
+        </div>
         <div class="header-right">
             <div class="header-user-con">
                 <!-- 全屏显示 -->
@@ -29,16 +35,16 @@
                 </div>
                 <!-- 用户头像 -->
                 <div class="user-avator">
-                    <img :src="useravator"/>
+                    <img :src="this.$store.getters.avatar"/>
                 </div>
                 <!-- 用户名下拉菜单 -->
                 <el-dropdown class="user-name" trigger="click" @command="handleCommand">
                     <span class="el-dropdown-link">
-                        {{username}}
+                        {{this.$store.getters.name}}
                         <i class="el-icon-caret-bottom"></i>
                     </span>
                     <el-dropdown-menu slot="dropdown">
-                        <a href="http://10.72.17.44/paper_man/server/" target="_blank">
+                        <a href="http://10.100.0.19/gaven.yang/nucleus" target="_blank">
                             <el-dropdown-item>项目仓库</el-dropdown-item>
                         </a>
                         <el-dropdown-item divided command="loginout">退出登录</el-dropdown-item>
@@ -50,66 +56,70 @@
 </template>
 <script>
 import bus from './bus';
+import Selecter from '../widget/Selecter.vue'
 export default {
     data() {
         return {
             collapse: false,
             fullscreen: false,
-            message: 2
+            project_id: null,
+            message: 2,
         };
     },
-    computed: {
-        username() {
-            return this.$store.getters.name;
-        },
-        useravator() {
-            return this.$store.getters.avatar;
-        }
+    components:{
+        Selecter
     },
     methods: {
         // 用户名下拉菜单选择事件
         handleCommand(command) {
             if (command == 'loginout') {
                 this.$store.dispatch("LogOut")
-                this.$router.push('/login');
+                this.$router.push('/login')
             }
+        },
+        // 项目下拉菜单
+        selectProj(proj_id, proj) {
+            console.log("selectProj2:" + proj.id + proj.name)
         },
         // 侧边栏折叠
         collapseChage() {
             this.collapse = !this.collapse;
-            bus.$emit('collapse', this.collapse);
+            bus.$emit('collapse', this.collapse)
         },
         // 全屏事件
         handleFullScreen() {
-            let element = document.documentElement;
+            let element = document.documentElement
             if (this.fullscreen) {
                 if (document.exitFullscreen) {
-                    document.exitFullscreen();
+                    document.exitFullscreen()
                 } else if (document.webkitCancelFullScreen) {
-                    document.webkitCancelFullScreen();
+                    document.webkitCancelFullScreen()
                 } else if (document.mozCancelFullScreen) {
-                    document.mozCancelFullScreen();
+                    document.mozCancelFullScreen()
                 } else if (document.msExitFullscreen) {
-                    document.msExitFullscreen();
+                    document.msExitFullscreen()
                 }
             } else {
                 if (element.requestFullscreen) {
-                    element.requestFullscreen();
+                    element.requestFullscreen()
                 } else if (element.webkitRequestFullScreen) {
-                    element.webkitRequestFullScreen();
+                    element.webkitRequestFullScreen()
                 } else if (element.mozRequestFullScreen) {
-                    element.mozRequestFullScreen();
+                    element.mozRequestFullScreen()
                 } else if (element.msRequestFullscreen) {
                     // IE11
-                    element.msRequestFullscreen();
+                    element.msRequestFullscreen()
                 }
             }
-            this.fullscreen = !this.fullscreen;
+            this.fullscreen = !this.fullscreen
         }
     },
     mounted() {
         if (document.body.clientWidth < 1500) {
-            this.collapseChage();
+            this.collapseChage()
+        }
+        if (this.$store.getters.proj) {
+            this.project_id = this.$store.getters.proj.id
         }
     }
 };
@@ -131,8 +141,12 @@ export default {
 }
 .header .logo {
     float: left;
-    width: 250px;
+    width: 200px;
     line-height: 70px;
+}
+.header-left {
+    float: left;
+    padding-left: 5px;
 }
 .header-right {
     float: right;
