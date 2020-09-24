@@ -3,22 +3,22 @@ import * as utils from '../../utils/index';
 
 const resource = {
     state:  {
-        users: [],
+        members: [],
         codes: [],
         projs: [],
     },
     mutations: {
-        INIT_USER: (state, users) => {
-            state.users = users
+        INIT_MEMBER: (state, members) => {
+            state.members = members
         },
-        ADD_USER: (state, user) => {
-            state.users.push(user)
+        ADD_MEMBER: (state, user) => {
+            state.members.push(user)
         },
-        DEL_USER: (state, user_id, key) => {
-            utils.array_remove(state.users, user_id, key)
+        DEL_MEMBER: (state, user_id, key) => {
+            utils.array_remove(state.members, user_id, key)
         },
-        UPDATE_USER: (state, user, key) => {
-            utils.array_update(state.users, user, key)
+        UPDATE_MEMBER: (state, user, key) => {
+            utils.array_update(state.members, user, key)
         },
         INIT_PROJ: (state, projs) => {
             state.projs = projs

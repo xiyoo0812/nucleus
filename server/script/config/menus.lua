@@ -16,18 +16,14 @@ local MENUS = {
                 title = "成员列表",
             },
             {
-                index = "auths",
+                index = "applys",
                 title = "申请队列",
-                auth = 1,
+                admin = 1,
             },
             {
                 index = "auths",
                 title = "权限设置",
-                auth = 1,
-            },
-            {
-                index = "projects",
-                title = "所有项目"
+                admin = 1,
             },
         },
     },
@@ -99,7 +95,7 @@ local MENUS = {
         title = "运营",
         subs =  {
             {
-                index = "platform_list",
+                index = "platform",
                 title = "平台配置"
             },
             {

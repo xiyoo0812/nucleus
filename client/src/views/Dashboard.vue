@@ -37,12 +37,18 @@
                 <el-card shadow="hover" style="height:800px;">
                     <div slot="header" class="clearfix">
                         <span>所有项目</span>
+                        <el-button style="float: right; padding: 3px 0" type="text">创建项目</el-button>
                     </div>
                     <el-table :data="this.$store.getters.projs" :show-header="false" height="700" style="width: 100%;font-size:14px;">
                         <el-table-column>
                             <template slot-scope="scope">
                                 <div class="proj-title">{{scope.row.name}}</div>
                                 <div class="proj-item">{{scope.row.desc}}</div>
+                            </template>
+                        </el-table-column>
+                        <el-table-column width="80">
+                            <template slot-scope="scope">
+                                <el-button size="small" type="primary" @click="handleJoin(scope.row)">加入</el-button>
                             </template>
                         </el-table-column>
                         <el-table-column width="80">

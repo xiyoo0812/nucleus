@@ -2,7 +2,7 @@
 <div class="app-container">
     <imp-panel>
         <div slot="body">
-            <el-table :data="this.$store.getters.users" border style="width: 100%" :v-loading="userLoading">
+            <el-table :data="this.$store.getters.members" border style="width: 100%" :v-loading="memberLoading">
                 <el-table-column prop="id" width="50"></el-table-column>
                 <el-table-column label="头像" width="96">
                     <template slot-scope="scope"><img :src='scope.row.avatar'></template>
@@ -14,8 +14,8 @@
                 <el-table-column prop="dept" label="部门" width="350"> </el-table-column>
                 <el-table-column label="操作" width="250">
                 <template slot-scope="scope">
-                    <el-button size="small" type="info" icon="setting" @click="handleRoleConfig(scope.row)">配置角色</el-button>
-                    <el-button size="small" type="danger" @click="handleDelete(scope.row)">删除</el-button>
+                    <el-button size="small" type="info" icon="setting" @click="handleRoleConfig(scope.row)">设置权限</el-button>
+                    <el-button size="small" type="danger" @click="handleDelete(scope.row)">踢出项目</el-button>
                 </template>
                 </el-table-column>
             </el-table>
@@ -51,7 +51,7 @@ export default {
     data(){
         return {
             currentRow: {},
-            userLoading: false,
+            memberLoading: false,
             dialogConfigVisible: false,
             pagination: {
                 total: 0,
@@ -81,20 +81,20 @@ export default {
         },
         handleConfigSure(){
             /*
-            var user_roles = {
+            var member_roles = {
                 en_name : this.currentRow.en_name,
                 roles : this.$refs.role.getCheckedKeys(),
             }
-            driver.update(user_roles).then(res => {
+            driver.update(member_roles).then(res => {
                 if (res.code != 0) {
                     utils.showFailed(this, res.msg)
                     return
                 }
                 utils.showSuccess(this, "配置角色成功")
                 this.dialogConfigVisible = false;
-                for (let user of this.userList) {
-                    if (user.en_name == user_roles.en_name) {
-                        user = res.data
+                for (let member of this.memberList) {
+                    if (member.en_name == member_roles.en_name) {
+                        member = res.data
                         break
                     }
                 }
@@ -110,25 +110,25 @@ export default {
         },
         handleDelete(row){
             if (this.$store.getters.name == row.name) {
-                utils.showFailed(this, "不能删除自己")
+                utils.showFailed(this, "不能踢出自己")
                 return
             }
-            var userlist = []
-            userlist.push(row.en_name)
-            driver.remove("user", userlist).then(res => {
+            var memberlist = []
+            memberlist.push(row.en_name)
+            driver.remove("member", memberlist).then(res => {
                 if (res.code != 0) {
                     utils.showFailed(this, res.msg)
                     return
                 }
-                this.$store.dispatch("DelResource", ["USER", row.en_name, "en_name"])
+                this.$store.dispatch("DelResource", ["MEMBER", row.en_name, "en_name"])
             });
         },
         loadData() {
             var pageNo = this.pagination.pageNo;
             var pageSize = this.pagination.pageSize;
-            driver.load("user", "", pageSize, pageNo).then(res => {
+            driver.load("member", "", pageSize, pageNo).then(res => {
                 utils.showNetRes(this, res, () => {
-                    this.$store.dispatch("InitResource", ["USER", res.data])
+                    this.$store.dispatch("InitResource", ["MEMBER", res.data])
                     this.pagination.total = res.total;
                 })
             });

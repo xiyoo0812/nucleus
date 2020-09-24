@@ -24,7 +24,11 @@ utility.apidoer = function(req, doers)
                 params = req.get_post_args()
             end
         else
-            params = req.get_uri_args()
+            params = jdecode(req.get_uri_args())
+            if not params then
+                --如果不是json格式，那么使用标准解析
+                params = req.get_uri_args()
+            end
         end
         local cur_session = session.start()
         local ok, res = pcall(func, req, params, cur_session)

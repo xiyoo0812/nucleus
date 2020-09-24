@@ -1,8 +1,4 @@
 -- api/project.lua
-local json = require "cjson.safe"
-json.encode_sparse_array(true)
-
-local jdecode   = json.decode
 local tinsert   = table.insert
 local sformat   = string.format
 local log_debug = logger.debug
@@ -13,9 +9,11 @@ local apidoer   = utility.apidoer
 local admin_db  = nucleus.admin_db
 local proj_db   = nucleus.proj_db
 
+
 --定义接口
 local project_doers = {
     GET = function(req, params, session)
+        --获取所有项目
         log_debug("/project GET params: %s", serialize(params))
         local res = admin_db:find("projects", {})
         local records = {}
@@ -25,53 +23,71 @@ local project_doers = {
         return { code = 0, data = records, total = #records }
     end,
     POST = function(req, params, session)
+        --修改项目内容
         log_debug("/project POST params: %s", serialize(params))
-        local project = jdecode(params.args)
+        local project = params.args
         local record = admin_db:find_one("projects", {name = project.name})
         if not record then
             return {code = -1, msg = "project not exist"}
         end
         local ok, err = admin_db:update("projects", project, { name = project.name })
         if not ok then
-            return {code = -1, msg = sformat("db update failed: %s", err)}
+            return {code = -1, msg = sformat("projects update failed: %s", err)}
         end
         return { code = 0, data = project }
     end,
     PUT = function(req, params, session)
+        --新建项目
         log_debug("/project PUT params: %s", serialize(params))
-        local usrres = session.data.user
-        local project = jdecode(params.args)
-        project.admin = usrres.en_name
+        local project = params.args
+        local member = session.data.user
+        project.creator = member.en_name
+        --查询是否重复
         local res = admin_db:find_one("projects", { name = project.name })
         if res then
             return { code = -1, msg = "name aready exist!" }
         end
-        local ok1, err1 = admin_db:insert("user_projs", { {user_name = usrres.en_name, proj_id = project.id } })
+        local proj_info = {
+            admin = true,
+            proj_id = project.id,
+            member_name = member.en_name,
+        }
+        --插入用户和项目关系
+        local ok1, err1 = admin_db:insert("member_projs", { proj_info })
         if not ok1 then
-            return { code = -1, msg = sformat("project user insert failed:%s", err1)}
+            return { code = -1, msg = sformat("member_projs insert failed:%s", err1)}
         end
+        --插入项目
         local ok2, err2 = admin_db:insert("projects", { project })
         if not ok2 then
             return { code = -1, msg = sformat("project insert failed:%s", err2)}
         end
-        proj_db:set_db("nucleus_proj_" .. project.id)
-        local ok3, err3 = proj_db:insert("users", { usrres })
+        local old_db = proj_db:get_db()
+        proj_db:set_db("nucleus_" .. project.id)
+        --插入成员信息
+        local ok3, err3 = proj_db:insert("members", { member })
         if not ok3 then
-            return { code = -1, msg = sformat("project admin insert failed:%s", err3)}
+            proj_db:set_db(old_db)
+            return { code = -1, msg = sformat("members insert failed:%s", err3)}
         end
+        proj_db:set_db(old_db)
         return { code = 0, data = project }
     end,
     DELETE = function(req, params, session)
+        --删除项目
         log_debug("/project DELETE params: %s", serialize(params))
         local project = params.args
+        --删除project数据
         local ok1, err1 = admin_db:delete("projects", { id = project })
         if not ok1 then
-            return {code = -1, msg = sformat("db delete failed: %s", err1)}
+            return {code = -1, msg = sformat("projects delete failed: %s", err1)}
         end
-        local ok2, err2 = admin_db:insert("user_projs", { proj_id = project })
+        --删除用户和项目关系
+        local ok2, err2 = admin_db:insert("member_projs", { proj_id = project })
         if not ok2 then
-            return { code = -1, msg = sformat("project user insert failed:%s", err2)}
+            return { code = -1, msg = sformat("member_projs insert failed:%s", err2)}
         end
+        --删除project数据库
         proj_db:drop()
         return { code = 0 }
     end,

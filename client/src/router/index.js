@@ -22,14 +22,19 @@ const router = new Router({
                     meta: { title: '我的主页' }
                 },
                 {
-                    path: '/projlist',
-                    component: () => import(/* webpackChunkName: "404" */ '../views/project/ProjList.vue'),
-                    meta: { title: '项目管理' }
+                    path: '/projects',
+                    component: () => import(/* webpackChunkName: "404" */ '../views/project/Projects.vue'),
+                    meta: { title: '所有项目' }
                 },
                 {
-                    path: '/userlist',
-                    component: () => import(/* webpackChunkName: "404" */ '../views/project/UserList.vue'),
-                    meta: { title: '用户管理' }
+                    path: '/members',
+                    component: () => import(/* webpackChunkName: "404" */ '../views/project/Members.vue'),
+                    meta: { title: '成员列表' }
+                },
+                {
+                    path: '/applys',
+                    component: () => import(/* webpackChunkName: "404" */ '../views/project/Members.vue'),
+                    meta: { title: '成员列表' }
                 },
                 {
                     path: '/404',
