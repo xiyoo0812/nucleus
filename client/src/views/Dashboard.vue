@@ -30,6 +30,11 @@
                                 <el-button size="small" type="primary" @click="handleView(scope.row)">查看</el-button>
                             </template>
                         </el-table-column>
+                        <el-table-column width="80">
+                            <template slot-scope="scope">
+                                <el-button size="small" type="primary" @click="handleDelete(scope.row)">删除</el-button>
+                            </template>
+                        </el-table-column>
                     </el-table>
                 </el-card>
             </el-col>
@@ -37,7 +42,7 @@
                 <el-card shadow="hover" style="height:800px;">
                     <div slot="header" class="clearfix">
                         <span>所有项目</span>
-                        <el-button style="float: right; padding: 3px 0" type="text">创建项目</el-button>
+                        <el-button style="float: right; padding: 3px 0" type="primary" @click="handleNew(scope.row)">创建</el-button>
                     </div>
                     <el-table :data="this.$store.getters.projs" :show-header="false" height="700" style="width: 100%;font-size:14px;">
                         <el-table-column>
@@ -53,7 +58,7 @@
                         </el-table-column>
                         <el-table-column width="80">
                             <template slot-scope="scope">
-                                <el-button size="small" type="primary" @click="handleJoin(scope.row)">加入</el-button>
+                                <el-button size="small" type="primary" @click="handleDelete(scope.row)">删除</el-button>
                             </template>
                         </el-table-column>
                     </el-table>
@@ -61,6 +66,22 @@
             </el-col>
         </el-row>
     </div>
+    <el-dialog :title="创建项目" :visible.sync="dialogVisible" :close-on-click-modal="false" width="60%">
+        <el-card class="box-card">
+            <el-form :model="form" :rules="rules" ref="form">
+                <el-form-item prop="name" label="名称" label-width="100px">
+                    <el-input v-model="form.name" auto-complete="off"></el-input>
+                </el-form-item>
+                <el-form-item prop="desc" label="简介" label-width="100px">
+                    <el-input v-model="form.desc" auto-complete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="" label-width="100px">
+                    <el-button type="primary" @click="dialogStatus==='create' ? handleCreate() : handleUpdate()">确认</el-button>
+                    <el-button @click="dialogVisible = false">取消</el-button>
+                </el-form-item>
+            </el-form>
+        </el-card>
+    </el-dialog>
 </template>
 
 <script>
@@ -70,6 +91,17 @@ export default {
     name: 'dashboard',
     data() {
         return {
+            dialogVisible:false,
+            form: {
+                id: null,
+                name: '',
+                admin: '',
+                desc: '',
+            },
+            rules: {
+                name: [{ required: true, message: '请输入项目名', trigger: 'blur' }],
+                desc: [{ required: true, message: '请输入项目简介', trigger: 'blur' }],
+            },
         }
     },
     created(){
@@ -83,12 +115,47 @@ export default {
                 })
             });
         },
+        handleNew(){
+            this.dialogVisible = true;
+            this.form = {
+                id: null,
+                name: '',
+                admin: '',
+                desc: '',
+            };
+        },
+        handleCreate() {
+            this.dialogVisible = false
+            this.$refs.form.validate(valid => {
+                this.form.id = utils.newGuid()
+                driver.insert("project", this.form).then(res => {
+                    if (res.code != 0){
+                        utils.showFailed(this, res.msg);
+                        return;
+                    }
+                    utils.showSuccess(this, "创建成功");
+                    this.$store.dispatch("AddResource", ["PROJ", res.data])
+                })
+            })
+        },
+        handleDelete(row){
+            utils.confirm(this, "确定删除?", () => {
+                var projlist = []
+                projlist.push(row.id)
+                driver.remove("project", projlist).then(res => {
+                    if (res.code != 0){
+                        utils.showFailed(this, res.msg);
+                        return;
+                    }
+                    utils.showSuccess(this, "删除成功");
+                    this.$store.dispatch("DelResource", ["PROJ", row.id, "id"])
+                });
+            });
+        },
         handleView(row){
         },
         handleJoin(row){
         },
-        handleSelect(row){
-        }
     }
 }
 </script>
