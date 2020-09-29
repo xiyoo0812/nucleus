@@ -1,7 +1,7 @@
 <template>
     <div>
         <el-row :gutter="20">
-            <el-col :span="10">
+            <el-col :span="8">
                 <el-card shadow="hover" class="mgb20" style="height:300px;">
                     <div class="user-info">
                         <img :src="this.$store.getters.avatar" class="user-avator" alt="">
@@ -25,12 +25,12 @@
                                 <div class="proj-item">{{scope.row.desc}}</div>
                             </template>
                         </el-table-column>
-                        <el-table-column width="80">
+                        <el-table-column width="60">
                             <template slot-scope="scope">
                                 <el-button size="small" type="primary" @click="handleView(scope.row)">查看</el-button>
                             </template>
                         </el-table-column>
-                        <el-table-column width="80">
+                        <el-table-column width="60">
                             <template slot-scope="scope">
                                 <el-button size="small" type="primary" @click="handleDelete(scope.row)">删除</el-button>
                             </template>
@@ -38,50 +38,73 @@
                     </el-table>
                 </el-card>
             </el-col>
-            <el-col :span="14">
-                <el-card shadow="hover" style="height:800px;">
+            <el-col :span="16">
+                <el-row :gutter="20" class="mgb20">
+                    <el-col :span="6">
+                        <el-card shadow="hover" :body-style="{padding: '0px'}">
+                            <div class="grid-content grid-con-1">
+                                <i class="el-icon-lx-people grid-con-icon"></i>
+                                <div class="grid-cont-right">
+                                    <div class="grid-num">3</div>
+                                    <div><router-link to="/codes" class="grid-name">代码库</router-link></div>
+                                </div>
+                            </div>
+                        </el-card>
+                    </el-col>
+                    <el-col :span="6">
+                        <el-card shadow="hover" :body-style="{padding: '0px'}">
+                            <div class="grid-content grid-con-2">
+                                <i class="el-icon-lx-notice grid-con-icon"></i>
+                                <div class="grid-cont-right">
+                                    <div class="grid-num">8</div>
+                                    <div><router-link to="/hosts" class="grid-name">主机</router-link></div>
+                                </div>
+                            </div>
+                        </el-card>
+                    </el-col>
+                    <el-col :span="6">
+                        <el-card shadow="hover" :body-style="{padding: '0px'}">
+                            <div class="grid-content grid-con-3">
+                                <i class="el-icon-lx-goods grid-con-icon"></i>
+                                <div class="grid-cont-right">
+                                    <div class="grid-num">21</div>
+                                    <div><router-link to="/hosts" class="grid-name">流水线</router-link></div>
+                                </div>
+                            </div>
+                        </el-card>
+                    </el-col>
+                    <el-col :span="6">
+                        <el-card shadow="hover" :body-style="{padding: '0px'}">
+                            <div class="grid-content grid-con-4">
+                                <i class="el-icon-lx-goods grid-con-icon"></i>
+                                <div class="grid-cont-right">
+                                    <div class="grid-num">50</div>
+                                    <div><router-link to="/hosts" class="grid-name">制品库</router-link></div>
+                                </div>
+                            </div>
+                        </el-card>
+                    </el-col>
+                </el-row>
+                <el-card shadow="hover" style="height:680px;">
                     <div slot="header" class="clearfix">
-                        <span>所有项目</span>
-                        <el-button style="float: right; padding: 3px 0" type="primary" @click="handleNew(scope.row)">创建</el-button>
+                        <span>操作记录</span>
+                        <el-button style="float: right;" size="small" type="primary" @click="handleRefesh()">刷新</el-button>
                     </div>
-                    <el-table :data="this.$store.getters.projs" :show-header="false" height="700" style="width: 100%;font-size:14px;">
+                    <el-table :data="logs" :show-header="false" height="580" style="width: 100%;font-size:14px;">
+                        <el-table-column width="120">
+                            <template slot-scope="scope"><div class="proj-item">{{scope.row.name}}</div></template>
+                        </el-table-column>
                         <el-table-column>
-                            <template slot-scope="scope">
-                                <div class="proj-title">{{scope.row.name}}</div>
-                                <div class="proj-item">{{scope.row.desc}}</div>
-                            </template>
+                            <template slot-scope="scope"><div class="proj-item">{{scope.row.title}}</div></template>
                         </el-table-column>
-                        <el-table-column width="80">
-                            <template slot-scope="scope">
-                                <el-button size="small" type="primary" @click="handleJoin(scope.row)">加入</el-button>
-                            </template>
-                        </el-table-column>
-                        <el-table-column width="80">
-                            <template slot-scope="scope">
-                                <el-button size="small" type="primary" @click="handleDelete(scope.row)">删除</el-button>
-                            </template>
+                        <el-table-column width="85">
+                            <template slot-scope="scope"><div class="proj-item">{{scope.row.time}}</div></template>
                         </el-table-column>
                     </el-table>
                 </el-card>
             </el-col>
         </el-row>
     </div>
-    <el-dialog :title="创建项目" :visible.sync="dialogVisible" :close-on-click-modal="false" width="60%">
-        <el-card class="box-card">
-            <el-form :model="form" :rules="rules" ref="form">
-                <el-form-item prop="name" label="名称" label-width="100px">
-                    <el-input v-model="form.name" auto-complete="off"></el-input>
-                </el-form-item>
-                <el-form-item prop="desc" label="简介" label-width="100px">
-                    <el-input v-model="form.desc" auto-complete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="" label-width="100px">
-                    <el-button type="primary" @click="dialogStatus==='create' ? handleCreate() : handleUpdate()">确认</el-button>
-                    <el-button @click="dialogVisible = false">取消</el-button>
-                </el-form-item>
-            </el-form>
-        </el-card>
-    </el-dialog>
 </template>
 
 <script>
@@ -91,17 +114,37 @@ export default {
     name: 'dashboard',
     data() {
         return {
-            dialogVisible:false,
-            form: {
-                id: null,
-                name: '',
-                admin: '',
-                desc: '',
-            },
-            rules: {
-                name: [{ required: true, message: '请输入项目名', trigger: 'blur' }],
-                desc: [{ required: true, message: '请输入项目简介', trigger: 'blur' }],
-            },
+            logs: [
+                {
+                    title: '今天要修复100个bug',
+                    time: "20200930",
+                    name: "gaven.yang",
+                },
+                {
+                    title: '今天要修复100个bug',
+                    time: "20200930",
+                    name: "gaven.yang",
+                },
+                {
+                    title: '今天要写100行代码加几个bug吧',
+                    time: "20200930",
+                    name: "gaven.yang",
+                }, {
+                    title: '今天要修复100个bug',
+                    time: "20200930",
+                    name: "gaven.yang",
+                },
+                {
+                    title: '今天要修复100个bug',
+                    time: "20200930",
+                    name: "gaven.yang",
+                },
+                {
+                    title: '今天要写100行代码加几个bug吧',
+                    time: "20200930",
+                    name: "gaven.yang",
+                }
+            ],
         }
     },
     created(){
@@ -115,46 +158,11 @@ export default {
                 })
             });
         },
-        handleNew(){
-            this.dialogVisible = true;
-            this.form = {
-                id: null,
-                name: '',
-                admin: '',
-                desc: '',
-            };
-        },
-        handleCreate() {
-            this.dialogVisible = false
-            this.$refs.form.validate(valid => {
-                this.form.id = utils.newGuid()
-                driver.insert("project", this.form).then(res => {
-                    if (res.code != 0){
-                        utils.showFailed(this, res.msg);
-                        return;
-                    }
-                    utils.showSuccess(this, "创建成功");
-                    this.$store.dispatch("AddResource", ["PROJ", res.data])
-                })
-            })
-        },
-        handleDelete(row){
-            utils.confirm(this, "确定删除?", () => {
-                var projlist = []
-                projlist.push(row.id)
-                driver.remove("project", projlist).then(res => {
-                    if (res.code != 0){
-                        utils.showFailed(this, res.msg);
-                        return;
-                    }
-                    utils.showSuccess(this, "删除成功");
-                    this.$store.dispatch("DelResource", ["PROJ", row.id, "id"])
-                });
-            });
-        },
         handleView(row){
         },
-        handleJoin(row){
+        handleDelete(row){
+        },
+        handleRefesh(){
         },
     }
 }
@@ -200,6 +208,72 @@ export default {
     .user-info-list span {
         margin-left: 70px;
     }
+
+    .grid-content {
+        display: flex;
+        align-items: center;
+        height: 100px;
+    }
+
+    .grid-cont-right {
+        flex: 1;
+        text-align: center;
+        font-size: 14px;
+        color: #999;
+    }
+
+    .grid-num {
+        font-size: 30px;
+        font-weight: bold;
+    }
+
+    .grid-name {
+        font-size: 16px;
+        font-weight: bold;
+        color: #222;
+    }
+
+    .grid-con-icon {
+        font-size: 50px;
+        width: 100px;
+        height: 100px;
+        text-align: center;
+        line-height: 100px;
+        color: #fff;
+    }
+
+    .grid-con-1 .grid-con-icon {
+        background: rgb(45, 140, 240);
+    }
+
+    .grid-con-1 .grid-num {
+        color: rgb(45, 140, 240);
+    }
+
+    .grid-con-2 .grid-con-icon {
+        background: rgb(100, 213, 114);
+    }
+
+    .grid-con-2 .grid-num {
+        color: rgb(45, 140, 240);
+    }
+
+    .grid-con-3 .grid-con-icon {
+        background: rgb(242, 94, 67);
+    }
+
+    .grid-con-3 .grid-num {
+        color: rgb(242, 94, 67);
+    }
+
+    .grid-con-4 .grid-con-icon {
+        background: rgb(12, 234, 241);
+    }
+
+    .grid-con-4 .grid-num {
+        color: rgb(12, 234, 241);
+    }
+
 
     .mgb20 {
         margin-bottom: 20px;

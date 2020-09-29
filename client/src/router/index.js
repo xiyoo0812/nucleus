@@ -33,8 +33,13 @@ const router = new Router({
                 },
                 {
                     path: '/applys',
-                    component: () => import(/* webpackChunkName: "404" */ '../views/project/Members.vue'),
+                    component: () => import(/* webpackChunkName: "404" */ '../views/project/Applys.vue'),
                     meta: { title: '申请列表' }
+                },
+                {
+                    path: '/projects',
+                    component: () => import(/* webpackChunkName: "404" */ '../views/project/Projects.vue'),
+                    meta: { title: '所有项目' }
                 },
                 {
                     path: '/404',

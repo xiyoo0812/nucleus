@@ -25,6 +25,10 @@ local MENUS = {
                 title = "权限设置",
                 admin = 1,
             },
+            {
+                index = "projects",
+                title = "所有项目",
+            },
         },
     },
     {
