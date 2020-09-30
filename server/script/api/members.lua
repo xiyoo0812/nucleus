@@ -1,4 +1,4 @@
--- api/member.lua
+-- api/members.lua
 local tinsert   = table.insert
 local sformat   = string.format
 local log_debug = logger.debug
@@ -9,10 +9,10 @@ local apidoer   = utility.apidoer
 local proj_db   = nucleus.proj_db
 
 --定义接口
-local member_doers = {
+local members_doers = {
     GET = function(req, params, session)
         --获取项目成员列表
-        log_debug("/member GET params: %s", serialize(params))
+        log_debug("/members GET params: %s", serialize(params))
         local res = proj_db:find("members", {})
         local records = {}
         for k, v in pairs(res) do
@@ -22,7 +22,7 @@ local member_doers = {
     end,
     POST = function(req, params, session)
         --修改项目成员
-        log_debug("/member POST params: %s", serialize(params))
+        log_debug("/members POST params: %s", serialize(params))
         local member = params.args
         local record = proj_db:find_one("members", {en_name = member.en_name})
         if not record then
@@ -36,9 +36,9 @@ local member_doers = {
     end,
     DELETE = function(req, params, session)
         --踢出项目成员
-        log_debug("/user DELETE params: %s", serialize(params))
-        local member_name = params.args
-        local ok, err = proj_db:delete("members", {en_name = member_name })
+        log_debug("/members DELETE params: %s", serialize(params))
+        local en_name = params.args
+        local ok, err = proj_db:delete("members", {en_name = en_name })
         if not ok then
             return {code = -1, msg = sformat("db delete failed: %s", err)}
         end
@@ -47,5 +47,5 @@ local member_doers = {
 }
 
 --执行
-apidoer(ngx.req, member_doers)
+apidoer(ngx.req, members_doers)
 

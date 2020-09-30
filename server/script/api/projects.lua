@@ -1,20 +1,20 @@
--- api/project.lua
+-- api/projects.lua
 local tinsert   = table.insert
 local sformat   = string.format
 local log_debug = logger.debug
 local serialize = logger.serialize
 local packproj  = data_pack.project
+local add_log   = utility.add_log
 
 local apidoer   = utility.apidoer
 local admin_db  = nucleus.admin_db
 local proj_db   = nucleus.proj_db
 
-
 --定义接口
-local project_doers = {
+local projects_doers = {
     GET = function(req, params, session)
         --获取所有项目
-        log_debug("/project GET params: %s", serialize(params))
+        log_debug("/projects GET params: %s", serialize(params))
         local res = admin_db:find("projects", {})
         local records = {}
         for k, v in pairs(res) do
@@ -24,7 +24,7 @@ local project_doers = {
     end,
     POST = function(req, params, session)
         --修改项目内容
-        log_debug("/project POST params: %s", serialize(params))
+        log_debug("/projects POST params: %s", serialize(params))
         local project = params.args
         local record = admin_db:find_one("projects", {name = project.name})
         if not record then
@@ -38,7 +38,7 @@ local project_doers = {
     end,
     PUT = function(req, params, session)
         --新建项目
-        log_debug("/project PUT params: %s", serialize(params))
+        log_debug("/projects PUT params: %s", serialize(params))
         local project = params.args
         local member = session.data.user
         project.creator = member.en_name
@@ -50,7 +50,7 @@ local project_doers = {
         local proj_info = {
             admin = true,
             proj_id = project.id,
-            member_name = member.en_name,
+            en_name = member.en_name,
         }
         --插入用户和项目关系
         local ok1, err1 = admin_db:insert("member_projs", { proj_info })
@@ -70,12 +70,14 @@ local project_doers = {
             proj_db:set_db(old_db)
             return { code = -1, msg = sformat("members insert failed:%s", err3)}
         end
+        --添加日志
+        add_log(proj_db, member.en_name, sformat("创建了项目：%s", project.name))
         proj_db:set_db(old_db)
         return { code = 0, data = project }
     end,
     DELETE = function(req, params, session)
         --删除项目
-        log_debug("/project DELETE params: %s", serialize(params))
+        log_debug("/projects DELETE params: %s", serialize(params))
         local project = params.args
         --删除project数据
         local ok1, err1 = admin_db:delete("projects", { id = project })
@@ -83,16 +85,19 @@ local project_doers = {
             return {code = -1, msg = sformat("projects delete failed: %s", err1)}
         end
         --删除用户和项目关系
-        local ok2, err2 = admin_db:insert("member_projs", { proj_id = project })
+        local ok2, err2 = admin_db:delete("member_projs", { proj_id = project })
         if not ok2 then
-            return { code = -1, msg = sformat("member_projs insert failed:%s", err2)}
+            return { code = -1, msg = sformat("member_projs delete failed:%s", err2)}
         end
         --删除project数据库
+        local old_db = proj_db:get_db()
+        proj_db:set_db("nucleus_" .. project)
         proj_db:drop()
+        proj_db:set_db(old_db)
         return { code = 0 }
     end,
 }
 
 --执行
-apidoer(ngx.req, project_doers)
+apidoer(ngx.req, projects_doers)
 

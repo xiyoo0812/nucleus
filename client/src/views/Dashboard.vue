@@ -18,21 +18,15 @@
                     <div slot="header" class="clearfix">
                         <span>我的项目</span>
                     </div>
-                    <el-table :data="this.$store.getters.meprojs" :show-header="false" height="380" style="width: 100%;font-size:14px;">
+                    <el-table :data="this.$store.getters.owns" :show-header="false" height="380" style="width: 100%;font-size:14px;">
                         <el-table-column> 
                             <template slot-scope="scope">
-                                <div class="proj-title">{{scope.row.name}}</div>
+                                <div class="proj-item">{{scope.row.name}}</div>
+                            </template>
+                        </el-table-column>
+                        <el-table-column>
+                            <template slot-scope="scope">
                                 <div class="proj-item">{{scope.row.desc}}</div>
-                            </template>
-                        </el-table-column>
-                        <el-table-column width="60">
-                            <template slot-scope="scope">
-                                <el-button size="small" type="primary" @click="handleView(scope.row)">查看</el-button>
-                            </template>
-                        </el-table-column>
-                        <el-table-column width="60">
-                            <template slot-scope="scope">
-                                <el-button size="small" type="primary" @click="handleDelete(scope.row)">删除</el-button>
                             </template>
                         </el-table-column>
                     </el-table>
@@ -90,7 +84,7 @@
                         <span>操作记录</span>
                         <el-button style="float: right;" size="small" type="primary" @click="handleRefesh()">刷新</el-button>
                     </div>
-                    <el-table :data="logs" :show-header="false" height="580" style="width: 100%;font-size:14px;">
+                    <el-table :data="this.$store.getters.logs" :show-header="false" height="580" style="width: 100%;font-size:14px;">
                         <el-table-column width="120">
                             <template slot-scope="scope"><div class="proj-item">{{scope.row.name}}</div></template>
                         </el-table-column>
@@ -114,55 +108,44 @@ export default {
     name: 'dashboard',
     data() {
         return {
-            logs: [
-                {
-                    title: '今天要修复100个bug',
-                    time: "20200930",
-                    name: "gaven.yang",
-                },
-                {
-                    title: '今天要修复100个bug',
-                    time: "20200930",
-                    name: "gaven.yang",
-                },
-                {
-                    title: '今天要写100行代码加几个bug吧',
-                    time: "20200930",
-                    name: "gaven.yang",
-                }, {
-                    title: '今天要修复100个bug',
-                    time: "20200930",
-                    name: "gaven.yang",
-                },
-                {
-                    title: '今天要修复100个bug',
-                    time: "20200930",
-                    name: "gaven.yang",
-                },
-                {
-                    title: '今天要写100行代码加几个bug吧',
-                    time: "20200930",
-                    name: "gaven.yang",
-                }
-            ],
         }
     },
     created(){
-        this.loadProj();
+        this.loadOwns();
     },
     methods: {
-        loadProj() {
-            driver.load("project").then(res => {
+        loadOwns() {
+            driver.load("owns").then(res => {
                 utils.showNetRes(this, res, () => {
-                    this.$store.dispatch("InitResource", ["PROJ", res.data])
+                    console.log("loadOwns", res.data)
+                    this.$store.dispatch("SetOwns", res.data)
+                    if (this.$store.getters.proj == null) {
+                        for (let proj of res.data) {
+                            this.chooseProj(proj)
+                            break
+                        }
+                    }
                 })
             });
         },
-        handleView(row){
+        chooseProj(proj) {
+            console.log("chooseProj", proj)
+            driver.update("owns", proj).then(res => {
+                utils.showNetRes(this, res, () => {
+                    this.loadLogs();
+                })
+            })
         },
-        handleDelete(row){
+        loadLogs() {
+            driver.load("logs").then(res => {
+                utils.showNetRes(this, res, () => {
+                    console.log("loadLogs", res.data)
+                    this.$store.dispatch("InitData", ["LOG", res.data])
+                })
+            });
         },
         handleRefesh(){
+            this.loadLogs()
         },
     }
 }

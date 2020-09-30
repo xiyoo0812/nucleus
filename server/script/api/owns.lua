@@ -1,4 +1,4 @@
--- api/owner.lua
+-- api/owns.lua
 local tinsert   = table.insert
 local log_debug = logger.debug
 local serialize = logger.serialize
@@ -9,12 +9,12 @@ local proj_db   = nucleus.proj_db
 local admin_db  = nucleus.admin_db
 
 --定义接口
-local owner_doers = {
+local owns_doers = {
     GET = function(req, params, session)
         --获取用户拥有的项目
-        log_debug("/owner GET params: %s", serialize(params))
+        log_debug("/owns GET params: %s", serialize(params))
         local projects = {}
-        local res = admin_db:find("member_projs", {member_name = params.key})
+        local res = admin_db:find("member_projs", {en_name = params.key})
         for _, uproj in pairs(res) do
             local proj = admin_db:find_one("projects", {id = uproj.proj_id})
             if proj then
@@ -31,10 +31,10 @@ local owner_doers = {
     end,
     POST = function(req, params, session)
         --选择当前项目
-        log_debug("/owner POST params: %s", serialize(params))
+        log_debug("/owns POST params: %s", serialize(params))
         local args = params.args
         local user = session.data.user
-        local res = admin_db:find_one("member_projs", {member_name = user.en_name, proj_id = args.proj_id})
+        local res = admin_db:find_one("member_projs", {en_name = user.en_name, proj_id = args.proj_id})
         if res then
             local proj = admin_db:find_one("projects", {id = res.proj_id})
             if proj then
@@ -51,5 +51,5 @@ local owner_doers = {
 }
 
 --执行
-apidoer(ngx.req, owner_doers)
+apidoer(ngx.req, owns_doers)
 

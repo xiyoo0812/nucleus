@@ -35,7 +35,7 @@ function dbmethods:listcollections ( )
 end
 
 function dbmethods:dropDatabase ( )
-    local r, err = self:cmd({ dropDatabase = true })
+    local r, err = self:cmd({dropDatabase = 1})
     if not r then
         return nil, err
     end

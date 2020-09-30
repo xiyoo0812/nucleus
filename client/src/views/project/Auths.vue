@@ -97,7 +97,7 @@ export default {
                         return;
                     }
                     utils.showSuccess(this, "删除成功");
-                    this.$store.dispatch("DelResource", ["PROJ", row.id, "id"])
+                    this.$store.dispatch("DelData", ["PROJ", row.id, "id"])
                 });
             });
         },
@@ -110,7 +110,7 @@ export default {
                         return;
                     }
                     utils.showSuccess(this, "修改成功");
-                    this.$store.dispatch("UpdateResource", ["PROJ", this.form, "id"])
+                    this.$store.dispatch("UpdateData", ["PROJ", this.form, "id"])
                 })
             })
         },
@@ -124,7 +124,7 @@ export default {
                         return;
                     }
                     utils.showSuccess(this, "创建成功");
-                    this.$store.dispatch("AddResource", ["PROJ", res.data])
+                    this.$store.dispatch("AddData", ["PROJ", res.data])
                 })
             })
         },
@@ -146,7 +146,7 @@ export default {
             var pageSize = this.pagination.pageSize;
             driver.load("project", this.searchKey, pageSize, pageNo).then(res => {
                 utils.showNetRes(this, res, () => {
-                    this.$store.dispatch("InitResource", ["PROJ", res.data])
+                    this.$store.dispatch("InitData", ["PROJ", res.data])
                     this.pagination.total = res.total;
                 })
             });

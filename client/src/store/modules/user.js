@@ -28,7 +28,7 @@ const user = {
         user: getUser(),
         name: getName(),
         avatar: getAvatar(),
-        meprojs : [{name : "测试项目", desc : "这是一个测试项目", id : "123456"}],
+        owns : [{name : "测试项目", desc : "这是一个测试项目", id : "123456"}],
     },
     mutations: {
         SET_NAME: (state, name) => {
@@ -43,8 +43,8 @@ const user = {
         SET_PROJ: (state, proj) => {
             state.proj = proj
         },
-        SET_ME_PROJS: (state, meprojs) => {
-            state.meprojs = meprojs
+        SET_OWNS: (state, owns) => {
+            state.owns = owns
         },
     },
 
@@ -63,12 +63,12 @@ const user = {
             removeToken()
         },
         // 当前项目
-        CurProj(context, data) {
+        SetProj(context, data) {
             context.commit('SET_PROJ', data.proj)
         },
-        // 当前项目
-        MeProjs(context, data) {
-            context.commit('SET_ME_PROJS', data.projs)
+        // 拥有的项目
+        SetOwns(context, data) {
+            context.commit('SET_OWNS', data.owns)
         },
     }
 }

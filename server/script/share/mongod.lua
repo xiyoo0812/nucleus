@@ -54,15 +54,19 @@ end
 function mongod:drop()
     local db = self:get_db()
     if db then
-        db:dropDatabase()
+        local res, err = db:dropDatabase()
+        return (res == 1), err
     end
+    return true
 end
 
 function mongod:drop_coll(coll_name)
     local coll = self:get_coll(coll_name)
     if coll then
-        coll:drop()
+        local res, err = coll:drop()
+        return (res == 1), err
     end
+    return true
 end
 
 function mongod:find(coll_name, selector, fields, sorts, limit)

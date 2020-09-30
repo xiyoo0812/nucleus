@@ -1,13 +1,13 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import user from './modules/user'
-import resource from './modules/resource'
+import project from './modules/proj'
 
 Vue.use(Vuex)
 
 const store = new Vuex.Store({
     modules : {
-        resource,
+        project,
         user,
     },
     getters : {
@@ -19,10 +19,10 @@ const store = new Vuex.Store({
         en_name: (state) => state.user.user.en_name,
         token: (state) => state.user.token,
         avatar: (state) => state.user.avatar,
-        meprojs: (state) => state.user.meprojs,
-        codes: (state) => state.resource.codes,
-        projs: (state) => state.resource.projs,
-        users: (state) => state.resource.users,
+        owns: (state) => state.user.owns,
+        codes: (state) => state.project.codes,
+        projs: (state) => state.project.projs,
+        users: (state) => state.project.users,
     }
 })
 

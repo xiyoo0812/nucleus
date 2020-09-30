@@ -35,7 +35,7 @@ local apply_doers = {
         end
         if apply.sure then
             local project = session.data.project
-            local ok1, err1 = admin_db:insert("member_projs", { {member_name = apply.en_name, proj_id = project.id } })
+            local ok1, err1 = admin_db:insert("member_projs", { {en_name = apply.en_name, proj_id = project.id } })
             if not ok1 then
                 return { code = -1, msg = sformat("member_projs insert failed:%s", err1)}
             end

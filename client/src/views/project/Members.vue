@@ -14,21 +14,14 @@
                 <el-table-column prop="dept" label="部门" width="350"> </el-table-column>
                 <el-table-column label="操作" width="250">
                 <template slot-scope="scope">
-                    <el-button size="small" type="info" icon="setting" @click="handleRoleConfig(scope.row)">设置权限</el-button>
+                    <el-button size="small" type="info" icon="setting" @click="handleConfig(scope.row)">配置权限</el-button>
                     <el-button size="small" type="danger" @click="handleDelete(scope.row)">踢出项目</el-button>
                 </template>
                 </el-table-column>
             </el-table>
-            <el-pagination @size-change="handleSizeChange" @current-change="handlePageChange"
-                layout="total, sizes, prev, pager, next, jumper"
-                :page-size="pagination.pageSize"
-                :current-page="pagination.pageNo"
-                :page-sizes="[5, 10, 20]"
-                :total="pagination.total">
-            </el-pagination>
         </div>
     </imp-panel>
-    <el-dialog title="配置用户权限" :visible.sync="dialogConfigVisible" :close-on-click-modal="false" width="60%">
+    <el-dialog title="配置权限" :visible.sync="dialogConfigVisible" :close-on-click-modal="false" width="60%">
         <imp-panel>
         </imp-panel>
         <span slot="footer" class="dialog-footer">
@@ -41,7 +34,7 @@
 
 <script>
 import panel from "../../components/Panel.vue"
-import * as utils from '../../utils/index';
+import * as utils from '../../utils/index'
 import * as driver from '../../api/driver'
 
 export default {
@@ -53,16 +46,10 @@ export default {
             currentRow: {},
             memberLoading: false,
             dialogConfigVisible: false,
-            pagination: {
-                total: 0,
-                pageNo: 1,
-                pageSize: 10,
-                parentId: 0
-            },
         }
     },
     methods: {
-        handleRoleConfig(row) {
+        handleConfig(row) {
             /*
             this.currentRow = row;
             this.dialogConfigVisible = true;
@@ -100,14 +87,6 @@ export default {
                 }
             })*/
         },
-        handleSizeChange(val) {
-            this.pagination.pageSize = val;
-            this.loadData();
-        },
-        handlePageChange(val) {
-            this.pagination.pageNo = val;
-            this.loadData();
-        },
         handleDelete(row){
             if (this.$store.getters.name == row.name) {
                 utils.showFailed(this, "不能踢出自己")
@@ -115,27 +94,25 @@ export default {
             }
             var memberlist = []
             memberlist.push(row.en_name)
-            driver.remove("member", memberlist).then(res => {
-                if (res.code != 0) {
-                    utils.showFailed(this, res.msg)
-                    return
-                }
-                this.$store.dispatch("DelResource", ["MEMBER", row.en_name, "en_name"])
+            driver.remove("members", memberlist).then(res => {
+                utils.showNetRes(this, res, () => {
+                    this.$store.dispatch("DelData", ["MEMBER", row.en_name, "en_name"])
+                })
             });
         },
-        loadData() {
-            var pageNo = this.pagination.pageNo;
-            var pageSize = this.pagination.pageSize;
-            driver.load("member", "", pageSize, pageNo).then(res => {
+        loadMembers() {
+            driver.load("members").then(res => {
                 utils.showNetRes(this, res, () => {
-                    this.$store.dispatch("InitResource", ["MEMBER", res.data])
-                    this.pagination.total = res.total;
+                    this.$store.dispatch("InitData", ["MEMBER", res.data])
                 })
             });
         }
     },
     created(){
-        this.loadData();
+        var data_center = this.$store.getters
+        if (data_center.proj && data_center.members.length == 0) {
+            this.loadMembers();
+        }
     }
 }
 </script>

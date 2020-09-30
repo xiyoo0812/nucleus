@@ -20,8 +20,9 @@ function data_pack.project(data)
     return {
         id          = data.id,
         name        = data.name or "",
-        admin       = data.admin or "",
+        nick        = data.nick or "",
         desc        = data.desc or "",
+        creator     = data.creator or "",
     }
 end
 
