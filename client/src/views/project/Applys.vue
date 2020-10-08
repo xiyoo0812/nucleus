@@ -25,6 +25,7 @@
 </div>
 </template>
 <script>
+import bus from '../../components/common/bus'
 import panel from "../../components/Panel.vue"
 import * as utils from '../../utils/index'
 import * as driver from '../../api/driver'
@@ -50,14 +51,19 @@ export default {
                 utils.showNetRes(this, res, () => {
                     this.$store.dispatch("InitData", ["APPLY", res.data])
                 })
-            });
+            })
         },
     },
     created(){
-        var data_center = this.$store.getters
-        if (data_center.proj && data_center.applys.length == 0) {
-            this.loadApplys();
+        var store = this.$store.getters
+        if (store.proj && store.applys.length == 0) {
+            this.loadApplys()
         }
+        bus.$on('project', msg => {
+            if (store.proj) {
+                this.loadApplys()
+            }
+        })
     }
 }
 </script>

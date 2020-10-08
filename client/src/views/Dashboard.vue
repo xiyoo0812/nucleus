@@ -19,7 +19,7 @@
                         <span>我的项目</span>
                     </div>
                     <el-table :data="this.$store.getters.owns" :show-header="false" height="380" style="width: 100%;font-size:14px;">
-                        <el-table-column> 
+                        <el-table-column>
                             <template slot-scope="scope">
                                 <div class="proj-item">{{scope.row.name}}</div>
                             </template>
@@ -89,10 +89,10 @@
                             <template slot-scope="scope"><div class="proj-item">{{scope.row.name}}</div></template>
                         </el-table-column>
                         <el-table-column>
-                            <template slot-scope="scope"><div class="proj-item">{{scope.row.title}}</div></template>
+                            <template slot-scope="scope"><div class="proj-item">{{scope.row.log}}</div></template>
                         </el-table-column>
                         <el-table-column width="85">
-                            <template slot-scope="scope"><div class="proj-item">{{scope.row.time}}</div></template>
+                            <template slot-scope="scope"><div class="proj-item">{{formatTime(scope.row.time)}}</div></template>
                         </el-table-column>
                     </el-table>
                 </el-card>
@@ -102,8 +102,11 @@
 </template>
 
 <script>
+
+import bus from '../components/common/bus'
 import * as driver from '../api/driver'
-import * as utils from '../utils/index';
+import * as utils from '../utils/index'
+import { formatTime } from '../utils/index'
 export default {
     name: 'dashboard',
     data() {
@@ -111,30 +114,27 @@ export default {
         }
     },
     created(){
-        this.loadOwns();
+        this.loadOwns()
+        bus.$on('project', msg => {
+            var store = this.$store.getters
+            if (store.proj) {
+                this.loadLogs()
+            }
+        })
     },
     methods: {
+        formatTime,
         loadOwns() {
             driver.load("owns").then(res => {
                 utils.showNetRes(this, res, () => {
-                    console.log("loadOwns", res.data)
-                    this.$store.dispatch("SetOwns", res.data)
-                    if (this.$store.getters.proj == null) {
-                        for (let proj of res.data) {
-                            this.chooseProj(proj)
-                            break
-                        }
+                    this.$store.dispatch("InitData", ["OWNS", res.data])
+                    if (res.proj) {
+                        this.$store.dispatch("SetProj", res.proj)
+                        bus.$emit('project');
                     }
+                    bus.$emit('owns');
                 })
             });
-        },
-        chooseProj(proj) {
-            console.log("chooseProj", proj)
-            driver.update("owns", proj).then(res => {
-                utils.showNetRes(this, res, () => {
-                    this.loadLogs();
-                })
-            })
         },
         loadLogs() {
             driver.load("logs").then(res => {

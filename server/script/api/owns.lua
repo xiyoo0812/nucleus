@@ -13,21 +13,24 @@ local owns_doers = {
     GET = function(req, params, session)
         --获取用户拥有的项目
         log_debug("/owns GET params: %s", serialize(params))
+        local choosed = nil
         local projects = {}
-        local res = admin_db:find("member_projs", {en_name = params.key})
+        local user = session.data.user
+        local res = admin_db:find("member_projs", {en_name = user.en_name})
         for _, uproj in pairs(res) do
             local proj = admin_db:find_one("projects", {id = uproj.proj_id})
             if proj then
                 tinsert(projects, packproj(proj))
                 if not session.data.project then
                     --缓存project到session
+                    choosed = proj
                     session.data.project = proj
                     proj_db:set_db("nucleus_" .. proj.id)
                     session:save()
                 end
             end
         end
-        return { code = 0, data = projects }
+        return { code = 0, data = projects, proj = packproj(choosed) }
     end,
     POST = function(req, params, session)
         --选择当前项目

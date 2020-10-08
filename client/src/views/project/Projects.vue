@@ -104,7 +104,19 @@ export default {
                     utils.showNetRes(this, res, () => {
                         utils.showSuccess(this, "创建成功");
                         this.$store.dispatch("AddData", ["PROJ", res.data])
+                        this.$store.dispatch("AddData", ["OWNS", res.data])
+                        if (this.$store.getters.proj == null) {
+                            this.$store.dispatch("SetProj", res.data)
+                        }
                     })
+                })
+            })
+        },
+        chooseProj(proj) {
+            console.log("chooseProj", proj)
+            driver.update("owns", proj).then(res => {
+                utils.showNetRes(this, res, () => {
+                    this.loadLogs();
                 })
             })
         },

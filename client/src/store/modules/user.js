@@ -28,7 +28,6 @@ const user = {
         user: getUser(),
         name: getName(),
         avatar: getAvatar(),
-        owns : [{name : "测试项目", desc : "这是一个测试项目", id : "123456"}],
     },
     mutations: {
         SET_NAME: (state, name) => {
@@ -42,9 +41,6 @@ const user = {
         },
         SET_PROJ: (state, proj) => {
             state.proj = proj
-        },
-        SET_OWNS: (state, owns) => {
-            state.owns = owns
         },
     },
 
@@ -64,11 +60,7 @@ const user = {
         },
         // 当前项目
         SetProj(context, data) {
-            context.commit('SET_PROJ', data.proj)
-        },
-        // 拥有的项目
-        SetOwns(context, data) {
-            context.commit('SET_OWNS', data.owns)
+            context.commit('SET_PROJ', data)
         },
     }
 }

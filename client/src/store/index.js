@@ -19,10 +19,14 @@ const store = new Vuex.Store({
         en_name: (state) => state.user.user.en_name,
         token: (state) => state.user.token,
         avatar: (state) => state.user.avatar,
-        owns: (state) => state.user.owns,
+        owns: (state) => state.project.owns,
+        logs: (state) => state.project.logs,
         codes: (state) => state.project.codes,
         projs: (state) => state.project.projs,
         users: (state) => state.project.users,
+        applys: (state) => state.project.applys,
+        members: (state) => state.project.members,
+        databases: (state) => state.project.databases,
     }
 })
 

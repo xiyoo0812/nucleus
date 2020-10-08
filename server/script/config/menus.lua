@@ -45,7 +45,7 @@ local MENUS = {
                 title = "代码库"
             },
             {
-                index = "keys",
+                index = "authkeys",
                 title = "凭证"
             },
             {
@@ -57,7 +57,7 @@ local MENUS = {
                 title = "节点"
             },
             {
-                index = "databses",
+                index = "databases",
                 title = "数据库"
             },
             {

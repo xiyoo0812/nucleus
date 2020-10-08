@@ -33,6 +33,7 @@
 </template>
 
 <script>
+import bus from '../../components/common/bus'
 import panel from "../../components/Panel.vue"
 import * as utils from '../../utils/index'
 import * as driver from '../../api/driver'
@@ -109,10 +110,15 @@ export default {
         }
     },
     created(){
-        var data_center = this.$store.getters
-        if (data_center.proj && data_center.members.length == 0) {
-            this.loadMembers();
+        var store = this.$store.getters
+        if (store.proj && store.members.length == 0) {
+            this.loadMembers()
         }
+        bus.$on('project', msg => {
+            if (store.proj) {
+                this.loadMembers()
+            }
+        })
     }
 }
 </script>

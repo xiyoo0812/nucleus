@@ -1,14 +1,14 @@
 <template>
 <div class="app-container">
     <h3>数据库管理</h3>
-    <el-alert :closable="false" type="success"title="负责管理数据库。"/>
+    <el-alert :closable="false" type="success" title="负责管理数据库。"/>
     <div class="twt-tool-box">
         <el-button-group>
             <el-button class="filter-item" type="primary" @click="handleCreate">添加</el-button>
             <el-button v-waves :loading="downloadLoading" class="filter-item" @click="handleDownload">导出</el-button>
         </el-button-group>
     </div>
-    <el-table stripe v-loading="listLoading" style="width: 100%" :key="tableKey" :data="databases">
+    <el-table stripe v-loading="listLoading" style="width: 100%" :data="this.$store.getters.databases">
         <el-table-column label="名称">
             <template slot-scope="scope"><span >{{ scope.row.name }}</span></template>
         </el-table-column>
@@ -75,14 +75,15 @@
 </template>
 
 <script>
-import {databaseAll,databaseNew,databaseDelete,databaseUpdate } from '../../api/database'
+
+import bus from '../../components/common/bus'
+import * as utils from '../../utils/index'
+import * as driver from '../../api/driver'
 export default {
-    name: 'Database',
+    name: 'Databases',
     data() {
         return {
-            tableKey: 0,
             form: {},
-            databases: [],
             dialogStatus: '',
             listLoading: false,
             downloadLoading: false,
@@ -101,23 +102,27 @@ export default {
             },
         }
     },
-    mounted() {
+    created() {
         this.resetForm()
-        this.getDatabases()
+        var store = this.$store.getters
+        if (store.proj && store.databases.length == 0) {
+            this.loadDatabases()
+        }
+        bus.$on('project', msg => {
+            if (store.proj) {
+                this.loadDatabases()
+            }
+        })
     },
     methods: {
-        getDatabases() {
-            databaseAll().then(res => {
-                if (res.code !== 0) {
-                    this.showFailed(res.msg)
-                    return
-                }
-                if (res.data.databases) {
-                    this.databases = res.data.databases.reverse()
-                    this.databases.forEach(e => {
+        loadDatabases() {
+            driver.load("databases").then(res => {
+                utils.showNetRes(this, res, () => {
+                    res.data.forEach(e => {
                         e.addr = `${e.ip}:${e.port}`
                     })
-                }
+                    this.$store.dispatch("InitData", ["DATABASE", res.data])
+                })
             })
         },
         resetForm() {
@@ -157,14 +162,12 @@ export default {
             this.$refs['dataForm'].validate((valid) => {
                 if (valid) {
                     var params = this.getFormParams()
-                    databaseNew(params).then(res => {
-                        if (res.code !== 0) {
-                            this.showFailed(res.msg)
-                            return
-                        }
-                        this.getDatabases()
-                        this.dialogFormVisible = false
-                        this.showSuccess('操作成功')
+                    driver.insert("databases", params).then(res => {
+                        utils.showNetRes(this, res, () => {
+                            this.$store.dispatch("AddData", ["DATABASE", res.data, "id"])
+                            this.dialogFormVisible = false
+
+                        })
                     })
                 }
             })
@@ -182,41 +185,29 @@ export default {
             this.$refs['dataForm'].validate((valid) => {
                 if (valid) {
                     var params = this.getFormParams()
-                    databaseUpdate(params).then(res => {
-                        if (res.code !== 0) {
-                            this.showFailed(res.msg)
-                            return
-                        }
-                        this.getDatabases()
-                        this.showSuccess('操作成功')
-                        this.dialogFormVisible = false
+                    driver.update("databases", params).then(res => {
+                        utils.showNetRes(this, res, () => {
+                            this.$store.dispatch("UpdateData", ["DATABASE", res.data, "id"])
+                            this.dialogFormVisible = false
+
+                        })
                     })
                 }
             })
         },
         handleDelete(row) {
             this.$confirm('确定要删除此主机，是否继续?', '提示', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                type: 'warning'
+                confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning'
             }).then(() => {
-                this.form = Object.assign({}, row)
-                databaseDelete(this.form).then(res => {
-                    if (res.code !== 0) {
-                        this.showFailed(res.msg)
-                        return
-                    }
-                    this.getDatabases()
-                    this.showSuccess('操作成功')
+                var dbids = []
+                dbids.push(row.id)
+                driver.remove("databases", dbids).then(res => {
+                    utils.showNetRes(this, res, () => {
+                        this.$store.dispatch("DelData", ["DATABASE", row.id, "id"])
+                    })
                 })
             }).catch(() => {})
         },
-        showSuccess(msg) {
-            this.$notify({title: '成功', message: msg, type: 'success', duration: 2000 })
-        },
-        showFailed(msg) {
-            this.$notify({title: '失败', message: msg, type: 'fail', duration: 2000 })
-        }
     }
 }
 </script>

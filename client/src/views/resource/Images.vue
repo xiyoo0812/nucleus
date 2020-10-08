@@ -1,7 +1,7 @@
 <template>
 <div class="app-container">
     <h3>镜像管理</h3>
-    <el-alert :closable="false" type="success"title="负责管Docker镜像生成和容器运行。"/>
+    <el-alert :closable="false" type="success" title="负责管Docker镜像生成和容器运行。"/>
     <div class="twt-tool-box">
         <el-button-group>
             <el-button class="filter-item" type="primary" @click="handleCreate">添加</el-button>

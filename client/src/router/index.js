@@ -23,23 +23,38 @@ const router = new Router({
                 },
                 {
                     path: '/auths',
-                    component: () => import(/* webpackChunkName: "404" */ '../views/project/Auths.vue'),
+                    component: () => import(/* webpackChunkName: "auths" */ '../views/project/Auths.vue'),
                     meta: { title: '项目权限' }
                 },
                 {
                     path: '/members',
-                    component: () => import(/* webpackChunkName: "404" */ '../views/project/Members.vue'),
+                    component: () => import(/* webpackChunkName: "members" */ '../views/project/Members.vue'),
                     meta: { title: '成员列表' }
                 },
                 {
                     path: '/applys',
-                    component: () => import(/* webpackChunkName: "404" */ '../views/project/Applys.vue'),
+                    component: () => import(/* webpackChunkName: "applys" */ '../views/project/Applys.vue'),
                     meta: { title: '申请列表' }
                 },
                 {
                     path: '/projects',
-                    component: () => import(/* webpackChunkName: "404" */ '../views/project/Projects.vue'),
+                    component: () => import(/* webpackChunkName: "projects" */ '../views/project/Projects.vue'),
                     meta: { title: '所有项目' }
+                },
+                {
+                    path: '/databases',
+                    component: () => import(/* webpackChunkName: "databases" */ '../views/resource/Databases.vue'),
+                    meta: { title: '数据库' }
+                },
+                {
+                    path: '/codes',
+                    component: () => import(/* webpackChunkName: "codes" */ '../views/resource/Codes.vue'),
+                    meta: { title: '代码库' }
+                },
+                {
+                    path: '/hosts',
+                    component: () => import(/* webpackChunkName: "hosts" */ '../views/resource/Codes.vue'),
+                    meta: { title: '主机' }
                 },
                 {
                     path: '/404',

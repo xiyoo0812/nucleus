@@ -3,14 +3,26 @@ import * as utils from '../../utils/index';
 
 const project = {
     state:  {
+        databases: [],
         members: [],
+        applys: [],
         codes: [],
         projs: [],
         logs: [],
+        owns: [],
     },
     mutations: {
         INIT_LOG: (state, logs) => {
             state.logs = logs
+        },
+        INIT_OWNS: (state, owns) => {
+            state.owns = owns
+        },
+        ADD_OWNS: (state, proj) => {
+            state.owns.push(proj)
+        },
+        DEL_OWNS: (state, args) => {
+            utils.array_remove(state.owns, args[0], args[1])
         },
         INIT_MEMBER: (state, members) => {
             state.members = members
@@ -23,6 +35,24 @@ const project = {
         },
         UPDATE_MEMBER: (state, args) => {
             utils.array_update(state.members, args[0], args[1])
+        },
+        INIT_APPLY: (state, applys) => {
+            state.applys = applys
+        },
+        DEL_APPLY: (state, args) => {
+            utils.array_remove(state.applys, args[0], args[1])
+        },
+        INIT_DATABASE: (state, databases) => {
+            state.databases = databases
+        },
+        ADD_DATABASE: (state, database) => {
+            state.databases.push(database)
+        },
+        DEL_DATABASE: (state, args) => {
+            utils.array_remove(state.databases, args[0], args[1])
+        },
+        UPDATE_DATABASE: (state, args) => {
+            utils.array_update(state.databases, args[0], args[1])
         },
         INIT_PROJ: (state, projs) => {
             state.projs = projs

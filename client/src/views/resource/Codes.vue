@@ -9,7 +9,7 @@
         </el-button-group>
     </div>
     <el-alert v-if="warning" :title="warning" type="warning"/>
-    <el-table v-loading="listLoading" stripe style="width: 100%" :element-loading-text="listLoadingText" :key="tableKey" :data="codes">
+    <el-table v-loading="listLoading" stripe style="width: 100%" :element-loading-text="listLoadingText" :data="this.$store.getters.codes">
         <el-table-column label="名称">
             <template slot-scope="scope">
                 <router-link :to="{ path: '/package', query: {id:scope.row.id} }">
@@ -23,9 +23,6 @@
         <el-table-column label="类型">
             <template slot-scope="scope"><span >{{ scope.row.type }}</span></template>
         </el-table-column>
-        <el-table-column label="打包机">
-            <template slot-scope="scope"><span >{{ scope.row.host_ip }}</span></template>
-        </el-table-column>
         <el-table-column label="状态">
             <template slot-scope="scope">
                 <span v-if="scope.row.code_enable" style="color:green">可用</span>
@@ -35,13 +32,12 @@
         <el-table-column label="操作" align="center">
             <template slot-scope="scope">
             <el-button size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
-            <el-button size="mini" @click="cloneCode(scope.row)">clone</el-button>
             <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
             </template>
         </el-table-column>
     </el-table>
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" :close-on-click-modal="false" width="60%">
-        <el-form v-loading="formLoadingVisible" ref="dataForm" :rules="rules" :model="form" label-position="left" label-width="100px" style="margin-left:50px;">
+        <el-form ref="dataForm" :rules="rules" :model="form" label-position="left" label-width="100px" style="margin-left:50px;">
             <el-form-item label="名称" prop="name">
                 <el-input v-model="form.name" placeholder="hive"/>
             </el-form-item>
@@ -57,91 +53,61 @@
                     <el-option v-for="item in codeTypes" :key="item.value" :label="item.name" :value="item.value"/>
                 </el-select>
             </el-form-item>
-            <el-form-item label="打包机" prop="host">
-                <HostSelect ref="HostSelect" :form="form" prop="host" pack="true" @change="selectHost"/>
-            </el-form-item>
-            <el-form-item label="Dockerfile" prop="image">
-                <el-select v-model="form.image" placeholder="请选择">
-                    <el-option v-for="item in images" :label="item.name" :value="item.id" :key="item.id"/>
-                </el-select>
-            </el-form-item>
-            <el-form-item label="打包脚本" prop="script">
-                <ScriptShow ref="ScriptShow" :form="form" @change="handleExample"/>
-            </el-form-item>
             <el-form-item>
                 <el-button @click="dialogFormVisible = false">取消</el-button>
                 <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">确认</el-button>
             </el-form-item>
         </el-form>
     </el-dialog>
-    <el-dialog :visible.sync="jobVisible" title="Clone输出" width="60%">
-        <JobShow ref="JobShow" :steps="build_steps" @change="handleProgress"/>
-    </el-dialog>
 </div>
 </template>
 
 <script>
-import JobShow from '@/components/widget/JobShow'
-import ScriptShow from '@/components/widget/ScriptShow'
-import HostSelect from '@/components/widget/HostSelect'
-import { imageAll } from '../../api/image'
-import { codeAll, codeNew, codeDelete, codeUpdate, codeClone } from '../../api/code'
+
+import bus from '../../components/common/bus'
+import * as utils from '../../utils/index'
+import * as driver from '../../api/driver'
+
 export default {
-    name: 'Code',
+    name: 'Codes',
     components: {
-        JobShow,
-        ScriptShow,
-        HostSelect
     },
     data() {
-        var self = this
         return {
-            tableKey: 0,
             form: {},
-            codes: [],
-            images: [],
             dialogStatus: '',
             listLoadingText: '',
-            jobVisible: false,
             listLoading: false,
             dialogFormVisible: false,
-            build_steps:[ "准备",  "克隆", "完成"],
             textMap: { update: '编辑', create: '新建' },
             codeTypes: [{ name: 'git', value: 'git' }, { name: 'svn', value: 'svn' }],
             rules: {
                 name: [{ required: true, message: '请填入仓库名字', trigger: 'blur' },],
                 addr: [{ required: true, message: '请填入仓库git/svn地址', trigger: 'blur' },],
                 type :[{ required: true, message: '请选择代码类型', trigger: 'blur' },],
-                host :[{ required: true, message: '请选择打包机', trigger: 'blur' },],
-                image :[{ required: true, message: '请选择打包机', trigger: 'blur' },]
             },
             warning: '',
             downloadLoading: false,
-            formLoadingVisible: false,
         }
     },
     mounted() {
         this.resetForm()
-        this.getImages()
-        this.getCodes()
+        var store = this.$store.getters
+        if (store.proj && store.codes.length == 0) {
+            this.loadCodes()
+        }
+        bus.$on('project', msg => {
+            if (store.proj) {
+                this.loadCodes()
+            }
+        })
     },
     methods: {
-        getImages() {
-            imageAll().then(res => {
-                if (res.code !== 0) {
-                    this.showFailed(res.msg)
-                    return
-                }
-                this.images = res.data.images.reverse()
-            })
-        },
-        getCodes() {
-            codeAll().then(res => {
-                if (res.code !== 0) {
-                    this.showFailed(res.msg)
-                    return
-                }
-                this.codes = res.data.codes.reverse()
+        loadCodes() {
+            driver.load("codes").then(res => {
+                utils.showNetRes(this, res, () => {
+                    this.$store.dispatch("InitData", ["CODE", res.data])
+                })
             })
         },
         resetForm() {
@@ -150,10 +116,6 @@ export default {
                 name: '',
                 addr: '',
                 type: '',
-                script: '',
-                host: '',
-                host_ip: '',
-                image: '',
                 is_remote: true,
             }
         },
@@ -186,32 +148,6 @@ export default {
         },
         selectHost(id, host) {
             this.form.host_ip = host.ip
-        },
-        cloneCode(code) {
-            if(code.is_remote)
-            {
-                this.openListLoading('正在clone仓库中，请稍后...')
-                codeClone({ id: code.id }).then((res) => {
-                    if (res.code !== 0) {
-                        this.showFailed(res.msg)
-                        return
-                    }
-                    this.showJobLog(res.data.job)
-                }).catch(() => {})
-            }
-        },
-        showJobLog(job){
-            this.jobVisible = true
-            this.$nextTick(() => {
-                this.$refs.JobShow.showJobLog(job)
-            })
-        },
-        handleProgress(complete) {
-            if (complete) {
-                this.getCodes()
-            } else {
-                this.jobVisible = true
-            }
         },
         handleUpdate(row) {
             this.form = Object.assign({}, row) // copy obj

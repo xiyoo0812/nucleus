@@ -9,7 +9,7 @@
         <div class="header-left">
             <div class="header-user-con">
                 <!-- 当前项目 -->
-                <Selecter :attr="project_id" :objs="this.$store.getters.meprojs" holder="请选择项目" @change="selectProj"/>
+                <Selecter :attr="proj_id" :objs="this.$store.getters.owns" holder="请选择项目" @change="selectProj"/>
             </div>
         </div>
         <div class="header-right">
@@ -55,14 +55,14 @@
     </div>
 </template>
 <script>
-import bus from './bus';
+import bus from './bus'
 import Selecter from '../widget/Selecter.vue'
 export default {
     data() {
         return {
             collapse: false,
             fullscreen: false,
-            project_id: null,
+            proj_id: null,
             message: 2,
         };
     },
@@ -80,6 +80,7 @@ export default {
         // 项目下拉菜单
         selectProj(proj_id, proj) {
             console.log("selectProj2:" + proj.id + proj.name)
+            //bus.$emit('project');
         },
         // 侧边栏折叠
         collapseChage() {
@@ -118,9 +119,11 @@ export default {
         if (document.body.clientWidth < 1500) {
             this.collapseChage()
         }
-        if (this.$store.getters.proj) {
-            this.project_id = this.$store.getters.proj.id
-        }
+        bus.$on('owns', msg => {
+            if (this.$store.getters.proj) {
+                this.proj_id = this.$store.getters.proj.id
+            }
+        })
     }
 };
 </script>

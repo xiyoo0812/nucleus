@@ -25,14 +25,3 @@ function data_pack.project(data)
         creator     = data.creator or "",
     }
 end
-
-function data_pack.resource(data)
-    return {
-        id          = data.id,
-        path        = data.path or "",
-        name        = data.name or "",
-        method      = data.method or {},
-        project     = data.project or 0,
-        remarks     = data.remarks or "",
-    }
-end
