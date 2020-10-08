@@ -12,7 +12,7 @@ local apidoer   = utility.apidoer
 local proj_db   = nucleus.proj_db
 
 --定义接口
-local code_doers = {
+local codes_doers = {
     GET = function(req, args)
         log_debug("/codes GET params: %s", serialize(args))
         local records = {}
@@ -69,5 +69,5 @@ local code_doers = {
 }
 
 --执行
-apidoer(ngx.req, code_doers)
+apidoer(ngx.req, codes_doers)
 

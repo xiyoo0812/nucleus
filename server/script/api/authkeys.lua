@@ -12,7 +12,7 @@ local apidoer   = utility.apidoer
 local proj_db   = nucleus.proj_db
 
 --定义接口
-local authkey_doers = {
+local authkeys_doers = {
     GET = function(req, args)
         log_debug("/authkeys GET params: %s", serialize(args))
         local res = proj_db:find("authkeys", {}, {_id = 0})
@@ -69,5 +69,5 @@ local authkey_doers = {
 }
 
 --执行
-apidoer(ngx.req, authkey_doers)
+apidoer(ngx.req, authkeys_doers)
 

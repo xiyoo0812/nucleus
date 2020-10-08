@@ -12,7 +12,7 @@ local apidoer   = utility.apidoer
 local proj_db   = nucleus.proj_db
 
 --定义接口
-local host_doers = {
+local hosts_doers = {
     GET = function(req, args)
         log_debug("/hosts GET params: %s", serialize(args))
         local res = proj_db:find("hosts", {}, {_id = 0})
@@ -69,5 +69,5 @@ local host_doers = {
 }
 
 --执行
-apidoer(ngx.req, host_doers)
+apidoer(ngx.req, hosts_doers)
 
