@@ -13,8 +13,8 @@ local proj_db   = nucleus.proj_db
 
 --定义接口
 local hosts_doers = {
-    GET = function(req, args)
-        log_debug("/hosts GET params: %s", serialize(args))
+    GET = function(req, params, session)
+        log_debug("/hosts GET params: %s", serialize(params))
         local res = proj_db:find("hosts", {}, {_id = 0})
         local records = {}
         for k, host in pairs(res) do
@@ -22,9 +22,9 @@ local hosts_doers = {
         end
         return { host = 0, data = records, total = #records }
     end,
-    POST = function(req, args)
-        log_debug("/hosts POST params: %s", serialize(args))
-        local host = jdecode(args.host)
+    POST = function(req, params, session)
+        log_debug("/hosts POST params: %s", serialize(params))
+        local host = params.args
         local record = proj_db:find_one("hosts", {name = host.name})
         if not record then
             return {host = -1, msg = "host not exist"}
@@ -35,9 +35,9 @@ local hosts_doers = {
         end
         return { host = 0, data = host }
     end,
-    PUT = function(req, args)
-        log_debug("/hosts PUT params: %s", serialize(args))
-        local host = jdecode(args.host)
+    PUT = function(req, params, session)
+        log_debug("/hosts PUT params: %s", serialize(params))
+        local host = params.args
         local res = proj_db:find_one("hosts", { name = host.name })
         if res then
             return { host = -1, msg = "name aready exist!" }
@@ -48,9 +48,9 @@ local hosts_doers = {
         end
         return { host = 0, data = host }
     end,
-    DELETE = function(req, args)
-        log_debug("/hosts DELETE params: %s", serialize(args))
-        local hosts = args.hosts
+    DELETE = function(req, params, session)
+        log_debug("/hosts DELETE params: %s", serialize(params))
+        local hosts = params.args
         if type(hosts) == "string" then
             local ok, err = proj_db:delete("hosts", { name = hosts })
             if not ok then

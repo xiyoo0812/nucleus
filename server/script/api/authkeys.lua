@@ -13,8 +13,8 @@ local proj_db   = nucleus.proj_db
 
 --定义接口
 local authkeys_doers = {
-    GET = function(req, args)
-        log_debug("/authkeys GET params: %s", serialize(args))
+    GET = function(req, params, session)
+        log_debug("/authkeys GET params: %s", serialize(params))
         local res = proj_db:find("authkeys", {}, {_id = 0})
         local records = {}
         for k, key in pairs(res) do
@@ -22,9 +22,9 @@ local authkeys_doers = {
         end
         return { authkey = 0, data = records, total = #records }
     end,
-    POST = function(req, args)
-        log_debug("/authkeys POST params: %s", serialize(args))
-        local authkey = jdecode(args.authkey)
+    POST = function(req, params, session)
+        log_debug("/authkeys POST params: %s", serialize(params))
+        local authkey = params.args
         local record = proj_db:find_one("authkeys", {name = authkey.name})
         if not record then
             return {authkey = -1, msg = "authkey not exist"}
@@ -35,9 +35,9 @@ local authkeys_doers = {
         end
         return { authkey = 0, data = authkey }
     end,
-    PUT = function(req, args)
-        log_debug("/authkeys PUT params: %s", serialize(args))
-        local authkey = jdecode(args.authkey)
+    PUT = function(req, params, session)
+        log_debug("/authkeys PUT params: %s", serialize(params))
+        local authkey = params.args
         local res = proj_db:find_one("authkeys", { name = authkey.name })
         if res then
             return { authkey = -1, msg = "name aready exist!" }
@@ -48,9 +48,9 @@ local authkeys_doers = {
         end
         return { authkey = 0, data = authkey }
     end,
-    DELETE = function(req, args)
-        log_debug("/authkeys DELETE params: %s", serialize(args))
-        local authkeys = args.authkeys
+    DELETE = function(req, params, session)
+        log_debug("/authkeys DELETE params: %s", serialize(params))
+        local authkeys = params.args
         if type(authkeys) == "string" then
             local ok, err = proj_db:delete("authkeys", { name = authkeys })
             if not ok then

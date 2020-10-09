@@ -7,7 +7,6 @@ local tinsert   = table.insert
 local sformat   = string.format
 local log_debug = logger.debug
 local serialize = logger.serialize
-local packnode  = data_pack.node
 
 local apidoer   = utility.apidoer
 local admin_db  = nucleus.admin_db
@@ -16,10 +15,10 @@ local admin_db  = nucleus.admin_db
 local node_doers = {
     GET = function(req, args)
         log_debug("/node GET params: %s", serialize(args))
-        local res = admin_db:find("nodes", {})
+        local res = admin_db:find("nodes", {}, {_id = 0})
         local records = {}
-        for k, v in pairs(res) do
-            tinsert(records, packnode(v))
+        for k, node in pairs(res) do
+            tinsert(records, node)
         end
         return { node = 0, data = records, total = #records }
     end,

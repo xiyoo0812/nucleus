@@ -5,10 +5,9 @@
     <div class="twt-tool-box">
         <el-button-group>
             <el-button class="filter-item" type="primary" @click="handleCreate">添加</el-button>
-            <el-button v-waves :loading="downloadLoading" class="filter-item" @click="handleDownload">导出</el-button>
         </el-button-group>
     </div>
-    <el-table stripe v-loading="listLoading" style="width: 100%" :key="tableKey" :data="hosts">
+    <el-table stripe v-loading="listLoading" style="width: 100%" :data="this.$store.getters.hosts">
         <el-table-column label="名称">
             <template slot-scope="scope"><span >{{ scope.row.name }}</span></template>
         </el-table-column>
@@ -16,7 +15,7 @@
             <template slot-scope="scope"><span >{{ scope.row.ip }}</span></template>
         </el-table-column>
         <el-table-column label="端口">
-            <template slot-scope="scope"><span >{{ scope.row.ssh_port }}</span></template>
+            <template slot-scope="scope"><span >{{ scope.row.port }}</span></template>
         </el-table-column>
         <el-table-column label="是否打包机">
             <template slot-scope="scope"><span >{{ formatBool(scope.row.can_pack) }}</span></template>
@@ -40,12 +39,12 @@
             <el-form-item label="地址" prop="addr">
                 <el-input v-model="form.addr" placeholder="192.168.0.1:22"/>
             </el-form-item>
-            <el-form-item label="密钥" prop="key_id">
-                <el-select v-model="form.key_id" placeholder="请选择">
-                    <el-option v-for="item in keys" :label="item.title" :value="item.id" :key="item.id"/>
+            <el-form-item label="/凭证" prop="authkey">
+                <el-select v-model="form.authkey" placeholder="请选择凭证">
+                    <el-option v-for="item in this.$store.getters.authkeys" :label="item.name" :value="item.id" :key="item.id"/>
                 </el-select>
-                <router-link :to="{ path: '/key' }">
-                    <el-button @click="dialogFormVisible = false" type="text">> 点我前往密钥管理</el-button>
+                <router-link :to="{ path: '/authkeys' }">
+                    <el-button @click="dialogFormVisible = false" type="text">> 点我前往凭证管理</el-button>
                 </router-link>
             </el-form-item>
             <el-form-item label="是否打包机" prop="can_pack">
@@ -62,34 +61,30 @@
 </template>
 
 <script>
-import { keyAll } from '../../api/key'
+
+import bus from '../../components/common/bus'
+import * as utils from '../../utils/index'
+import * as driver from '../../api/driver'
 import { formatBool } from '@/utils/index'
-import { hostAll, hostNew, hostDelete, hostUpdate } from '../../api/host'
 export default {
-    name: 'Host',
+    name: 'Hosts',
     data() {
         return {
-            tableKey: 0,
             form: {},
-            keys: [],
-            hosts: [],
             total: null,
             dialogStatus: '',
             listLoading: false,
-            downloadLoading: false,
             dialogFormVisible: false,
             textMap: { update: '编辑', create: '新建' },
             rules: {
                 name: [{ required: true, message: '请填入主机名字', trigger: 'blur' },],
-                key_id: [{ required: true, message: '请选择密钥', trigger: 'change' }],
+                authkey: [{ required: true, message: '请选择凭证', trigger: 'change' }],
                 addr: [
                     { required: true, message: '请填入主机访问地址', trigger: 'blur' },
                     { type: 'string', pattern: /^.+:.+$/, message: '请填写正确主机地址，例：192.168.0.1:22' }
                 ],
                 ip: [{ required: true, message: '请填入主机域名或者IP', trigger: 'blur' }],
-                ssh_port: [{ required: true, message: '请填入ssh的端口', trigger: 'blur' }],
-                user: [{ required: true, message: '请填入通过ssh登录的用户名', trigger: 'blur' }],
-                method: [{ required: true, message: '请选择提权方法', trigger: 'change' }]
+                port: [{ required: true, message: '请填入ssh的端口', trigger: 'blur' }],
             },
         }
     },
@@ -100,15 +95,6 @@ export default {
     },
     methods: {
         formatBool,
-        getKeys() {
-            keyAll().then(res => {
-                if (res.code !== 0) {
-                    this.showFailed(res.msg)
-                    return
-                }
-                this.keys = (res.data.keys || []).reverse()
-            })
-        },
         getHosts() {
             hostAll().then(res => {
                 if (res.code !== 0) {
@@ -128,11 +114,9 @@ export default {
             this.form = {
                 id: '',
                 name: '',
-                new_name: '',
-                user: '',
                 ip: '',
-                ssh_port: '',
-                key_id: '',
+                port: '',
+                authkey: '',
                 can_pack: false
             }
         },
@@ -148,21 +132,18 @@ export default {
             var url = '/console/html/console.html?sid=' + row.id + '&path=/webconsole/connect_host&token='
             window.open(url, '_blank')
         },
-        parseAddr(addr) {
-            var metas = addr.split(':')
-            return { ip: metas[0], port: metas[1] }
-        },
-        getFormParams() {
-            var params = Object.assign({}, this.form)
-            const addrMetas = this.parseAddr(params.addr)
-            params.ip = addrMetas.ip
-            params.ssh_port = addrMetas.port
-            return params
+        
+        buildForm() {
+            var form = Object.assign({}, this.form)
+            var metas = form.addr.split(':')
+            form.ip = metas[0]
+            form.port = metas[1]
+            return form
         },
         createData() {
             this.$refs['dataForm'].validate((valid) => {
                 if (valid) {
-                    var params = this.getFormParams()
+                    var params = this.buildForm()
                     hostNew(params).then(res => {
                         if (res.code !== 0) {
                             this.showFailed(res.msg)
@@ -176,7 +157,6 @@ export default {
             })
         },
         handleUpdate(row) {
-            this.resetTemp()
             this.form = Object.assign({}, row) // copy obj
             this.dialogStatus = 'update'
             this.dialogFormVisible = true
@@ -187,7 +167,7 @@ export default {
         updateData() {
             this.$refs['dataForm'].validate((valid) => {
                 if (valid) {
-                    var params = this.getFormParams()
+                    var params = this.buildForm()
                     hostUpdate(params).then(res => {
                         if (res.code !== 0) {
                             this.showFailed(res.msg)
@@ -217,12 +197,6 @@ export default {
                 })
             }).catch(() => {})
         },
-        showSuccess(msg) {
-            this.$notify({title: '成功', message: msg, type: 'success', duration: 2000 })
-        },
-        showFailed(msg) {
-            this.$notify({title: '失败', message: msg, type: 'fail', duration: 2000 })
-        }
     }
 }
 </script>

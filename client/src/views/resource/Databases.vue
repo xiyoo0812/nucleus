@@ -54,15 +54,20 @@
             <el-form-item label="密码" prop="passwd">
                 <el-input placeholder="password" v-model="form.passwd"/>
             </el-form-item>
-             <el-form-item label="类型" prop="type">
-                <el-select v-model="form.type" placeholder="请选择类型">
+            <el-form-item label="类型" prop="type">
+                <el-select v-model="form.driver" placeholder="请选择类型">
                     <el-option v-for="item in dbType" :key="item" :label="item" :value="item"/>
                 </el-select>
             </el-form-item>
-             <el-form-item label="Group" prop="group">
+            <el-form-item label="部署环境" prop="type">
+                <el-select v-model="form.type" placeholder="请选择部署环境">
+                    <el-option v-for="item in dbEnv" :key="item" :label="item" :value="item"/>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="Group" prop="group">
                 <el-input v-model="form.group"/>
             </el-form-item>
-             <el-form-item label="Index" prop="index">
+            <el-form-item label="Index" prop="index">
                 <el-input v-model="form.index"/>
             </el-form-item>
             <el-form-item>
@@ -89,10 +94,12 @@ export default {
             downloadLoading: false,
             dialogFormVisible: false,
             dbType: [ "mysql", "mongo" ],
+            dbEnv: [ "publish", "develop", "local"],
             textMap: { update: '编辑', create: '新建' },
             rules: {
                 name: [{ required: true, message: '请填入数据库名', trigger: 'blur' },],
-                type: [{ required: true, message: '请选型数据库类型', trigger: 'blur' }],
+                driver: [{ required: true, message: '请选型数据库类型', trigger: 'blur' }],
+                quanta_deploy: [{ required: true, message: '请选型部署环境', trigger: 'blur' }],
                 group: [{ required: true, message: '请填入数据库集群', trigger: 'blur' },],
                 index: [{ required: true, message: '请填入数据库索引', trigger: 'blur' },],
                 addr: [
@@ -118,9 +125,6 @@ export default {
         loadDatabases() {
             driver.load("databases").then(res => {
                 utils.showNetRes(this, res, () => {
-                    res.data.forEach(e => {
-                        e.addr = `${e.ip}:${e.port}`
-                    })
                     this.$store.dispatch("InitData", ["DATABASE", res.data])
                 })
             })
@@ -132,11 +136,12 @@ export default {
                 passwd: '',
                 uname: '',
                 ip: '',
-                port: null,
-                type: '',
+                port: 0,
+                driver: '',
+                quanta_deploy : '',
                 addr: '',
-                group: null,
-                index: null,
+                group: 0,
+                index: 0,
             }
         },
         handleCreate() {
@@ -147,33 +152,27 @@ export default {
                 this.$refs['dataForm'].clearValidate()
             })
         },
-        parseAddr(addr) {
-            var metas = addr.split(':')
-            return { ip: metas[0], port: metas[1] }
-        },
-        getFormParams() {
-            var params = Object.assign({}, this.form)
-            const addrMetas = this.parseAddr(params.addr)
-            params.ip = addrMetas.ip
-            params.port = addrMetas.port
-            return params
+        buildForm() {
+            var form = Object.assign({}, this.form)
+            var metas = form.addr.split(':')
+            form.ip = metas[0]
+            form.port = metas[1]
+            return form
         },
         createData() {
             this.$refs['dataForm'].validate((valid) => {
                 if (valid) {
-                    var params = this.getFormParams()
-                    driver.insert("databases", params).then(res => {
+                    var form = this.buildForm()
+                    driver.insert("databases", form).then(res => {
                         utils.showNetRes(this, res, () => {
                             this.$store.dispatch("AddData", ["DATABASE", res.data, "id"])
                             this.dialogFormVisible = false
-
                         })
                     })
                 }
             })
         },
         handleUpdate(row) {
-            this.resetForm()
             this.form = Object.assign({}, row) // copy obj
             this.dialogStatus = 'update'
             this.dialogFormVisible = true
@@ -184,12 +183,11 @@ export default {
         updateData() {
             this.$refs['dataForm'].validate((valid) => {
                 if (valid) {
-                    var params = this.getFormParams()
-                    driver.update("databases", params).then(res => {
+                    var form = this.buildForm()
+                    driver.update("databases", form).then(res => {
                         utils.showNetRes(this, res, () => {
                             this.$store.dispatch("UpdateData", ["DATABASE", res.data, "id"])
                             this.dialogFormVisible = false
-
                         })
                     })
                 }

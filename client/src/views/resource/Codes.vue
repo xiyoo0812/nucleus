@@ -5,7 +5,6 @@
     <div class="tool-box">
         <el-button-group>
             <el-button class="filter-item" type="primary" @click="handleCreate">添加</el-button>
-            <el-button v-waves :loading="downloadLoading" class="filter-item" @click="handleDownload">导出</el-button>
         </el-button-group>
     </div>
     <el-alert v-if="warning" :title="warning" type="warning"/>

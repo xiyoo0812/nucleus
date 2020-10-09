@@ -13,8 +13,8 @@ local proj_db   = nucleus.proj_db
 
 --定义接口
 local databases_doers = {
-    GET = function(req, args)
-        log_debug("/databases GET params: %s", serialize(args))
+    GET = function(req, params, session)
+        log_debug("/databases GET params: %s", serialize(params))
         local res = proj_db:find("databases", {}, {_id = 0})
         local records = {}
         for k, db in pairs(res) do
@@ -22,22 +22,22 @@ local databases_doers = {
         end
         return { code = 0, data = records, total = #records }
     end,
-    POST = function(req, args)
-        log_debug("/databases POST params: %s", serialize(args))
-        local database = jdecode(args.database)
+    POST = function(req, params, session)
+        log_debug("/databases POST params: %s", serialize(params))
+        local database = params.args
         local record = proj_db:find_one("databases", {name = database.name})
         if not record then
-            return {database = -1, msg = "database not exist"}
+            return {code = -1, msg = "database not exist"}
         end
         local ok, err = proj_db:update("databases", database, { name = database.name })
         if not ok then
-            return {database = -1, msg = sformat("db update failed: %s", err)}
+            return {code = -1, msg = sformat("db update failed: %s", err)}
         end
         return { code = 0, data = database }
     end,
-    PUT = function(req, args)
-        log_debug("/databases PUT params: %s", serialize(args))
-        local database = jdecode(args.database)
+    PUT = function(req, params, session)
+        log_debug("/databases PUT params: %s", serialize(params))
+        local database = params.args
         local res = proj_db:find_one("databases", { name = database.name })
         if res then
             return { code = -1, msg = "name aready exist!" }
@@ -48,9 +48,9 @@ local databases_doers = {
         end
         return { code = 0, data = database }
     end,
-    DELETE = function(req, args)
-        log_debug("/databases DELETE params: %s", serialize(args))
-        local databases = args.databases
+    DELETE = function(req, params, session)
+        log_debug("/databases DELETE params: %s", serialize(params))
+        local databases = params.args
         if type(databases) == "string" then
             local ok, err = proj_db:delete("databases", { name = databases })
             if not ok then
