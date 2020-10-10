@@ -26,6 +26,7 @@ const store = new Vuex.Store({
         users: (state) => state.project.users,
         applys: (state) => state.project.applys,
         members: (state) => state.project.members,
+        authkeys: (state) => state.project.authkeys,
         databases: (state) => state.project.databases,
     }
 })

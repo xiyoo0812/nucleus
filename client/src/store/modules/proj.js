@@ -4,6 +4,7 @@ import * as utils from '../../utils/index';
 const project = {
     state:  {
         databases: [],
+        authkeys: [],
         members: [],
         applys: [],
         codes: [],
@@ -35,6 +36,18 @@ const project = {
         },
         UPDATE_MEMBER: (state, args) => {
             utils.array_update(state.members, args[0], args[1])
+        },
+        INIT_AUTHKEY: (state, authkeys) => {
+            state.authkeys = authkeys
+        },
+        ADD_AUTHKEY: (state, key) => {
+            state.authkeys.push(key)
+        },
+        DEL_AUTHKEY: (state, args) => {
+            utils.array_remove(state.authkeys, args[0], args[1])
+        },
+        UPDATE_AUTHKEY: (state, args) => {
+            utils.array_update(state.authkeys, args[0], args[1])
         },
         INIT_APPLY: (state, applys) => {
             state.applys = applys

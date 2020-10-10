@@ -2,6 +2,7 @@
 local lshell    = require "resty.shell"
 
 local log_err   = logger.err
+local log_debug = logger.debug
 local sformat   = string.format
 local sexecute  = lshell.execute
 
@@ -14,6 +15,7 @@ local call_shell = function(cmd)
         log_err("execute [%s] shell failed: status: %s, out:%s, err:%s", cmd, status, out, err)
         return false, err
     end
+    log_debug("execute [%s] shell result: status: %s, out:%s, err:%s", cmd, status, out, err)
     return true, out
 end
 

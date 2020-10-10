@@ -53,8 +53,13 @@ const router = new Router({
                 },
                 {
                     path: '/hosts',
-                    component: () => import(/* webpackChunkName: "hosts" */ '../views/resource/Codes.vue'),
+                    component: () => import(/* webpackChunkName: "hosts" */ '../views/resource/Hosts.vue'),
                     meta: { title: '主机' }
+                },
+                {
+                    path: '/authkeys',
+                    component: () => import(/* webpackChunkName: "authkeys" */ '../views/resource/AuthKeys.vue'),
+                    meta: { title: '凭据' }
                 },
                 {
                     path: '/404',

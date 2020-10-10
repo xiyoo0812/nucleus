@@ -30,7 +30,7 @@
                     <el-input v-model="form.nick" auto-complete="off"></el-input>
                 </el-form-item>
                 <el-form-item prop="desc" label="项目简介" label-width="100px">
-                    <el-input v-model="form.desc" auto-complete="off"></el-input>
+                    <el-input v-model="form.desc" rows="5" type='textarea' auto-complete="off"></el-input>
                 </el-form-item>
                 <el-form-item label="" label-width="100px">
                     <el-button type="primary" @click="handleCreate()">确认</el-button>

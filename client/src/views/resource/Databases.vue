@@ -59,8 +59,8 @@
                     <el-option v-for="item in dbType" :key="item" :label="item" :value="item"/>
                 </el-select>
             </el-form-item>
-            <el-form-item label="部署环境" prop="type">
-                <el-select v-model="form.type" placeholder="请选择部署环境">
+            <el-form-item label="部署环境" prop="quanta_deploy">
+                <el-select v-model="form.quanta_deploy" placeholder="请选择部署环境">
                     <el-option v-for="item in dbEnv" :key="item" :label="item" :value="item"/>
                 </el-select>
             </el-form-item>
@@ -84,6 +84,7 @@
 import bus from '../../components/common/bus'
 import * as utils from '../../utils/index'
 import * as driver from '../../api/driver'
+
 export default {
     name: 'Databases',
     data() {
@@ -112,7 +113,7 @@ export default {
     created() {
         this.resetForm()
         var store = this.$store.getters
-        if (store.proj && store.databases.length == 0) {
+        if (store.proj) {
             this.loadDatabases()
         }
         bus.$on('project', msg => {
@@ -131,7 +132,6 @@ export default {
         },
         resetForm() {
             this.form = {
-                id: '',
                 name: '',
                 passwd: '',
                 uname: '',
@@ -163,6 +163,7 @@ export default {
             this.$refs['dataForm'].validate((valid) => {
                 if (valid) {
                     var form = this.buildForm()
+                    form.id = utils.newGuid()
                     driver.insert("databases", form).then(res => {
                         utils.showNetRes(this, res, () => {
                             this.$store.dispatch("AddData", ["DATABASE", res.data, "id"])

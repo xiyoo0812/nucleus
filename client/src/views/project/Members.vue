@@ -111,7 +111,7 @@ export default {
     },
     created(){
         var store = this.$store.getters
-        if (store.proj && store.members.length == 0) {
+        if (store.proj) {
             this.loadMembers()
         }
         bus.$on('project', msg => {

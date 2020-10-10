@@ -28,9 +28,6 @@
             </template>
         </el-table-column>
     </el-table>
-    <div class="pagination-container">
-        <el-pagination v-show="total>0" :total="total" layout="total"/>
-    </div>
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" :close-on-click-modal="false" >
         <el-form ref="dataForm" :rules="rules" :model="form" label-position="left" label-width="80px">
             <el-form-item label="名称" prop="name">
@@ -65,13 +62,12 @@
 import bus from '../../components/common/bus'
 import * as utils from '../../utils/index'
 import * as driver from '../../api/driver'
-import { formatBool } from '@/utils/index'
+
 export default {
     name: 'Hosts',
     data() {
         return {
             form: {},
-            total: null,
             dialogStatus: '',
             listLoading: false,
             dialogFormVisible: false,
@@ -88,26 +84,27 @@ export default {
             },
         }
     },
-    mounted() {
-        this.resetTemp()
-        this.getHosts()
-        this.getKeys()
+    created() {
+        this.resetForm()
+        var store = this.$store.getters
+        if (store.proj) {
+            this.loadHosts()
+        }
+        bus.$on('project', msg => {
+            if (store.proj) {
+                this.loadHosts()
+            }
+        })
     },
     methods: {
-        formatBool,
-        getHosts() {
-            hostAll().then(res => {
-                if (res.code !== 0) {
-                    this.showFailed(res.msg)
-                    return
-                }
-                if (res.data.hosts) {
-                    this.hosts = res.data.hosts.reverse()
-                    this.hosts.forEach(e => {
-                        e.addr = `${e.ip}:${e.ssh_port}`
-                    })
-                }
-                this.total = this.hosts.length
+        formatBool(val) {
+            return utils.formatBool(val)
+        },
+        loadHosts() {
+            driver.load("hosts").then(res => {
+                utils.showNetRes(this, res, () => {
+                    this.$store.dispatch("InitData", ["HOST", res.data])
+                })
             })
         },
         resetTemp() {
@@ -143,15 +140,13 @@ export default {
         createData() {
             this.$refs['dataForm'].validate((valid) => {
                 if (valid) {
-                    var params = this.buildForm()
-                    hostNew(params).then(res => {
-                        if (res.code !== 0) {
-                            this.showFailed(res.msg)
-                            return
-                        }
-                        this.getHosts()
-                        this.dialogFormVisible = false
-                        this.showSuccess('操作成功')
+                    var form = this.buildForm()
+                    form.id = utils.newGuid()
+                    driver.insert("hosts", form).then(res => {
+                        utils.showNetRes(this, res, () => {
+                            this.$store.dispatch("AddData", ["HOST", res.data, "id"])
+                            this.dialogFormVisible = false
+                        })
                     })
                 }
             })
@@ -167,33 +162,26 @@ export default {
         updateData() {
             this.$refs['dataForm'].validate((valid) => {
                 if (valid) {
-                    var params = this.buildForm()
-                    hostUpdate(params).then(res => {
-                        if (res.code !== 0) {
-                            this.showFailed(res.msg)
-                            return
-                        }
-                        this.getHosts()
-                        this.showSuccess('操作成功')
-                        this.dialogFormVisible = false
+                    var form = this.buildForm()
+                    driver.update("hosts", form).then(res => {
+                        utils.showNetRes(this, res, () => {
+                            this.$store.dispatch("UpdateData", ["HOST", res.data, "id"])
+                            this.dialogFormVisible = false
+                        })
                     })
                 }
             })
         },
         handleDelete(row) {
             this.$confirm('确定要删除此主机，是否继续?', '提示', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                type: 'warning'
+                confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning'
             }).then(() => {
-                this.form = Object.assign({}, row)
-                hostDelete(this.form).then(res => {
-                    if (res.code !== 0) {
-                        this.showFailed(res.msg)
-                        return
-                    }
-                    this.getHosts()
-                    this.showSuccess('操作成功')
+                var hostids = []
+                hostids.push(row.id)
+                driver.remove("hosts", hostids).then(res => {
+                    utils.showNetRes(this, res, () => {
+                        this.$store.dispatch("DelData", ["HOST", row.id, "id"])
+                    })
                 })
             }).catch(() => {})
         },

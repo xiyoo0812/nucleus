@@ -7,7 +7,6 @@
             <el-button class="filter-item" type="primary" @click="handleCreate">添加</el-button>
         </el-button-group>
     </div>
-    <el-alert v-if="warning" :title="warning" type="warning"/>
     <el-table v-loading="listLoading" stripe style="width: 100%" :element-loading-text="listLoadingText" :data="this.$store.getters.codes">
         <el-table-column label="名称">
             <template slot-scope="scope">
@@ -69,13 +68,10 @@ import * as driver from '../../api/driver'
 
 export default {
     name: 'Codes',
-    components: {
-    },
     data() {
         return {
             form: {},
             dialogStatus: '',
-            listLoadingText: '',
             listLoading: false,
             dialogFormVisible: false,
             textMap: { update: '编辑', create: '新建' },
@@ -85,14 +81,12 @@ export default {
                 addr: [{ required: true, message: '请填入仓库git/svn地址', trigger: 'blur' },],
                 type :[{ required: true, message: '请选择代码类型', trigger: 'blur' },],
             },
-            warning: '',
-            downloadLoading: false,
         }
     },
-    mounted() {
+    created() {
         this.resetForm()
         var store = this.$store.getters
-        if (store.proj && store.codes.length == 0) {
+        if (store.proj) {
             this.loadCodes()
         }
         bus.$on('project', msg => {
@@ -128,25 +122,16 @@ export default {
         },
         createData() {
             this.$refs['dataForm'].validate((valid) => {
-                if (!valid) {
-                    eturn
+                if (valid) {
+                    this.form.id = utils.newGuid()
+                    driver.insert("codes", this.form).then(res => {
+                        utils.showNetRes(this, res, () => {
+                            this.$store.dispatch("AddData", ["CODE", res.data, "id"])
+                            this.dialogFormVisible = false
+                        })
+                    })
                 }
-                this.openListLoading('正在创建代码库...')
-                codeNew(this.form).then(res => {
-                    this.listLoading = false
-                    if (res.code !== 0) {
-                        this.showFailed(res.msg)
-                        return
-                    }
-                    var code = res.data.code
-                    this.showSuccess('创建代码库成功')
-                    this.cloneCode(code)
-                    this.dialogFormVisible = false
-                })
             })
-        },
-        selectHost(id, host) {
-            this.form.host_ip = host.ip
         },
         handleUpdate(row) {
             this.form = Object.assign({}, row) // copy obj
@@ -156,75 +141,31 @@ export default {
                 this.$refs['dataForm'].clearValidate()
             })
         },
-        openFormLoading() {
-            this.formLoadingVisible = true
-        },
-        closeFormLoading() {
-            this.formLoadingVisible = false
-        },
         updateData() {
             this.$refs['dataForm'].validate((valid) => {
-                if (!valid) {
-                    return
+                if (valid) {
+                    driver.update("codes", this.form).then(res => {
+                        utils.showNetRes(this, res, () => {
+                            this.$store.dispatch("UpdateData", ["CODE", res.data, "id"])
+                            this.dialogFormVisible = false
+                        })
+                    })
                 }
-                this.openFormLoading('正在更新中...')
-                const tempData = Object.assign({}, this.form)
-                codeUpdate(tempData).then(res => {
-                    this.closeFormLoading()
-                    if (res.code !== 0) {
-                        this.showFailed(res.msg)
-                        return
-                    }
-                    this.getCodes()
-                    this.dialogFormVisible = false
-                    this.showSuccess('更新成功')
-                })
             })
         },
         handleDelete(row) {
             this.$confirm('确定要删除此代码仓库，是否继续?', '提示', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                type: 'warning'
+                confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning'
             }).then(() => {
-                this.form = Object.assign({}, row)
-                codeDelete(this.form).then(res => {
-                    if (res.code !== 0) {
-                        this.showFailed(res.msg)
-                        return
-                    }
-                    this.getCodes()
-                    this.showSuccess()
+                var codeids = []
+                codeids.push(row.id)
+                driver.remove("codes", codeids).then(res => {
+                    utils.showNetRes(this, res, () => {
+                        this.$store.dispatch("DelData", ["CODE", row.id, "id"])
+                    })
                 })
             }).catch(() => {})
         },
-        openListLoading(text) {
-            this.listLoadingText = text
-            this.listLoading = true
-        },
-        handleExample() {
-            if (this.form.image == ""){
-                this.showFailed("请先选择Dockerfile")
-                return
-            }
-            //示例代码写到script_show组件
-            this.$nextTick(() => {
-                var image = this.images.filter(e => { return e.id == this.form.image})[0]
-                if(image.name == "hive") {
-                    this.$refs.ScriptShow.showExample(1)
-                } else if(image.name == "ds") {
-                    this.$refs.ScriptShow.showExample(2)
-                } else {
-                    this.$refs.ScriptShow.showExample(3)
-                }
-            })
-        },
-        showSuccess(msg) {
-            this.$notify({title: '成功', message: msg, type: 'success', duration: 2000 })
-        },
-        showFailed(msg) {
-            this.$notify({title: '失败', message: msg, type: 'fail', duration: 2000 })
-        }
     }
 }
 </script>

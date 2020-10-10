@@ -2,7 +2,6 @@
 local json = require "cjson.safe"
 json.encode_sparse_array(true)
 
-local jdecode   = json.decode
 local tinsert   = table.insert
 local sformat   = string.format
 local log_debug = logger.debug
@@ -52,13 +51,13 @@ local codes_doers = {
         log_debug("/codes DELETE params: %s", serialize(params))
         local codes = params.args
         if type(codes) == "string" then
-            local ok, err = proj_db:delete("codes", { name = codes })
+            local ok, err = proj_db:delete("codes", { id = codes })
             if not ok then
                 return {code = -1, msg = sformat("db delete failed: %s", err)}
             end
         else
-            for _, cname in pairs(codes) do
-                local ok, err = proj_db:delete("codes", { name = cname })
+            for _, cid in pairs(codes) do
+                local ok, err = proj_db:delete("codes", { id = cid })
                 if not ok then
                     return {code = -1, msg = sformat("db delete failed: %s", err)}
                 end
