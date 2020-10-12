@@ -2,7 +2,6 @@
 local json = require "cjson.safe"
 json.encode_sparse_array(true)
 
-local jdecode   = json.decode
 local tinsert   = table.insert
 local sformat   = string.format
 local log_debug = logger.debug
@@ -20,51 +19,55 @@ local hosts_doers = {
         for k, host in pairs(res) do
             tinsert(records, host)
         end
-        return { host = 0, data = records, total = #records }
+        return { code = 0, data = records, total = #records }
     end,
     POST = function(req, params, session)
         log_debug("/hosts POST params: %s", serialize(params))
         local host = params.args
-        local record = proj_db:find_one("hosts", {name = host.name})
+        local res = proj_db:find_one("hosts", { name = host.name })
+        if res and res.id ~= host.id then
+            return { code = -1, msg = "host name aready exist!" }
+        end
+        local record = proj_db:find_one("hosts", {id = host.id})
         if not record then
-            return {host = -1, msg = "host not exist"}
+            return {code = -1, msg = "host not exist"}
         end
-        local ok, err = proj_db:update("hosts", host, { name = host.name })
+        local ok, err = proj_db:update("hosts", host, { id = host.id })
         if not ok then
-            return {host = -1, msg = sformat("db update failed: %s", err)}
+            return {code = -1, msg = sformat("db update failed: %s", err)}
         end
-        return { host = 0, data = host }
+        return { code = 0, data = host }
     end,
     PUT = function(req, params, session)
         log_debug("/hosts PUT params: %s", serialize(params))
         local host = params.args
         local res = proj_db:find_one("hosts", { name = host.name })
         if res then
-            return { host = -1, msg = "name aready exist!" }
+            return { code = -1, msg = "host name aready exist!" }
         end
         local ok, err = proj_db:insert("hosts", { host })
         if not ok then
-            return { host = -1, msg = sformat("db insert failed:%s", err)}
+            return { code = -1, msg = sformat("db insert failed:%s", err)}
         end
-        return { host = 0, data = host }
+        return { code = 0, data = host }
     end,
     DELETE = function(req, params, session)
         log_debug("/hosts DELETE params: %s", serialize(params))
         local hosts = params.args
         if type(hosts) == "string" then
-            local ok, err = proj_db:delete("hosts", { name = hosts })
+            local ok, err = proj_db:delete("hosts", { id = hosts })
             if not ok then
-                return {host = -1, msg = sformat("db delete failed: %s", err)}
+                return {code = -1, msg = sformat("db delete failed: %s", err)}
             end
         else
-            for _, cname in pairs(hosts) do
-                local ok, err = proj_db:delete("hosts", { name = cname })
+            for _, hid in pairs(hosts) do
+                local ok, err = proj_db:delete("hosts", { id = hid })
                 if not ok then
-                    return {host = -1, msg = sformat("db delete failed: %s", err)}
+                    return {code = -1, msg = sformat("db delete failed: %s", err)}
                 end
             end
         end
-        return { host = 0 }
+        return { code = 0 }
     end,
 }
 

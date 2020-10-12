@@ -24,11 +24,15 @@ local codes_doers = {
     POST = function(req, params, session)
         log_debug("/codes POST params: %s", serialize(params))
         local code = params.args
-        local record = proj_db:find_one("codes", {name = code.name})
+        local res = proj_db:find_one("codes", { name = code.name })
+        if res and res.id ~= code.id then
+            return { code = -1, msg = "code name aready exist!" }
+        end
+        local record = proj_db:find_one("codes", {id = code.id})
         if not record then
             return {code = -1, msg = "code not exist"}
         end
-        local ok, err = proj_db:update("codes", code, { name = code.name })
+        local ok, err = proj_db:update("codes", code, { id = code.id })
         if not ok then
             return {code = -1, msg = sformat("db update failed: %s", err)}
         end

@@ -9,6 +9,7 @@ const project = {
         applys: [],
         codes: [],
         projs: [],
+        hosts: [],
         logs: [],
         owns: [],
     },
@@ -24,6 +25,12 @@ const project = {
         },
         DEL_OWNS: (state, args) => {
             utils.array_remove(state.owns, args[0], args[1])
+        },
+        INIT_APPLY: (state, applys) => {
+            state.applys = applys
+        },
+        DEL_APPLY: (state, args) => {
+            utils.array_remove(state.applys, args[0], args[1])
         },
         INIT_MEMBER: (state, members) => {
             state.members = members
@@ -49,11 +56,17 @@ const project = {
         UPDATE_AUTHKEY: (state, args) => {
             utils.array_update(state.authkeys, args[0], args[1])
         },
-        INIT_APPLY: (state, applys) => {
-            state.applys = applys
+        INIT_HOST: (state, hosts) => {
+            state.hosts = hosts
         },
-        DEL_APPLY: (state, args) => {
-            utils.array_remove(state.applys, args[0], args[1])
+        ADD_HOST: (state, host) => {
+            state.hosts.push(host)
+        },
+        DEL_HOST: (state, args) => {
+            utils.array_remove(state.hosts, args[0], args[1])
+        },
+        UPDATE_HOST: (state, args) => {
+            utils.array_update(state.hosts, args[0], args[1])
         },
         INIT_DATABASE: (state, databases) => {
             state.databases = databases
@@ -67,18 +80,6 @@ const project = {
         UPDATE_DATABASE: (state, args) => {
             utils.array_update(state.databases, args[0], args[1])
         },
-        INIT_PROJ: (state, projs) => {
-            state.projs = projs
-        },
-        ADD_PROJ: (state, proj) => {
-            state.projs.push(proj)
-        },
-        DEL_PROJ: (state, args) => {
-            utils.array_remove(state.projs, args[0], args[1])
-        },
-        UPDATE_PROJ: (state, args) => {
-            utils.array_update(state.projs, args[0], args[1])
-        },
         INIT_CODE: (state, codes) => {
             state.codes = codes
         },
@@ -90,6 +91,18 @@ const project = {
         },
         UPDATE_CODE: (state, args) => {
             utils.array_update(state.codes, args[0], args[1])
+        },
+        INIT_PROJ: (state, projs) => {
+            state.projs = projs
+        },
+        ADD_PROJ: (state, proj) => {
+            state.projs.push(proj)
+        },
+        DEL_PROJ: (state, args) => {
+            utils.array_remove(state.projs, args[0], args[1])
+        },
+        UPDATE_PROJ: (state, args) => {
+            utils.array_update(state.projs, args[0], args[1])
         },
     },
     actions: {

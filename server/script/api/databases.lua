@@ -24,11 +24,15 @@ local databases_doers = {
     POST = function(req, params, session)
         log_debug("/databases POST params: %s", serialize(params))
         local database = params.args
-        local record = proj_db:find_one("databases", {name = database.name})
+        local res = proj_db:find_one("databases", { name = database.name })
+        if res and res.id ~= database.id then
+            return { code = -1, msg = "database name aready exist!" }
+        end
+        local record = proj_db:find_one("databases", {id = database.id})
         if not record then
             return {code = -1, msg = "database not exist"}
         end
-        local ok, err = proj_db:update("databases", database, { name = database.name })
+        local ok, err = proj_db:update("databases", database, { id = database.id })
         if not ok then
             return {code = -1, msg = sformat("db update failed: %s", err)}
         end
@@ -39,7 +43,7 @@ local databases_doers = {
         local database = params.args
         local res = proj_db:find_one("databases", { name = database.name })
         if res then
-            return { code = -1, msg = "name aready exist!" }
+            return { code = -1, msg = "database name aready exist!" }
         end
         local ok, err = proj_db:insert("databases", { database })
         if not ok then

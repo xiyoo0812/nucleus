@@ -25,13 +25,17 @@ local authkeys_doers = {
     POST = function(req, params, session)
         log_debug("/authkeys POST params: %s", serialize(params))
         local authkey = params.args
-        local record = proj_db:find_one("authkeys", {name = authkey.name})
+        local res = proj_db:find_one("authkeys", { name = authkey.name })
+        if res and res.id ~= authkey.id then
+            return { code = -1, msg = "authkey name aready exist!" }
+        end
+        local record = proj_db:find_one("authkeys", {id = authkey.id})
         if not record then
             return {code = -1, msg = "authkey not exist"}
         end
         authkey.time = os.time()
         authkey.sshkey = record.sshkey
-        local ok, err = proj_db:update("authkeys", authkey, { name = authkey.name })
+        local ok, err = proj_db:update("authkeys", authkey, { id = authkey.id })
         if not ok then
             return {code = -1, msg = sformat("db update failed: %s", err)}
         end
@@ -42,7 +46,7 @@ local authkeys_doers = {
         local authkey = params.args
         local res = proj_db:find_one("authkeys", { name = authkey.name })
         if res then
-            return { code = -1, msg = "name aready exist!" }
+            return { code = -1, msg = "authkey name aready exist!" }
         end
         if authkey.type == "SSHKey" then
             if #authkey.sshkey == 0 then

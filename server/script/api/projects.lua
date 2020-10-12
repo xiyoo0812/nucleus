@@ -26,11 +26,16 @@ local projects_doers = {
         --修改项目内容
         log_debug("/projects POST params: %s", serialize(params))
         local project = params.args
-        local record = admin_db:find_one("projects", {name = project.name})
+        --查询是否重复
+        local res = admin_db:find_one("projects", { name = project.name })
+        if res and res.id ~= project.id then
+            return { code = -1, msg = "project name aready exist!" }
+        end
+        local record = admin_db:find_one("projects", {id = project.id})
         if not record then
             return {code = -1, msg = "project not exist"}
         end
-        local ok, err = admin_db:update("projects", project, { name = project.name })
+        local ok, err = admin_db:update("projects", project, { id = project.id })
         if not ok then
             return {code = -1, msg = sformat("projects update failed: %s", err)}
         end
@@ -45,7 +50,7 @@ local projects_doers = {
         --查询是否重复
         local res = admin_db:find_one("projects", { name = project.name })
         if res then
-            return { code = -1, msg = "name aready exist!" }
+            return { code = -1, msg = "project name aready exist!" }
         end
         local proj_info = {
             admin = true,

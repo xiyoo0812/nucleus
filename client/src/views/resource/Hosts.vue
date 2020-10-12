@@ -23,7 +23,6 @@
         <el-table-column label="操作" align="center">
             <template slot-scope="scope">
                 <el-button size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
-                <el-button size="mini" @click="handleConnect(scope.row)">连接</el-button>
                 <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
             </template>
         </el-table-column>
@@ -36,7 +35,7 @@
             <el-form-item label="地址" prop="addr">
                 <el-input v-model="form.addr" placeholder="192.168.0.1:22"/>
             </el-form-item>
-            <el-form-item label="/凭证" prop="authkey">
+            <el-form-item label="凭证" prop="authkey">
                 <el-select v-model="form.authkey" placeholder="请选择凭证">
                     <el-option v-for="item in this.$store.getters.authkeys" :label="item.name" :value="item.id" :key="item.id"/>
                 </el-select>
@@ -107,7 +106,7 @@ export default {
                 })
             })
         },
-        resetTemp() {
+        resetForm() {
             this.form = {
                 id: '',
                 name: '',
@@ -118,18 +117,13 @@ export default {
             }
         },
         handleCreate() {
-            this.resetTemp()
+            this.resetForm()
             this.dialogStatus = 'create'
             this.dialogFormVisible = true
             this.$nextTick(() => {
                 this.$refs['dataForm'].clearValidate()
             })
         },
-        handleConnect(row) {
-            var url = '/console/html/console.html?sid=' + row.id + '&path=/webconsole/connect_host&token='
-            window.open(url, '_blank')
-        },
-        
         buildForm() {
             var form = Object.assign({}, this.form)
             var metas = form.addr.split(':')

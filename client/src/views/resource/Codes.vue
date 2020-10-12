@@ -15,17 +15,11 @@
                 </router-link>
             </template>
         </el-table-column>
-        <el-table-column label="地址">
-            <template slot-scope="scope"><span >{{ scope.row.addr }}</span></template>
-        </el-table-column>
         <el-table-column label="类型">
             <template slot-scope="scope"><span >{{ scope.row.type }}</span></template>
         </el-table-column>
-        <el-table-column label="状态">
-            <template slot-scope="scope">
-                <span v-if="scope.row.code_enable" style="color:green">可用</span>
-                <span v-else style="color:red">不可用</span>
-            </template>
+        <el-table-column label="地址">
+            <template slot-scope="scope"><span >{{ scope.row.addr }}</span></template>
         </el-table-column>
         <el-table-column label="操作" align="center">
             <template slot-scope="scope">
