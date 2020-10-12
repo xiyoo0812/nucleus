@@ -24,7 +24,7 @@
             </template>
         </el-table-column>
     </el-table>
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" :close-on-click-modal="false" >
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" :close-on-click-modal="false" width="70%">
         <el-form ref="dataForm" :rules="rules" :model="form" label-position="left" label-width="80px">
             <el-form-item label="名称" prop="name">
                 <el-input v-model="form.name" placeholder="插件名称"/>
@@ -32,22 +32,22 @@
             <el-form-item label="描述" prop="desc">
                 <el-input v-model="form.desc" placeholder="插件描述"/>
             </el-form-item>
-            <el-tab-pane label="参数定义" name="args">
-                <el-form :inline="true" ref="argForm" :rules="rules2" :model="argform" label-position="left" label-width="100px">
-                    <el-form-item label="参数类型" prop="type">
-                        <el-select v-model="argform.type" placeholder="请选择参数类型" clearable filterable @change="selectPlugType">
+            <el-form-item label="参数" prop="args">
+                <el-form :inline="true" ref="argForm" :rules="rules2" :model="argform" label-position="left" label-width="40px">
+                    <el-form-item label="类型" prop="type">
+                        <el-select v-model="argform.type" placeholder="选择参数类型" clearable filterable @change="selectPlugType">
                             <el-option v-for="item in pluginArgTypes" :key="item" :label="item" :value="item"/>
                         </el-select>
                     </el-form-item>
-                    <el-form-item label="参数名" prop="value">
-                        <el-input v-model="argform.name" placeholder="请输入参数名" />
+                    <el-form-item label="名称" prop="value">
+                        <el-input v-model="argform.name" placeholder="输入参数名" />
                     </el-form-item>
-                    <el-form-item label="参数描述" prop="value">
-                        <el-input v-model="argform.desc" placeholder="请输入参数名" />
+                    <el-form-item label="描述" prop="value">
+                        <el-input v-model="argform.desc" placeholder="输入参数名" />
                     </el-form-item>
                     <el-button type="primary" @click="addPlugArg()">添加</el-button>
                 </el-form>
-                <el-table :data="args" height="320" stripe border style="width: 100%;">
+                <el-table :data="form.args" height="240" stripe border style="width: 100%;">
                     <el-table-column label="名称">
                         <template slot-scope="scope">
                             <span style="margin-left: 10px">{{ scope.row.name }}</span>
@@ -71,7 +71,7 @@
                         </template>
                     </el-table-column>
                 </el-table>
-            </el-tab-pane>
+            </el-form-item>
             <el-form-item label="脚本" prop="desc">
                 <el-input v-model="form.script" placeholder="插件脚本"/>
             </el-form-item>

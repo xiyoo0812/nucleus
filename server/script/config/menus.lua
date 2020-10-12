@@ -53,7 +53,7 @@ local MENUS = {
                 title = "镜像"
             },
             {
-                index = "plugin",
+                index = "plugins",
                 title = "插件"
             },
             {
