@@ -53,19 +53,10 @@ local codes_doers = {
     end,
     DELETE = function(req, params, session)
         log_debug("/codes DELETE params: %s", serialize(params))
-        local codes = params.args
-        if type(codes) == "string" then
-            local ok, err = proj_db:delete("codes", { id = codes })
-            if not ok then
-                return {code = -1, msg = sformat("db delete failed: %s", err)}
-            end
-        else
-            for _, cid in pairs(codes) do
-                local ok, err = proj_db:delete("codes", { id = cid })
-                if not ok then
-                    return {code = -1, msg = sformat("db delete failed: %s", err)}
-                end
-            end
+        local code_id = params.args
+        local ok, err = proj_db:delete("codes", { id = code_id })
+        if not ok then
+            return {code = -1, msg = sformat("db delete failed: %s", err)}
         end
         return { code = 0 }
     end,

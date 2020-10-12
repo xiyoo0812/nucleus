@@ -7,9 +7,9 @@ local sformat   = string.format
 local shrun     = lshell.run
 
 shell = {}
-local call_shell = function(cmd)
+local call_shell = function(cmd, stdin, timeout, max_size)
     --ok, stdout, stderr, reason, status = shell.run(cmd, stdin?, timeout?, max_size?)
-    local ok, stdout, stderr, reason, status = shrun(cmd)
+    local ok, stdout, stderr, reason, status = shrun(cmd, stdin, timeout, max_size)
     if not ok then
         log_err("run [%s] failed: status: %s, out:%s, err:%s, reason=%s", cmd, status, stdout, stderr, reason)
         if reason == "exit" then

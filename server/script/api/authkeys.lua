@@ -11,6 +11,24 @@ local serialize = logger.serialize
 local apidoer   = utility.apidoer
 local proj_db   = nucleus.proj_db
 
+local function delete_authkeys(authkey)
+    local res = proj_db:find_one("authkeys", { id = authkey })
+    if not res then
+        return false, "authkey name aready exist!"
+    end
+    local ok, err = proj_db:delete("authkeys", { id = authkey })
+    if not ok then
+        return false, err
+    end
+    if res.type == "SSHKey" then
+        local sok, shres = shcall(sformat("rm -fr /nucleus/runtime/%s*", res.name))
+        if not sok then
+            return false, shres
+        end
+    end
+    return true
+end
+
 --定义接口
 local authkeys_doers = {
     GET = function(req, params, session)
@@ -50,13 +68,13 @@ local authkeys_doers = {
         end
         if authkey.type == "SSHKey" then
             if #authkey.sshkey == 0 then
-                local ok, shres = shcall(sformat("ssh-keygen -q -trsa -N -Cnucleus -f ~/.ssh/%s", authkey.id))
+                local ok, shres = shcall(sformat("ssh-keygen -q -trsa -N -Cnucleus -f /nucleus/runtime/%s", authkey.name))
                 if not ok then
                     return { code = -1, msg = sformat("ssh-keygen failed:%s", shres)}
                 end
-                authkey.sshkey = authkey.id
+                authkey.sshkey = authkey.name
             end
-            local ok, shres = shcall(sformat("cat ~/.ssh/%s.pub", authkey.id))
+            local ok, shres = shcall(sformat("cat /nucleus/runtime/%s.pub", authkey.name))
             if not ok then
                 return { code = -1, msg = sformat("ssh read pub failed:%s", shres)}
             end
@@ -71,19 +89,10 @@ local authkeys_doers = {
     end,
     DELETE = function(req, params, session)
         log_debug("/authkeys DELETE params: %s", serialize(params))
-        local authkeys = params.args
-        if type(authkeys) == "string" then
-            local ok, err = proj_db:delete("authkeys", { id = authkeys })
-            if not ok then
-                return {code = -1, msg = sformat("db delete failed: %s", err)}
-            end
-        else
-            for _, kid in pairs(authkeys) do
-                local ok, err = proj_db:delete("authkeys", { id = kid })
-                if not ok then
-                    return {code = -1, msg = sformat("db delete failed: %s", err)}
-                end
-            end
+        local authkey_id = params.args
+        local ok, err = delete_authkeys(authkey_id)
+        if not ok then
+            return {code = -1, msg = sformat("db delete failed: %s", err)}
         end
         return { code = 0 }
     end,

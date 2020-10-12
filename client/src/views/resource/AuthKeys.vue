@@ -6,7 +6,7 @@
         <el-button class="filter-item" type="primary" @click="handleCreate">添加</el-button>
     </div>
     <el-table stripe v-loading="listLoading" style="width: 100%" :data="this.$store.getters.authkeys">
-        <el-table-column label="别名">
+        <el-table-column label="名称">
             <template slot-scope="scope"><span >{{ scope.row.name }}</span></template>
         </el-table-column>
         <el-table-column label="描述">
@@ -30,8 +30,8 @@
     </el-table>
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" :close-on-click-modal="false" width="60%">
         <el-form ref="dataForm" :rules="rules" :model="form" label-width="100px">
-            <el-form-item label="别名" prop="name">
-                <el-input v-model="form.name" placeholder="别名"/>
+            <el-form-item label="名称" prop="name">
+                <el-input v-model="form.name" placeholder="名称"/>
             </el-form-item>
             <el-form-item label="描述" prop="desc">
                 <el-input v-model="form.desc" placeholder="请简单描述凭证"/>
@@ -81,7 +81,6 @@ export default {
                 name: [{ required: true, message: '请输入名字', trigger: 'blur' },],
                 desc: [{ required: true, message: '请输入描述', trigger: 'blur' },],
                 type: [{ required: true, message: '请选择凭据类型', trigger: 'blur' },],
-                title: [{ required: true, message: '请输入账户别名', trigger: 'blur' },],
                 user: [{ required: true, message: '请输入账户名字', trigger: 'blur' },],
                 token: [{ required: true, message: '请输入access token', trigger: 'blur' },],
                 passwd: [{ required: true, message: '请输入password', trigger: 'blur' },],

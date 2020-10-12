@@ -53,19 +53,10 @@ local hosts_doers = {
     end,
     DELETE = function(req, params, session)
         log_debug("/hosts DELETE params: %s", serialize(params))
-        local hosts = params.args
-        if type(hosts) == "string" then
-            local ok, err = proj_db:delete("hosts", { id = hosts })
-            if not ok then
-                return {code = -1, msg = sformat("db delete failed: %s", err)}
-            end
-        else
-            for _, hid in pairs(hosts) do
-                local ok, err = proj_db:delete("hosts", { id = hid })
-                if not ok then
-                    return {code = -1, msg = sformat("db delete failed: %s", err)}
-                end
-            end
+        local host_id = params.args
+        local ok, err = proj_db:delete("hosts", { id = host_id })
+        if not ok then
+            return {code = -1, msg = sformat("db delete failed: %s", err)}
         end
         return { code = 0 }
     end,
