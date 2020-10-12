@@ -62,6 +62,11 @@ const router = new Router({
                     meta: { title: '凭据' }
                 },
                 {
+                    path: '/plugins',
+                    component: () => import(/* webpackChunkName: "plugins" */ '../views/resource/Plugins.vue'),
+                    meta: { title: '插件' }
+                },
+                {
                     path: '/404',
                     component: () => import(/* webpackChunkName: "404" */ '../views/404.vue'),
                     meta: { title: '404' }

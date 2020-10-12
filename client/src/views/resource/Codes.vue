@@ -36,6 +36,14 @@
             <el-form-item label="地址" prop="addr">
                 <el-input v-model="form.addr" placeholder="ssh://git@10.72.17.44:10022/paper_man/server.git"/>
             </el-form-item>
+            <el-form-item label="凭证" prop="authkey">
+                <el-select v-model="form.authkey" placeholder="请选择凭证">
+                    <el-option v-for="item in this.$store.getters.authkeys" :label="item.name" :value="item.id" :key="item.id"/>
+                </el-select>
+                <router-link :to="{ path: '/authkeys' }">
+                    <el-button @click="dialogFormVisible = false" type="text">> 点我前往凭证管理</el-button>
+                </router-link>
+            </el-form-item>
             <el-form-item label="是否远程仓库" prop="is_remote">
                 <el-checkbox v-model="form.is_remote"/>
                 <span style="color:#E6A23C"> 勾选表示地址为远程git/svn仓库 </span>
@@ -74,6 +82,7 @@ export default {
                 name: [{ required: true, message: '请填入仓库名字', trigger: 'blur' },],
                 addr: [{ required: true, message: '请填入仓库git/svn地址', trigger: 'blur' },],
                 type :[{ required: true, message: '请选择代码类型', trigger: 'blur' },],
+                authkey: [{ required: true, message: '请选择凭证', trigger: 'change' }],
             },
         }
     },
@@ -103,6 +112,7 @@ export default {
                 name: '',
                 addr: '',
                 type: '',
+                authkey: '',
                 is_remote: true,
             }
         },

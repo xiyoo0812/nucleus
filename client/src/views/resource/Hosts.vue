@@ -73,13 +73,10 @@ export default {
             textMap: { update: '编辑', create: '新建' },
             rules: {
                 name: [{ required: true, message: '请填入主机名字', trigger: 'blur' },],
-                authkey: [{ required: true, message: '请选择凭证', trigger: 'change' }],
                 addr: [
                     { required: true, message: '请填入主机访问地址', trigger: 'blur' },
                     { type: 'string', pattern: /^.+:.+$/, message: '请填写正确主机地址，例：192.168.0.1:22' }
                 ],
-                ip: [{ required: true, message: '请填入主机域名或者IP', trigger: 'blur' }],
-                port: [{ required: true, message: '请填入ssh的端口', trigger: 'blur' }],
             },
         }
     },
