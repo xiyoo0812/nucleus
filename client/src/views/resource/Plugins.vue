@@ -24,60 +24,58 @@
             </template>
         </el-table-column>
     </el-table>
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" :close-on-click-modal="false" width="70%">
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" :close-on-click-modal="false" width="65%">
         <el-form ref="dataForm" :rules="rules" :model="form" label-position="left" label-width="80px">
             <el-form-item label="名称" prop="name">
-                <el-input v-model="form.name" placeholder="插件名称"/>
+                <el-input v-model="form.name" maxlength="20" placeholder="插件名称"/>
             </el-form-item>
             <el-form-item label="描述" prop="desc">
-                <el-input v-model="form.desc" placeholder="插件描述"/>
+                <el-input v-model="form.desc" maxlength="100" placeholder="插件描述"/>
+            </el-form-item>
+            <el-form-item label="脚本" prop="script">
+                <CodeEditor v-model="form.script" :code="form.script" height="400px" language="text/x-lua"/>
             </el-form-item>
             <el-form-item label="参数" prop="args">
-                <el-form :inline="true" ref="argForm" :rules="rules2" :model="argform" label-position="left" label-width="40px">
-                    <el-form-item label="类型" prop="type">
-                        <el-select v-model="argform.type" placeholder="选择参数类型" clearable filterable @change="selectPlugType">
-                            <el-option v-for="item in pluginArgTypes" :key="item" :label="item" :value="item"/>
-                        </el-select>
-                    </el-form-item>
-                    <el-form-item label="名称" prop="value">
-                        <el-input v-model="argform.name" placeholder="输入参数名" />
-                    </el-form-item>
-                    <el-form-item label="描述" prop="value">
-                        <el-input v-model="argform.desc" placeholder="输入参数名" />
-                    </el-form-item>
-                    <el-button type="primary" @click="addPlugArg()">添加</el-button>
-                </el-form>
-                <el-table :data="form.args" height="240" stripe border style="width: 100%;">
+                <el-table :data="form.args" height="200" stripe border style="width: 100%;">
                     <el-table-column label="名称">
                         <template slot-scope="scope">
-                            <span style="margin-left: 10px">{{ scope.row.name }}</span>
+                            <span v-if="!scope.row.edit" slot="reference" class="name-wrapper">{{ scope.row.name }}</span>
+                            <span v-if="scope.row.edit" class="cell">
+                                <el-input v-model="scope.row.name" placeholder="参数名称"></el-input>
+                            </span>
                         </template>
                     </el-table-column>
                     <el-table-column label="类型">
                         <template slot-scope="scope">
-                            <span style="margin-left: 10px">{{ scope.row.type }}</span>
+                            <span v-if="!scope.row.edit" slot="reference" class="name-wrapper">{{ scope.row.type }}</span>
+                            <span v-if="scope.row.edit" class="cell">
+                                <el-select v-model="scope.row.type" placeholder="参数类型" clearable filterable>
+                                    <el-option v-for="item in pluginArgTypes" :key="item" :label="item" :value="item"/>
+                                </el-select>
+                            </span>
                         </template>
                     </el-table-column>
                     <el-table-column label="描述">
                         <template slot-scope="scope">
-                            <span style="margin-left: 10px">{{ scope.row.desc }}</span>
+                            <span v-if="!scope.row.edit" slot="reference" class="name-wrapper">{{ scope.row.desc }}</span>
+                            <span v-if="scope.row.edit" class="cell">
+                                <el-input v-model="scope.row.desc" placeholder="输入描述"></el-input>
+                            </span>
                         </template>
                     </el-table-column>
                     <el-table-column label="操作">
                         <template slot-scope="scope">
-                            <el-button v-if="scope.row.edit" size="mini" @click="scope.row.edit=false">保存</el-button>
-                            <el-button v-if="!scope.row.edit" size="mini" @click="scope.row.edit=true">编辑</el-button>
-                            <el-button size="mini" type="danger" @click="deletePlugArg(scope.row)">删除</el-button>
+                            <el-button v-if="scope.row.edit" size="mini" @click="savePlugArg(scope.row)">保存</el-button>
+                            <el-button v-if="!scope.row.edit" size="mini" @click="scope.row.edit=true;argEdit=true">编辑</el-button>
+                            <el-button v-if="!scope.row.edit" size="mini" type="danger" @click="delPlugArg(scope.row)">删除</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
             </el-form-item>
-            <el-form-item label="脚本" prop="desc">
-                <el-input v-model="form.script" placeholder="插件脚本"/>
-            </el-form-item>
             <el-form-item>
+                <el-button v-if="!argEdit" type="primary" @click="addPlugArg()">添加参数</el-button>
+                <el-button v-if="!argEdit" type="primary" @click="dialogStatus==='create'?createData():updateData()">确认</el-button>
                 <el-button @click="dialogFormVisible = false">取消</el-button>
-                <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">确认</el-button>
             </el-form-item>
         </el-form>
     </el-dialog>
@@ -85,17 +83,35 @@
 </template>
 
 <script>
-
-import bus from '../../components/common/bus'
 import * as utils from '../../utils/index'
 import * as driver from '../../api/driver'
+import bus from '../../components/common/bus'
+import CodeEditor from '../../components/widget/CodeEditor.vue'
+
+const example = `--plugin脚本
+--插件开发使用lua语言
+
+--init函数在插件初始化的时候执行
+local plugin = {}
+function plugin.init()
+end
+
+--run函数在插件运行的时候执行
+function plugin.run()
+end
+
+return plugin
+`
 
 export default {
     name: 'Plugins',
+    components:{
+        CodeEditor
+    },
     data() {
         return {
             form: {},
-            argform: {},
+            argEdit: false,
             dialogStatus: '',
             listLoading: false,
             dialogFormVisible: false,
@@ -104,6 +120,8 @@ export default {
             rules: {
                 name: [{ required: true, message: '请填入插件名字', trigger: 'blur' },],
                 desc: [{ required: true, message: '请填入插件描述', trigger: 'blur' },],
+                args: [{ required: true, message: '请填入插件参数', trigger: 'blur' },],
+                script: [{ required: true, message: '请填入插件脚本', trigger: 'blur' },],
             },
         }
     },
@@ -111,29 +129,49 @@ export default {
         this.resetForm()
         var store = this.$store.getters
         if (store.proj) {
-            this.loadHosts()
+            this.loadPlugins()
         }
         bus.$on('project', msg => {
             if (store.proj) {
-                this.loadHosts()
+                this.loadPlugins()
             }
         })
     },
     methods: {
-        loadHosts() {
+        loadPlugins() {
             driver.load("plugins").then(res => {
                 utils.showNetRes(this, res, () => {
                     this.$store.dispatch("InitData", ["PLUGIN", res.data])
                 })
             })
         },
+        savePlugArg(row) {
+            if(row.name.length == 0 || row.type.length == 0 || row.desc.length == 0) {
+                utils.showFailed(this, "参数不能为空")
+                return
+            }
+            if (utils.array_count(this.form.args, row.name, "name") > 1) {
+                utils.showFailed(this, "已经存在同名参数")
+                return
+            }
+            row.edit = null
+            this.argEdit = false
+        },
+        addPlugArg() {
+            this.argEdit = true
+            this.form.args.push({ edit: true, name: "", type: "", desc: "", })
+        },
+        delPlugArg(row) {
+            utils.array_remove(this.form.args, row.name, "name")
+        },
         resetForm() {
+            this.argEdit = false
             this.form = {
                 id: '',
                 name: '',
                 desc: '',
-                args: '',
-                script: '',
+                args: [],
+                script: example,
             }
         },
         handleCreate() {
@@ -144,11 +182,20 @@ export default {
                 this.$refs['dataForm'].clearValidate()
             })
         },
+        formatForm() {
+            var fargs = []
+            var form = Object.assign({}, this.form) // copy obj
+            for (var arg of form.args) {
+                fargs.push({type: arg.type, name: arg.name, desc: arg.desc })
+            }
+            form.args = fargs
+            return form
+        },
         createData() {
             this.$refs['dataForm'].validate((valid) => {
                 if (valid) {
                     this.form.id = utils.newGuid()
-                    driver.insert("plugins", this.form).then(res => {
+                    driver.insert("plugins", this.formatForm()).then(res => {
                         utils.showNetRes(this, res, () => {
                             this.$store.dispatch("AddData", ["PLUGIN", res.data, "id"])
                             this.dialogFormVisible = false
@@ -168,7 +215,7 @@ export default {
         updateData() {
             this.$refs['dataForm'].validate((valid) => {
                 if (valid) {
-                    driver.update("plugins", this.form).then(res => {
+                    driver.update("plugins", this.formatForm()).then(res => {
                         utils.showNetRes(this, res, () => {
                             this.$store.dispatch("UpdateData", ["PLUGIN", res.data, "id"])
                             this.dialogFormVisible = false

@@ -1,24 +1,33 @@
 //utils/auth.ts
 
-const TokenKey = 'Authorization'
+const userToken = 'Authorization'
+const projToken = 'AuthorizationProj'
 
-export function getToken() {
-    var token = localStorage.getItem(TokenKey)
+export function getLocUser() {
+    var token = localStorage.getItem(userToken)
     if (token) {
         var now = new Date().getTime()
-        var tokenData = JSON.parse(token)
-        if (tokenData.tick >= now){
-            return tokenData
+        var userData = JSON.parse(token)
+        if (userData.tick >= now){
+            return userData
         }
-        localStorage.removeItem(TokenKey)
+        localStorage.removeItem(userToken)
     }
 }
 
-export function setToken(token) {
-    token.tick = new Date().getTime() + 3600 * 1000
-    localStorage.setItem(TokenKey, JSON.stringify(token))
+export function setLocUser(user) {
+    user.tick = new Date().getTime() + 3600 * 1000
+    localStorage.setItem(userToken, JSON.stringify(user))
 }
 
-export function removeToken() {
-    localStorage.removeItem(TokenKey)
+export function delLocUser() {
+    localStorage.removeItem(userToken)
+}
+
+export function getSessProj() {
+    return JSON.parse(sessionStorage.getItem(projToken))
+}
+
+export function setSessProj(proj) {
+    sessionStorage.setItem(projToken, JSON.stringify(proj))
 }

@@ -5,7 +5,7 @@ import { getBaseUrl } from "./index";
 const service = axios.create({
     baseURL: getBaseUrl(window.location.href),
     headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-    timeout: 5000
+    timeout: 10000
 })
 
 service.interceptors.request.use( (config) => {

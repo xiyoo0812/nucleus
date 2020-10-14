@@ -1,6 +1,6 @@
 <template>
-    <el-select v-model="attr" :placeholder="holder" :clearable="clear" :filterable="filter" @change="handleSelect">
-        <el-option v-for="item in objs" :key="item[key]" :label="item[label]" :value="item[key]"/>
+    <el-select v-model="option" :placeholder="holder" :clearable="clear" :filterable="filter" @change="handleSelect">
+        <el-option v-for="item in options" :key="item[opid]" :label="item[oplabel]" :value="item[opid]"/>
     </el-select>
 </template>
 
@@ -8,16 +8,16 @@
 export default {
     name: 'Selecter',
     props: {
-        attr: null,
-        objs: {
+        option: null,
+        options: {
             type: Array,
             default: () => {}
         },
-        key: {
+        opid: {
             type: String,
             default: "id"
         },
-        label: {
+        oplabel: {
             type: String,
             default: "name"
         },
@@ -35,9 +35,10 @@ export default {
         },
     },
     methods: {
-        handleSelect(key) {
-            var obj = this.objs.filter(e => { return e[this.key] === key })[0]
-            this.$emit('change', key, obj)
+        handleSelect(op_sel) {
+            this.$emit("input", op_sel)
+            var item = this.options.filter(e => { return e[this.opid] === op_sel })[0]
+            this.$emit('change', op_sel, item)
         },
     }
 }

@@ -9,7 +9,7 @@
         <div class="header-left">
             <div class="header-user-con">
                 <!-- 当前项目 -->
-                <Selecter :attr="proj_id" :objs="this.$store.getters.owns" holder="请选择项目" @change="selectProj"/>
+                <Selecter v-model="proj_id" holder="请选择项目" :option="proj_id" :options="this.$store.getters.owns" @change="selectProj"/>
             </div>
         </div>
         <div class="header-right">

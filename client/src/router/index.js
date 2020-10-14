@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router';
-import {getToken} from "../utils/auth";
+import * as auth from "../utils/auth";
 
 Vue.use(Router);
 
@@ -100,9 +100,9 @@ router.beforeEach((route, redirect, next) => {
         next();
         return
     }
-    var tokenData = getToken()
+    var userToken = auth.getLocUser()
     if (route.path !== '/login') {
-        if (!tokenData){
+        if (!userToken){
             next({
                 path: "/login",
                 query: {redirect: route.path }

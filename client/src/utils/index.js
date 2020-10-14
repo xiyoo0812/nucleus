@@ -140,6 +140,25 @@ export function confirm(view, msg, func) {
     view.$confirm(msg, '提示', {confirmButtonText: '确定',cancelButtonText: '取消',type: 'warning'}).then(func);
 }
 
+export function array_find(array, obj_key, key) {
+    for (let i = 0, len = array.length; i < len; i++) {
+        if(array[i][key] == obj_key) {
+            return true
+        }
+    }
+    return false
+}
+
+export function array_count(array, obj_key, key) {
+    var count = 0
+    for (let i = 0, len = array.length; i < len; i++) {
+        if(array[i][key] == obj_key) {
+            count++
+        }
+    }
+    return count
+}
+
 export function array_remove(array, obj_key, key) {
     for (let i = 0, len = array.length; i < len; i++) {
         if(array[i][key] == obj_key) {

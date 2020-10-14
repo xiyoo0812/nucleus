@@ -1,9 +1,10 @@
 //store/modules/user.ts
 
-import { getToken, setToken, removeToken } from '@/utils/auth'
+import * as auth from '@/utils/auth'
+import { getSessProj } from '../../utils/auth'
 
 function getName(){
-    var token = getToken()
+    var token = auth.getLocUser()
     if (token) {
         return token.name
     }
@@ -11,7 +12,7 @@ function getName(){
 }
 
 function getAvatar(){
-    var token = getToken()
+    var token = auth.getLocUser()
     if (token) {
         return token.avatar
     }
@@ -19,12 +20,16 @@ function getAvatar(){
 }
 
 function getUser(){
-    return getToken()
+    return auth.getLocUser()
+}
+
+function getProj(){
+    return auth.getSessProj()
 }
 
 const user = {
     state:  {
-        proj: null,
+        proj: getProj(),
         user: getUser(),
         name: getName(),
         avatar: getAvatar(),
@@ -50,17 +55,18 @@ const user = {
             context.commit('SET_AVATAR', data.avatar)
             context.commit('SET_NAME', data.name)
             context.commit('SET_USER', data)
-            setToken(data)
+            auth.setLocUser(data)
         },
         // 登出
         LogOut(context) {
             context.commit('SET_NAME', '')
             context.commit('SET_AVATAR', '')
-            removeToken()
+            auth.delLocUser()
         },
         // 当前项目
         SetProj(context, data) {
             context.commit('SET_PROJ', data)
+            auth.setSessProj(data)
         },
     }
 }

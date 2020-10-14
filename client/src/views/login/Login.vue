@@ -76,8 +76,8 @@ export default {
         }
     },
     mounted() {
-        var tokenData = auth.getToken()
-        if (tokenData) {
+        var userToken = auth.getLocUser()
+        if (userToken) {
             this.$router.push({ path: this.$route.query.redirect || '/' })
             return
         }
