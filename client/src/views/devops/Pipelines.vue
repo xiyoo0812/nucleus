@@ -1,13 +1,13 @@
 <template>
 <div class="app-container">
-    <h3>插件管理</h3>
-    <el-alert :closable="false" type="success" title="负责管理系统的所有插件。"/>
+    <h3>流水线管理</h3>
+    <el-alert :closable="false" type="success" title="负责管理项目的所有流水线。"/>
     <div class="twt-tool-box">
         <el-button-group>
             <el-button class="filter-item" type="primary" @click="handleCreate">添加</el-button>
         </el-button-group>
     </div>
-    <el-table stripe v-loading="listLoading" style="width: 100%" :data="this.$store.getters.plugins">
+    <el-table stripe v-loading="listLoading" style="width: 100%" :data="this.$store.getters.pipelines">
         <el-table-column label="名称">
             <template slot-scope="scope"><span >{{ scope.row.name }}</span></template>
         </el-table-column>
@@ -19,6 +19,7 @@
         </el-table-column>
         <el-table-column label="操作" align="center">
             <template slot-scope="scope">
+                <el-button size="mini" @click="handleRun(scope.row)">执行</el-button>
                 <el-button size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
                 <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
             </template>
@@ -79,6 +80,9 @@
             </el-form-item>
         </el-form>
     </el-dialog>
+    <el-dialog title="执行" :visible.sync="dialogRunVisible" :close-on-click-modal="false" width="65%">
+        
+    </el-dialog>
 </div>
 </template>
 
@@ -104,9 +108,21 @@ return plugin
 `
 
 export default {
-    name: 'Plugins',
+    name: 'Pipelines',
     components:{
         CodeEditor
+    },
+    created() {
+        this.resetForm()
+        var store = this.$store.getters
+        if (store.proj) {
+            this.loadPipelines()
+        }
+        bus.$on('project', msg => {
+            if (store.proj) {
+                this.loadPipelines()
+            }
+        })
     },
     data() {
         return {
@@ -114,6 +130,7 @@ export default {
             argEdit: false,
             dialogStatus: '',
             listLoading: false,
+            dialogRunVisible: false,
             dialogFormVisible: false,
             textMap: { update: '编辑', create: '新建' },
             pluginArgTypes: ["Codes", "Hosts", "Args", "Input", "Auto"],
@@ -125,23 +142,11 @@ export default {
             },
         }
     },
-    created() {
-        this.resetForm()
-        var store = this.$store.getters
-        if (store.proj) {
-            this.loadPlugins()
-        }
-        bus.$on('project', msg => {
-            if (store.proj) {
-                this.loadPlugins()
-            }
-        })
-    },
     methods: {
-        loadPlugins() {
-            driver.load("plugins").then(res => {
+        loadPipelines() {
+            driver.load("pipelines").then(res => {
                 utils.showNetRes(this, res, () => {
-                    this.$store.dispatch("InitData", ["PLUGIN", res.data])
+                    this.$store.dispatch("InitData", ["PIPELINE", res.data])
                 })
             })
         },
@@ -195,14 +200,17 @@ export default {
             this.$refs['dataForm'].validate((valid) => {
                 if (valid) {
                     this.form.id = utils.newGuid()
-                    driver.insert("plugins", this.formatForm()).then(res => {
+                    driver.insert("pipelines", this.formatForm()).then(res => {
                         utils.showNetRes(this, res, () => {
-                            this.$store.dispatch("AddData", ["PLUGIN", res.data, "id"])
+                            this.$store.dispatch("AddData", ["PIPELINE", res.data, "id"])
                             this.dialogFormVisible = false
                         })
                     })
                 }
             })
+        },
+        handleRun(row) {
+
         },
         handleUpdate(row) {
             this.form = Object.assign({}, row) // copy obj
@@ -215,9 +223,9 @@ export default {
         updateData() {
             this.$refs['dataForm'].validate((valid) => {
                 if (valid) {
-                    driver.update("plugins", this.formatForm()).then(res => {
+                    driver.update("pipelines", this.formatForm()).then(res => {
                         utils.showNetRes(this, res, () => {
-                            this.$store.dispatch("UpdateData", ["PLUGIN", res.data, "id"])
+                            this.$store.dispatch("UpdateData", ["PIPELINE", res.data, "id"])
                             this.dialogFormVisible = false
                         })
                     })
@@ -230,9 +238,9 @@ export default {
             }).then(() => {
                 var hostids = []
                 hostids.push(row.id)
-                driver.remove("plugins", hostids).then(res => {
+                driver.remove("pipelines", hostids).then(res => {
                     utils.showNetRes(this, res, () => {
-                        this.$store.dispatch("DelData", ["PLUGIN", row.id, "id"])
+                        this.$store.dispatch("DelData", ["PIPELINE", row.id, "id"])
                     })
                 })
             }).catch(() => {})

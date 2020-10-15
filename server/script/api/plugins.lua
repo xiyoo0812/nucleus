@@ -32,6 +32,7 @@ local plugins_doers = {
         if not record then
             return {code = -1, msg = "plugin not exist"}
         end
+        plugin.creator = session.data.user.name
         local ok, err = admin_db:update("plugins", plugin, { id = plugin.id })
         if not ok then
             return {code = -1, msg = sformat("db update failed: %s", err)}
@@ -45,6 +46,7 @@ local plugins_doers = {
         if res then
             return { code = -1, msg = "plugin name aready exist!" }
         end
+        plugin.creator = session.data.user.name
         local ok, err = admin_db:insert("plugins", { plugin })
         if not ok then
             return { code = -1, msg = sformat("db insert failed:%s", err)}

@@ -63,8 +63,23 @@ const router = new Router({
                 },
                 {
                     path: '/plugins',
-                    component: () => import(/* webpackChunkName: "plugins" */ '../views/resource/Plugins.vue'),
+                    component: () => import(/* webpackChunkName: "plugins" */ '../views/devops/Plugins.vue'),
                     meta: { title: '插件' }
+                },
+                {
+                    path: '/products',
+                    component: () => import(/* webpackChunkName: "products" */ '../views/devops/Products.vue'),
+                    meta: { title: '制品库' }
+                },
+                {
+                    path: '/pipelines',
+                    component: () => import(/* webpackChunkName: "pipelines" */ '../views/devops/Pipelines.vue'),
+                    meta: { title: '流水线' }
+                },
+                {
+                    path: '/nodes',
+                    component: () => import(/* webpackChunkName: "nodes" */ '../views/devops/DragList.vue'),
+                    meta: { title: '镜像' }
                 },
                 {
                     path: '/404',

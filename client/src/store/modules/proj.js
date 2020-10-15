@@ -4,8 +4,11 @@ import * as utils from '../../utils/index';
 const project = {
     state:  {
         databases: [],
+        pipelines: [],
         authkeys: [],
+        products: [],
         members: [],
+        plugins: [],
         applys: [],
         codes: [],
         projs: [],
@@ -26,6 +29,18 @@ const project = {
         DEL_OWNS: (state, args) => {
             utils.array_remove(state.owns, args[0], args[1])
         },
+        INIT_HOST: (state, hosts) => {
+            state.hosts = hosts
+        },
+        ADD_HOST: (state, host) => {
+            state.hosts.push(host)
+        },
+        DEL_HOST: (state, args) => {
+            utils.array_remove(state.hosts, args[0], args[1])
+        },
+        UPDATE_HOST: (state, args) => {
+            utils.array_update(state.hosts, args[0], args[1])
+        },
         INIT_APPLY: (state, applys) => {
             state.applys = applys
         },
@@ -44,6 +59,30 @@ const project = {
         UPDATE_MEMBER: (state, args) => {
             utils.array_update(state.members, args[0], args[1])
         },
+        INIT_PLUGIN: (state, plugins) => {
+            state.plugins = plugins
+        },
+        ADD_PLUGIN: (state, plugin) => {
+            state.plugins.push(plugin)
+        },
+        DEL_PLUGIN: (state, args) => {
+            utils.array_remove(state.plugins, args[0], args[1])
+        },
+        UPDATE_PLUGIN: (state, args) => {
+            utils.array_update(state.plugins, args[0], args[1])
+        },
+        INIT_PRODUCT: (state, products) => {
+            state.products = products
+        },
+        ADD_PRODUCT: (state, product) => {
+            state.products.push(product)
+        },
+        DEL_PRODUCT: (state, args) => {
+            utils.array_remove(state.products, args[0], args[1])
+        },
+        UPDATE_PRODUCT: (state, args) => {
+            utils.array_update(state.products, args[0], args[1])
+        },
         INIT_AUTHKEY: (state, authkeys) => {
             state.authkeys = authkeys
         },
@@ -56,17 +95,17 @@ const project = {
         UPDATE_AUTHKEY: (state, args) => {
             utils.array_update(state.authkeys, args[0], args[1])
         },
-        INIT_HOST: (state, hosts) => {
-            state.hosts = hosts
+        INIT_PIPELINE: (state, pipelines) => {
+            state.pipelines = pipelines
         },
-        ADD_HOST: (state, host) => {
-            state.hosts.push(host)
+        ADD_PIPELINE: (state, pipeline) => {
+            state.pipelines.push(pipeline)
         },
-        DEL_HOST: (state, args) => {
-            utils.array_remove(state.hosts, args[0], args[1])
+        DEL_PIPELINE: (state, args) => {
+            utils.array_remove(state.pipelines, args[0], args[1])
         },
-        UPDATE_HOST: (state, args) => {
-            utils.array_update(state.hosts, args[0], args[1])
+        UPDATE_PIPELINE: (state, args) => {
+            utils.array_update(state.pipelines, args[0], args[1])
         },
         INIT_DATABASE: (state, databases) => {
             state.databases = databases

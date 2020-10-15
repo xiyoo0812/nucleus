@@ -103,10 +103,10 @@
 
 <script>
 
-import bus from '../components/common/bus'
 import * as driver from '../api/driver'
 import * as utils from '../utils/index'
-import { formatTime } from '../utils/index'
+import bus from '../components/common/bus'
+
 export default {
     name: 'dashboard',
     data() {
@@ -123,7 +123,6 @@ export default {
         })
     },
     methods: {
-        formatTime,
         loadOwns() {
             driver.load("owns").then(res => {
                 utils.showNetRes(this, res, () => {
@@ -139,10 +138,12 @@ export default {
         loadLogs() {
             driver.load("logs").then(res => {
                 utils.showNetRes(this, res, () => {
-                    console.log("loadLogs", res.data)
                     this.$store.dispatch("InitData", ["LOG", res.data])
                 })
             });
+        },
+        formatTime(val) {
+            return utils.formatTime(val)
         },
         handleRefesh(){
             this.loadLogs()

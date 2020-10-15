@@ -41,28 +41,20 @@ local MENUS = {
                 title = "主机"
             },
             {
-                index = "codes",
-                title = "代码库"
-            },
-            {
                 index = "authkeys",
                 title = "凭证"
             },
             {
-                index = "images",
-                title = "镜像"
+                index = "databases",
+                title = "数据库"
             },
             {
-                index = "plugins",
-                title = "插件"
+                index = "codes",
+                title = "代码库"
             },
             {
                 index = "nodes",
                 title = "节点"
-            },
-            {
-                index = "databases",
-                title = "数据库"
             },
             {
                 index = "envs",
@@ -76,11 +68,15 @@ local MENUS = {
         title = "运维",
         subs =  {
             {
+                index = "plugins",
+                title = "插件"
+            },
+            {
                 index = "pipelines",
                 title = "流水线"
             },
             {
-                index = "product",
+                index = "products",
                 title = "制品库"
             },
             {
