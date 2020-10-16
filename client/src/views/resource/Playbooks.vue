@@ -1,13 +1,13 @@
 <template>
 <div class="app-container">
-    <h3>Dockerfile管理</h3>
-    <el-alert :closable="false" type="success" title="负责管理系统的所有Dockerfile脚本。"/>
+    <h3>Playbook管理</h3>
+    <el-alert :closable="false" type="success" title="负责管理系统的所有Ansible脚本。"/>
     <div class="twt-tool-box">
         <el-button-group>
             <el-button class="filter-item" type="primary" @click="handleCreate">添加</el-button>
         </el-button-group>
     </div>
-    <el-table stripe v-loading="listLoading" style="width: 100%" :data="this.$store.getters.images">
+    <el-table stripe v-loading="listLoading" style="width: 100%" :data="this.$store.getters.playbooks">
         <el-table-column label="名称">
             <template slot-scope="scope"><span >{{ scope.row.name }}</span></template>
         </el-table-column>
@@ -27,13 +27,13 @@
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" :close-on-click-modal="false" width="65%">
         <el-form ref="dataForm" :rules="rules" :model="form" label-position="left" label-width="80px">
             <el-form-item label="名称" prop="name">
-                <el-input v-model="form.name" maxlength="20" placeholder="image名称"/>
+                <el-input v-model="form.name" maxlength="20" placeholder="playbook名称"/>
             </el-form-item>
             <el-form-item label="描述" prop="desc">
-                <el-input v-model="form.desc" maxlength="100" placeholder="image描述"/>
+                <el-input v-model="form.desc" maxlength="100" placeholder="playbook描述"/>
             </el-form-item>
             <el-form-item label="脚本" prop="script">
-                <CodeEditor v-model="form.script" :code="form.script" height="400px" language="text/x-dockerfile"/>
+                <CodeEditor v-model="form.script" :code="form.script" height="400px" language="text/x-yaml"/>
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">确认</el-button>
@@ -49,27 +49,21 @@ import * as utils from '../../utils/index'
 import * as driver from '../../api/driver'
 import CodeEditor from '../../components/widget/CodeEditor.vue'
 
-const example = `#dockerfile脚本
-#基础image
-FROM ubuntu:16.04
-
-RUN apt-get update \\
-    && apt-get -y install wget \\
-    && apt-get -y install ansible \\
-    && apt-get -y install openssh-client \\
-    && ssh-keygen -t rsa -N '' -f /root/.ssh/id_rsa -q \\
-    && apt-get -y install --no-install-recommends wget gnupg ca-certificates \\
-    && wget -O - https://openresty.org/package/pubkey.gpg | apt-key add - \\
-    && apt-get -y install --no-install-recommends software-properties-common \\
-    && add-apt-repository -y "deb http://openresty.org/package/ubuntu $(lsb_release -sc) main" \\
-    && apt-get update \\
-    && apt-get -y install openresty
-
-CMD ["/bin/bash"]
+const example = `#ansible-playbook脚本
+- hosts : 10.100.0.48
+  remote_user : root
+  tasks :
+    - name : dir
+      command : cd /root/ansible/quanta
+      ignore_errors : True
+      register : result
+    - name : clone
+      shell : cd /root/ansible && git clone http://oauth2:BZ1whjxTNc18uTe7f5Wp@10.100.0.19/gaven.yang/quanta.git/
+      when : result.stderr
 `
 
 export default {
-    name: 'Images',
+    name: 'Playbooks',
     components:{
         CodeEditor
     },
@@ -77,7 +71,7 @@ export default {
         this.resetForm()
         var store = this.$store.getters
         if (store.proj) {
-            this.loadImages()
+            this.loadPlaybooks()
         }
     },
     data() {
@@ -88,17 +82,17 @@ export default {
             dialogFormVisible: false,
             textMap: { update: '编辑', create: '新建' },
             rules: {
-                name: [{ required: true, message: '请填入Image名字', trigger: 'blur' },],
-                desc: [{ required: true, message: '请填入Image描述', trigger: 'blur' },],
-                script: [{ required: true, message: '请填入Image脚本', trigger: 'blur' },],
+                name: [{ required: true, message: '请填入Playbook名字', trigger: 'blur' },],
+                desc: [{ required: true, message: '请填入Playbook描述', trigger: 'blur' },],
+                script: [{ required: true, message: '请填入Playbook脚本', trigger: 'blur' },],
             },
         }
     },
     methods: {
-        loadImages() {
-            driver.load("images").then(res => {
+        loadPlaybooks() {
+            driver.load("playbooks").then(res => {
                 utils.showNetRes(this, res, () => {
-                    this.$store.dispatch("InitData", ["IMAGE", res.data])
+                    this.$store.dispatch("InitData", ["PLAYBOOK", res.data])
                 })
             })
         },
@@ -130,9 +124,9 @@ export default {
             this.$refs['dataForm'].validate((valid) => {
                 if (valid) {
                     this.form.id = utils.newGuid()
-                    driver.insert("images", this.form).then(res => {
+                    driver.insert("playbooks", this.form).then(res => {
                         utils.showNetRes(this, res, () => {
-                            this.$store.dispatch("AddData", ["IMAGE", res.data, "id"])
+                            this.$store.dispatch("AddData", ["PLAYBOOK", res.data, "id"])
                             this.dialogFormVisible = false
                         })
                     })
@@ -142,9 +136,9 @@ export default {
         updateData() {
             this.$refs['dataForm'].validate((valid) => {
                 if (valid) {
-                    driver.update("images", this.form).then(res => {
+                    driver.update("playbooks", this.form).then(res => {
                         utils.showNetRes(this, res, () => {
-                            this.$store.dispatch("UpdateData", ["IMAGE", res.data, "id"])
+                            this.$store.dispatch("UpdateData", ["PLAYBOOK", res.data, "id"])
                             this.dialogFormVisible = false
                         })
                     })
@@ -152,14 +146,14 @@ export default {
             })
         },
         handleDelete(row) {
-            this.$confirm('确定要删除此Image，是否继续?', '提示', {
+            this.$confirm('确定要删除此Playbook，是否继续?', '提示', {
                 confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning'
             }).then(() => {
-                var imageids = []
-                imageids.push(row.id)
-                driver.remove("images", imageids).then(res => {
+                var playbookids = []
+                playbookids.push(row.id)
+                driver.remove("playbooks", playbookids).then(res => {
                     utils.showNetRes(this, res, () => {
-                        this.$store.dispatch("DelData", ["IMAGE", row.id, "id"])
+                        this.$store.dispatch("DelData", ["PLAYBOOK", row.id, "id"])
                     })
                 })
             }).catch(() => {})

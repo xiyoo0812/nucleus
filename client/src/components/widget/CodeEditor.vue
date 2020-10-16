@@ -8,7 +8,10 @@
 
   // languageuage
   import 'codemirror/mode/lua/lua.js'
+  import 'codemirror/mode/yaml/yaml.js'
   import 'codemirror/mode/shell/shell.js'
+  import 'codemirror/mode/javascript/javascript.js'
+  import 'codemirror/mode/dockerfile/dockerfile.js'
 
   // theme css
   import 'codemirror/theme/monokai.css'
@@ -76,7 +79,7 @@
         },
         language: {
             type: String,
-            default: "text/javascript"
+            default: "text/x-sh"
         },
     },
     mounted() {
@@ -98,7 +101,7 @@
           foldGutter: true,
           gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
           highlightSelectionMatches: { showToken: /\w/, annotateScrollbar: true },
-          mode: 'text/javascript',
+          mode: 'text/x-sh',
           hintOptions:{
             completeSingle: false
           },

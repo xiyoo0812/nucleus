@@ -26,10 +26,12 @@ const store = new Vuex.Store({
         users: (state) => state.project.users,
         hosts: (state) => state.project.hosts,
         applys: (state) => state.project.applys,
+        images: (state) => state.project.images,
         plugins: (state) => state.project.plugins,
         members: (state) => state.project.members,
         products: (state) => state.project.products,
         authkeys: (state) => state.project.authkeys,
+        playbooks: (state) => state.project.playbooks,
         pipelines: (state) => state.project.pipelines,
         databases: (state) => state.project.databases,
     }

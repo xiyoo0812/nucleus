@@ -53,6 +53,14 @@ local MENUS = {
                 title = "代码库"
             },
             {
+                index = "playbooks",
+                title = "Playbook"
+            },
+            {
+                index = "images",
+                title = "镜像"
+            },
+            {
                 index = "nodes",
                 title = "节点"
             },

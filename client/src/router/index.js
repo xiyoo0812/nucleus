@@ -62,6 +62,16 @@ const router = new Router({
                     meta: { title: '凭据' }
                 },
                 {
+                    path: '/images',
+                    component: () => import(/* webpackChunkName: "images" */ '../views/resource/Images.vue'),
+                    meta: { title: '镜像' }
+                },
+                {
+                    path: '/playbooks',
+                    component: () => import(/* webpackChunkName: "playbooks" */ '../views/resource/Playbooks.vue'),
+                    meta: { title: 'Playbook' }
+                },
+                {
                     path: '/plugins',
                     component: () => import(/* webpackChunkName: "plugins" */ '../views/devops/Plugins.vue'),
                     meta: { title: '插件' }
@@ -79,7 +89,7 @@ const router = new Router({
                 {
                     path: '/nodes',
                     component: () => import(/* webpackChunkName: "nodes" */ '../views/devops/DragList.vue'),
-                    meta: { title: '镜像' }
+                    meta: { title: '节点' }
                 },
                 {
                     path: '/404',

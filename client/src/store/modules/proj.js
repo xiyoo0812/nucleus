@@ -5,11 +5,13 @@ const project = {
     state:  {
         databases: [],
         pipelines: [],
+        playbooks: [],
         authkeys: [],
         products: [],
         members: [],
         plugins: [],
         applys: [],
+        images: [],
         codes: [],
         projs: [],
         hosts: [],
@@ -71,6 +73,18 @@ const project = {
         UPDATE_PLUGIN: (state, args) => {
             utils.array_update(state.plugins, args[0], args[1])
         },
+        INIT_IMAGE: (state, images) => {
+            state.images = images
+        },
+        ADD_IMAGE: (state, image) => {
+            state.images.push(image)
+        },
+        DEL_IMAGE: (state, args) => {
+            utils.array_remove(state.images, args[0], args[1])
+        },
+        UPDATE_IMAGE: (state, args) => {
+            utils.array_update(state.images, args[0], args[1])
+        },
         INIT_PRODUCT: (state, products) => {
             state.products = products
         },
@@ -94,6 +108,18 @@ const project = {
         },
         UPDATE_AUTHKEY: (state, args) => {
             utils.array_update(state.authkeys, args[0], args[1])
+        },
+        INIT_PLAYBOOK: (state, playbooks) => {
+            state.playbooks = playbooks
+        },
+        ADD_PLAYBOOK: (state, playbook) => {
+            state.playbooks.push(playbook)
+        },
+        DEL_PLAYBOOK: (state, args) => {
+            utils.array_remove(state.playbooks, args[0], args[1])
+        },
+        UPDATE_PLAYBOOK: (state, args) => {
+            utils.array_update(state.playbooks, args[0], args[1])
         },
         INIT_PIPELINE: (state, pipelines) => {
             state.pipelines = pipelines

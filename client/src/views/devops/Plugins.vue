@@ -255,9 +255,9 @@ export default {
             this.$confirm('确定要删除此插件，是否继续?', '提示', {
                 confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning'
             }).then(() => {
-                var hostids = []
-                hostids.push(row.id)
-                driver.remove("plugins", hostids).then(res => {
+                var pluginids = []
+                pluginids.push(row.id)
+                driver.remove("plugins", pluginids).then(res => {
                     utils.showNetRes(this, res, () => {
                         this.$store.dispatch("DelData", ["PLUGIN", row.id, "id"])
                     })
