@@ -5,7 +5,7 @@
     <div class="tool-box">
         <el-button class="filter-item" type="primary" @click="handleCreate">添加</el-button>
     </div>
-    <el-table stripe v-loading="listLoading" style="width: 100%" :data="this.$store.getters.authkeys">
+    <el-table stripe v-loading="listLoading" style="width: 100%" :data="$store.getters.authkeys">
         <el-table-column label="名称">
             <template slot-scope="scope"><span >{{ scope.row.name }}</span></template>
         </el-table-column>

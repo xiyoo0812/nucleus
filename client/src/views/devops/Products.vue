@@ -2,7 +2,7 @@
 <div class="app-container">
     <h3>制品管理</h3>
     <el-alert :closable="false" type="success" title="管理项目生成的制品。"/>
-    <el-table stripe v-loading="listLoading" style="width: 100%" :data="this.$store.getters.products">
+    <el-table stripe v-loading="listLoading" style="width: 100%" :data="$store.getters.products">
         <el-table-column label="名称">
             <template slot-scope="scope"><span >{{ scope.row.name }}</span></template>
         </el-table-column>

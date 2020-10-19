@@ -8,7 +8,7 @@
             <el-button v-waves :loading="downloadLoading" class="filter-item" @click="handleDownload">导出</el-button>
         </el-button-group>
     </div>
-    <el-table stripe v-loading="listLoading" style="width: 100%" :data="this.$store.getters.databases">
+    <el-table stripe v-loading="listLoading" style="width: 100%" :data="$store.getters.databases">
         <el-table-column label="名称">
             <template slot-scope="scope"><span >{{ scope.row.name }}</span></template>
         </el-table-column>

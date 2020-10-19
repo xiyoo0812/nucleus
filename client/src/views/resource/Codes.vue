@@ -7,7 +7,7 @@
             <el-button class="filter-item" type="primary" @click="handleCreate">添加</el-button>
         </el-button-group>
     </div>
-    <el-table v-loading="listLoading" stripe style="width: 100%" :element-loading-text="listLoadingText" :data="this.$store.getters.codes">
+    <el-table v-loading="listLoading" stripe style="width: 100%" :element-loading-text="listLoadingText" :data="$store.getters.codes">
         <el-table-column label="名称">
             <template slot-scope="scope">
                 <router-link :to="{ path: '/package', query: {id:scope.row.id} }">

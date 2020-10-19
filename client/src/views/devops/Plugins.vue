@@ -7,7 +7,7 @@
             <el-button class="filter-item" type="primary" @click="handleCreate">添加</el-button>
         </el-button-group>
     </div>
-    <el-table stripe v-loading="listLoading" style="width: 100%" :data="this.$store.getters.plugins">
+    <el-table stripe v-loading="listLoading" style="width: 100%" :data="$store.getters.plugins">
         <el-table-column label="名称">
             <template slot-scope="scope"><span >{{ scope.row.name }}</span></template>
         </el-table-column>
@@ -142,7 +142,7 @@ export default {
             listLoading: false,
             dialogFormVisible: false,
             textMap: { update: '编辑', create: '新建' },
-            pluginArgTypes: ["Codes", "Hosts", "Args", "Input", "Auto"],
+            pluginArgTypes: ["Codes", "Hosts", "Args", "Input", "Shell"],
             rules: {
                 name: [{ required: true, message: '请填入插件名字', trigger: 'blur' },],
                 desc: [{ required: true, message: '请填入插件描述', trigger: 'blur' },],

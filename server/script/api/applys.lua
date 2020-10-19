@@ -1,4 +1,4 @@
--- api/apply.lua
+-- api/applys.lua
 local tinsert   = table.insert
 local sformat   = string.format
 local log_debug = logger.debug
@@ -9,10 +9,10 @@ local proj_db   = nucleus.proj_db
 local admin_db  = nucleus.admin_db
 
 --定义接口
-local apply_doers = {
+local applys_doers = {
     GET = function(req, params, session)
         --获取项目申请列表
-        log_debug("/apply GET params: %s", serialize(params))
+        log_debug("/applys GET params: %s", serialize(params))
         local records = {}
         local res = proj_db:find("applys", {}, {_id = 0})
         for k, mem in pairs(res) do
@@ -22,7 +22,7 @@ local apply_doers = {
     end,
     POST = function(req, params, session)
         --批准申请
-        log_debug("/apply POST params: %s", serialize(params))
+        log_debug("/applys POST params: %s", serialize(params))
         local apply = params.args
         local record = proj_db:find_one("applys", {en_name = apply.en_name})
         if not record then
@@ -47,7 +47,7 @@ local apply_doers = {
     end,
     PUT = function(req, params, session)
         --申请项目权限
-        log_debug("/project PUT params: %s", serialize(params))
+        log_debug("/applys PUT params: %s", serialize(params))
         local apply_info = params.args
         local record = proj_db:find_one("applys", {en_name = apply_info.en_name})
         if record then
@@ -67,5 +67,5 @@ local apply_doers = {
 }
 
 --执行
-apidoer(ngx.req, apply_doers)
+apidoer(ngx.req, applys_doers)
 

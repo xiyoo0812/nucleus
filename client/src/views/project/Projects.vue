@@ -6,7 +6,7 @@
             <el-button type="primary" icon="plus" @click="handleNew()">创建项目</el-button>
         </h3>
         <div slot="body">
-            <el-table :data="this.$store.getters.projs" border style="width: 100%" :v-loading="listLoading">
+            <el-table :data="$store.getters.projs" border style="width: 100%" :v-loading="listLoading">
                 <el-table-column prop="name" label="项目名称" width="120"></el-table-column>
                 <el-table-column prop="nick" label="项目编号" width="120"></el-table-column>
                 <el-table-column prop="creator" label="项目创建者" width="120"></el-table-column>

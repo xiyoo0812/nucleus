@@ -1,6 +1,6 @@
 <template>
     <el-select v-model="option" :placeholder="holder" :clearable="clear" :filterable="filter" @change="handleSelect">
-        <el-option v-for="item in options" :key="item[opid]" :label="item[oplabel]" :value="item[opid]"/>
+        <el-option v-for="item in options" :key="getKey(item)" :label="getLabel(item)" :value="getKey(item)"/>
     </el-select>
 </template>
 
@@ -35,6 +35,18 @@ export default {
         },
     },
     methods: {
+        getKey(item) {
+            if (typeof(item) === "string") {
+                return item
+            }
+            return item[this.opid]
+        },
+        getLabel(item) {
+            if (typeof(item) === "string") {
+                return item
+            }
+            return item[this.oplabel]
+        },
         handleSelect(op_sel) {
             this.$emit("input", op_sel)
             var item = this.options.filter(e => { return e[this.opid] === op_sel })[0]

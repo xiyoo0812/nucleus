@@ -18,7 +18,7 @@
                     <div slot="header" class="clearfix">
                         <span>我的项目</span>
                     </div>
-                    <el-table :data="this.$store.getters.owns" :show-header="false" height="380" style="width: 100%;font-size:14px;">
+                    <el-table :data="$store.getters.owns" :show-header="false" height="380" style="width: 100%;font-size:14px;">
                         <el-table-column>
                             <template slot-scope="scope">
                                 <div class="proj-item">{{scope.row.name}}</div>
@@ -84,7 +84,7 @@
                         <span>操作记录</span>
                         <el-button style="float: right;" size="small" type="primary" @click="handleRefesh()">刷新</el-button>
                     </div>
-                    <el-table :data="this.$store.getters.logs" :show-header="false" height="580" style="width: 100%;font-size:14px;">
+                    <el-table :data="$store.getters.logs" :show-header="false" height="580" style="width: 100%;font-size:14px;">
                         <el-table-column width="120">
                             <template slot-scope="scope"><div class="proj-item">{{scope.row.name}}</div></template>
                         </el-table-column>

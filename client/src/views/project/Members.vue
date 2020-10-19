@@ -2,7 +2,7 @@
 <div class="app-container">
     <imp-panel>
         <div slot="body">
-            <el-table :data="this.$store.getters.members" border style="width: 100%" :v-loading="memberLoading">
+            <el-table :data="$store.getters.members" border style="width: 100%" :v-loading="memberLoading">
                 <el-table-column prop="id" width="50"></el-table-column>
                 <el-table-column label="头像" width="96">
                     <template slot-scope="scope"><img :src='scope.row.avatar'></template>

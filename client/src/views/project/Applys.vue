@@ -3,7 +3,7 @@
     <imp-panel>
         <h3>申请列表</h3>
         <div slot="body">
-            <el-table :data="this.$store.getters.applys" border style="width: 100%" :v-loading="listLoading">
+            <el-table :data="$store.getters.applys" border style="width: 100%" :v-loading="listLoading">
                 <el-table-column prop="id" width="50"></el-table-column>
                 <el-table-column label="头像" width="96">
                     <template slot-scope="scope"><img :src='scope.row.avatar'></template>

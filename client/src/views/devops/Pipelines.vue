@@ -7,7 +7,7 @@
             <el-button class="filter-item" type="primary" @click="handleCreate">添加</el-button>
         </el-button-group>
     </div>
-    <el-table stripe v-loading="listLoading" style="width: 100%" :data="this.$store.getters.pipelines">
+    <el-table stripe v-loading="listLoading" style="width: 100%" :data="$store.getters.pipelines">
         <el-table-column label="名称">
             <template slot-scope="scope"><span >{{ scope.row.name }}</span></template>
         </el-table-column>
@@ -25,56 +25,44 @@
             </template>
         </el-table-column>
     </el-table>
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" :close-on-click-modal="false" width="65%">
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" :close-on-click-modal="false" width="80%">
         <el-form ref="dataForm" :rules="rules" :model="form" label-position="left" label-width="80px">
-            <el-form-item label="名称" prop="name">
-                <el-input v-model="form.name" maxlength="20" placeholder="插件名称"/>
-            </el-form-item>
-            <el-form-item label="描述" prop="desc">
-                <el-input v-model="form.desc" maxlength="100" placeholder="插件描述"/>
-            </el-form-item>
-            <el-form-item label="脚本" prop="script">
-                <CodeEditor v-model="form.script" :code="form.script" height="400px" language="text/x-lua"/>
-            </el-form-item>
-            <el-form-item label="参数" prop="args">
-                <el-table :data="form.args" height="200" stripe border style="width: 100%;">
-                    <el-table-column label="名称">
-                        <template slot-scope="scope">
-                            <span v-if="!scope.row.edit" slot="reference" class="name-wrapper">{{ scope.row.name }}</span>
-                            <span v-if="scope.row.edit" class="cell">
-                                <el-input v-model="scope.row.name" placeholder="参数名称"></el-input>
-                            </span>
-                        </template>
-                    </el-table-column>
-                    <el-table-column label="类型">
-                        <template slot-scope="scope">
-                            <span v-if="!scope.row.edit" slot="reference" class="name-wrapper">{{ scope.row.type }}</span>
-                            <span v-if="scope.row.edit" class="cell">
-                                <el-select v-model="scope.row.type" placeholder="参数类型" clearable filterable>
-                                    <el-option v-for="item in pluginArgTypes" :key="item" :label="item" :value="item"/>
-                                </el-select>
-                            </span>
-                        </template>
-                    </el-table-column>
-                    <el-table-column label="描述">
-                        <template slot-scope="scope">
-                            <span v-if="!scope.row.edit" slot="reference" class="name-wrapper">{{ scope.row.desc }}</span>
-                            <span v-if="scope.row.edit" class="cell">
-                                <el-input v-model="scope.row.desc" placeholder="输入描述"></el-input>
-                            </span>
-                        </template>
-                    </el-table-column>
-                    <el-table-column label="操作">
-                        <template slot-scope="scope">
-                            <el-button v-if="scope.row.edit" size="mini" @click="savePlugArg(scope.row)">保存</el-button>
-                            <el-button v-if="!scope.row.edit" size="mini" @click="scope.row.edit=true;argEdit=true">编辑</el-button>
-                            <el-button v-if="!scope.row.edit" size="mini" type="danger" @click="delPlugArg(scope.row)">删除</el-button>
-                        </template>
-                    </el-table-column>
-                </el-table>
-            </el-form-item>
+            <el-row :gutter="20">
+                <el-col :span="10">
+                    <el-card shadow="hover" class="mgb20" style="height:520px;">
+                        <div class="item-title"> <span >{{ pipelineName }}</span></div>
+                        <draggable v-model="doing" @remove="removeHandle" :options="dragOptions">
+                        <transition-group tag="div" id="doing" class="item-ul">
+                            <div v-for="item in doing" class="drag-list" :key="item.id">
+                                {{item.content}}
+                            </div>
+                        </transition-group>
+                    </draggable>
+                    </el-card>
+                </el-col>
+                <el-col :span="14">
+                    <el-card shadow="hover" style="height:520px;">
+                        <el-form ref="pForm" :rules="rules" :model="pForm" label-position="left" label-width="80px">
+                            <el-form-item label="名称" prop="name">
+                                <Selecter v-model="pForm.name" :option="pForm.name" :options="$store.getters.plugins" @change="selectPlugin"/>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-button type="primary" @click="addPlugin()">添加插件</el-button>
+                                <el-button type="primary" @click="savePlugin()">保存</el-button>
+                                <el-button type="primary" @click="resetPlugin()">还原</el-button>
+                            </el-form-item>
+                            <el-form-item v-for="arg in pForm.args" :label="arg.desc" :prop="args">
+                                <el-input v-if="arg.type==='Input'" v-model="arg.value" placeholder="输入参数"/>
+                                <CodeEditor v-if="arg.type==='Shell'" v-model="arg.value" :code="arg.value" height="400px" language="text/x-sh"/>
+                                <Selecter v-if="arg.type==='Args'" v-model="arg.value" :option="arg.value" :options="pipelineArgs[arg.name]" @change="selectArgs"/>
+                                <Selecter v-if="arg.type==='Codes'" v-model="arg.value" :option="arg.value" :options="$store.getters.codes" @change="selectPlugin"/>
+                                <Selecter v-if="arg.type==='Hosts'" v-model="arg.value" :option="arg.value" :options="$store.getters.hosts" @change="selectPlugin"/>
+                            </el-form-item>
+                        </el-form>
+                    </el-card>
+                </el-col>
+            </el-row>
             <el-form-item>
-                <el-button v-if="!argEdit" type="primary" @click="addPlugArg()">添加参数</el-button>
                 <el-button v-if="!argEdit" type="primary" @click="dialogStatus==='create'?createData():updateData()">确认</el-button>
                 <el-button @click="dialogFormVisible = false">取消</el-button>
             </el-form-item>
@@ -89,7 +77,9 @@
 <script>
 import * as utils from '../../utils/index'
 import * as driver from '../../api/driver'
+import draggable from 'vuedraggable'
 import bus from '../../components/common/bus'
+import Selecter from '../../components/widget/Selecter.vue'
 import CodeEditor from '../../components/widget/CodeEditor.vue'
 
 const example = `--plugin脚本
@@ -110,6 +100,8 @@ return plugin
 export default {
     name: 'Pipelines',
     components:{
+        draggable,
+        Selecter,
         CodeEditor
     },
     created() {
@@ -123,11 +115,47 @@ export default {
                 this.loadPipelines()
             }
         })
+        this.pForm.args = [
+            {value:"", name:"t1", type:"Input", desc:"t1d"},
+            {value:"", name:"t2", type:"Codes", desc:"t2d"},
+            {value:"", name:"t3", type:"Hosts", desc:"t3d"},
+            {value:"", name:"t4", type:"Args", desc:"t4d"},
+            {value:"", name:"t5", type:"Shell", desc:"t5d"},
+        ]
     },
     data() {
         return {
             form: {},
-            argEdit: false,
+            pipelineName: "测试",
+            pipelineArgs: { "t4" : ["aaa", "bbb", "ccc"]},
+            pForm: {
+                name : "",
+                args : []
+            },
+            doing: [
+                {
+                    id: 1,
+                    content: '开发登录注册页面'
+                },
+                {
+                    id: 2,
+                    content: '开发头部组件'
+                },
+                {
+                    id: 3,
+                    content: '开发表格相关组件'
+                },
+                {
+                    id: 4,
+                    content: '开发表单相关组件'
+                }
+            ],
+            dragOptions:{
+                animation: 120,
+                scroll: true,
+                group: 'sortlist',
+                ghostClass: 'ghost-style'
+            },
             dialogStatus: '',
             listLoading: false,
             dialogRunVisible: false,
@@ -150,33 +178,19 @@ export default {
                 })
             })
         },
-        savePlugArg(row) {
-            if(row.name.length == 0 || row.type.length == 0 || row.desc.length == 0) {
-                utils.showFailed(this, "参数不能为空")
-                return
-            }
-            if (utils.array_count(this.form.args, row.name, "name") > 1) {
-                utils.showFailed(this, "已经存在同名参数")
-                return
-            }
-            row.edit = null
-            this.argEdit = false
+        savePlugin() {
         },
-        addPlugArg() {
-            this.argEdit = true
-            this.form.args.push({ edit: true, name: "", type: "", desc: "", })
-        },
-        delPlugArg(row) {
-            utils.array_remove(this.form.args, row.name, "name")
+        resetPlugin(row) {
         },
         resetForm() {
-            this.argEdit = false
             this.form = {
                 id: '',
                 name: '',
                 desc: '',
-                args: [],
-                script: example,
+                plugins: [
+                    {name : "111", id : 1},
+                    {name : "222", id : 2},
+                ],
             }
         },
         handleCreate() {
@@ -248,3 +262,46 @@ export default {
     }
 }
 </script>
+<style scoped>
+    .item-title{
+        padding: 8px 8px 8px 12px;
+        font-size: 14px;
+        line-height: 1.5;
+        color: #24292e;
+        font-weight: 600;
+    }
+    .item-ul{
+        padding: 0 8px 8px;
+        height: 500px;
+        overflow-y: scroll;
+    }
+    .item-ul::-webkit-scrollbar{
+        width: 0;
+    }
+    .drag-list {
+        border: 1px #e1e4e8 solid;
+        padding: 10px;
+        margin: 5px 0 10px;
+        list-style: none;
+        background-color: #fff;
+        border-radius: 6px;
+        cursor: pointer;
+        -webkit-transition: border .3s ease-in;
+        transition: border .3s ease-in;
+    }
+    .drag-list:hover {
+        border: 1px solid #20a0ff;
+    }
+    .drag-title {
+        font-weight: 400;
+        line-height: 25px;
+        margin: 10px 0;
+        font-size: 22px;
+        color: #1f2f3d;
+    }
+    .ghost-style{
+        display: block;
+        color: transparent;
+        border-style: dashed
+    }
+</style>
