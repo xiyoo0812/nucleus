@@ -63,6 +63,14 @@
                             </span>
                         </template>
                     </el-table-column>
+                    <el-table-column label="自定义参数">
+                        <template slot-scope="scope">
+                            <span v-if="!scope.row.edit" slot="reference" class="name-wrapper">{{ scope.row.custom }}</span>
+                            <span v-if="scope.row.edit" class="cell">
+                                <el-input v-model="scope.row.custom" placeholder="输入描述"></el-input>
+                            </span>
+                        </template>
+                    </el-table-column>
                     <el-table-column label="操作">
                         <template slot-scope="scope">
                             <el-button v-if="scope.row.edit" size="mini" @click="savePlugArg(scope.row)">保存</el-button>
@@ -142,7 +150,7 @@ export default {
             listLoading: false,
             dialogFormVisible: false,
             textMap: { update: '编辑', create: '新建' },
-            pluginArgTypes: ["Codes", "Hosts", "Args", "Input", "Shell"],
+            pluginArgTypes: ["Resource", "Args", "Input", "Shell"],
             rules: {
                 name: [{ required: true, message: '请填入插件名字', trigger: 'blur' },],
                 desc: [{ required: true, message: '请填入插件描述', trigger: 'blur' },],
@@ -173,7 +181,7 @@ export default {
         },
         addPlugArg() {
             this.argEdit = true
-            this.form.args.push({ edit: true, name: "", type: "", desc: "" })
+            this.form.args.push({ edit: true, custom: "", name: "", type: "", desc: "" })
         },
         editPlugArg(row) {
             if (!this.argEdit) {
@@ -207,7 +215,7 @@ export default {
             this.form.args = []
             this.argEdit = false
             for (var arg of row.args) {
-                this.form.args.push({ edit: false, name: arg.name, type: arg.type, desc: arg.desc })
+                this.form.args.push({ edit: false, custom: arg.custom, name: arg.name, type: arg.type, desc: arg.desc })
             }
             this.dialogStatus = 'update'
             this.dialogFormVisible = true
@@ -220,7 +228,7 @@ export default {
             var form = Object.assign({}, this.form) // copy obj
             for (var arg of form.args) {
                 if (arg.type.length > 0 && arg.name.length > 0 && arg.desc.length > 0) {
-                    fargs.push({type: arg.type, name: arg.name, desc: arg.desc })
+                    fargs.push({type: arg.type, custom: arg.custom, name: arg.name, desc: arg.desc })
                 }
             }
             form.args = fargs
