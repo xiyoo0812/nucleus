@@ -8,20 +8,23 @@
         </el-button-group>
     </div>
     <el-table v-loading="listLoading" stripe style="width: 100%" :element-loading-text="listLoadingText" :data="$store.getters.codes">
-        <el-table-column label="名称">
+        <el-table-column label="名称" width="150">
             <template slot-scope="scope">
                 <router-link :to="{ path: '/package', query: {id:scope.row.id} }">
                     <el-button type="text"><span >{{ scope.row.name }}</span></el-button>
                 </router-link>
             </template>
         </el-table-column>
-        <el-table-column label="类型">
+        <el-table-column label="类型" width="150">
             <template slot-scope="scope"><span >{{ scope.row.type }}</span></template>
+        </el-table-column>
+        <el-table-column label="主机" width="150">
+            <template slot-scope="scope"><span >{{ scope.row.host }}</span></template>
         </el-table-column>
         <el-table-column label="地址">
             <template slot-scope="scope"><span >{{ scope.row.addr }}</span></template>
         </el-table-column>
-        <el-table-column label="操作" align="center">
+        <el-table-column label="操作" width="150" align="center">
             <template slot-scope="scope">
             <el-button size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
             <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
@@ -38,11 +41,28 @@
             </el-form-item>
             <el-form-item label="凭证" prop="authkey">
                 <el-select v-model="form.authkey" placeholder="请选择凭证">
-                    <el-option v-for="item in this.$store.getters.authkeys" :label="item.name" :value="item.id" :key="item.id"/>
+                    <el-option v-for="item in this.$store.getters.authkeys" :label="item.name" :value="item.token" :key="item.id"/>
                 </el-select>
                 <router-link :to="{ path: '/authkeys' }">
                     <el-button @click="dialogFormVisible = false" type="text">> 点我前往凭证管理</el-button>
                 </router-link>
+            </el-form-item>
+            <el-form-item label="主机" prop="host">
+                <el-select v-model="form.host" placeholder="请选择主机">
+                    <el-option v-for="item in this.$store.getters.hosts" :label="item.name" :value="item.ip" :key="item.id"/>
+                </el-select>
+                <router-link :to="{ path: '/hosts' }">
+                    <el-button @click="dialogFormVisible = false" type="text">> 点我前往主机管理</el-button>
+                </router-link>
+            </el-form-item>
+            <el-form-item label="Playbook" prop="playbook">
+                <el-select v-model="form.playbook" placeholder="请选择Playbook">
+                    <el-option v-for="item in this.$store.getters.playbooks" :label="item.name" :value="item.id" :key="item.id"/>
+                </el-select>
+                <router-link :to="{ path: '/playbooks' }">
+                    <el-button @click="dialogFormVisible = false" type="text">> 点我前往Playbook管理</el-button>
+                </router-link>
+                <span style="color:#E6A23C"> Playbook为构建脚本 </span>
             </el-form-item>
             <el-form-item label="是否远程仓库" prop="is_remote">
                 <el-checkbox v-model="form.is_remote"/>
@@ -82,7 +102,9 @@ export default {
                 name: [{ required: true, message: '请填入仓库名字', trigger: 'blur' },],
                 addr: [{ required: true, message: '请填入仓库git/svn地址', trigger: 'blur' },],
                 type :[{ required: true, message: '请选择代码类型', trigger: 'blur' },],
+                host :[{ required: true, message: '请选择主机', trigger: 'blur' },],
                 authkey: [{ required: true, message: '请选择凭证', trigger: 'change' }],
+                playbook: [{ required: true, message: '请选择Playbook', trigger: 'change' }],
             },
         }
     },
@@ -111,8 +133,10 @@ export default {
                 id: '',
                 name: '',
                 addr: '',
+                host: '',
                 type: '',
                 authkey: '',
+                playbook: '',
                 is_remote: true,
             }
         },

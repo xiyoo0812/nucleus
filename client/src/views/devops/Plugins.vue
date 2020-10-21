@@ -97,12 +97,11 @@ import CodeEditor from '../../components/widget/CodeEditor.vue'
 
 const example = `--plugin脚本
 --插件开发使用lua语言
---shell函数可以执行shell指令
---ansible函数可以执行ansible指令
---local ok, res/err = shell(cmd, timeout?)
---local ok, res/err = ansible(host, cmd, timeout?)
-local shell   = shell.call
-local ansible = shell.ansible
+--execute/playbook函数可以执行shell/ansible指令
+--local ok, res/err = execute(cmd, timeout?)
+--local ok, res/err = playbook(book, args, timeout?)
+local execute  = shell.execute
+local playbook = ansible.playbook
 
 --生成动态参数
 local function build_dynamic(args)

@@ -198,12 +198,13 @@ export default {
             this.pform.args = []
             this.pform.name = item.name
             this.pform.desc = item.desc
+            this.pform.script = item.script
             for (var arg of item.args) {
                 this.pform.args.push({ custom: arg.custom, name: arg.name, type: arg.type, desc: arg.desc })
             }
         },
         selectArgs(id, arg) {
-            
+
         },
         createData() {
             this.$refs['dataForm'].validate((valid) => {
@@ -247,7 +248,7 @@ export default {
             }).then(() => {
                 var pipelineids = []
                 pipelineids.push(row.id)
-                driver.remove("pipelines", hostids).then(res => {
+                driver.remove("pipelines", pipelineids).then(res => {
                     utils.showNetRes(this, res, () => {
                         this.$store.dispatch("DelData", ["PIPELINE", row.id, "id"])
                     })

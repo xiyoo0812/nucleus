@@ -2,7 +2,7 @@
 local json = require "cjson.safe"
 json.encode_sparse_array(true)
 
-local shcall    = shell.call
+local sexecute  = shell.execute
 local tinsert   = table.insert
 local sformat   = string.format
 local log_debug = logger.debug
@@ -21,7 +21,7 @@ local function delete_authkeys(authkey)
         return false, err
     end
     if res.type == "SSHKey" then
-        local sok, shres = shcall(sformat("rm -fr /nucleus/runtime/%s*", res.name))
+        local sok, shres = sexecute(sformat("rm -fr /nucleus/runtime/%s*", res.name))
         if not sok then
             return false, shres
         end
@@ -68,13 +68,13 @@ local authkeys_doers = {
         end
         if authkey.type == "SSHKey" then
             if #authkey.sshkey == 0 then
-                local ok, shres = shcall(sformat("ssh-keygen -q -trsa -N -Cnucleus -f /nucleus/runtime/%s", authkey.name))
+                local ok, shres = sexecute(sformat("ssh-keygen -q -trsa -N -Cnucleus -f /nucleus/runtime/sshkeys/%s", authkey.name))
                 if not ok then
                     return { code = -1, msg = sformat("ssh-keygen failed:%s", shres)}
                 end
                 authkey.sshkey = authkey.name
             end
-            local ok, shres = shcall(sformat("cat /nucleus/runtime/%s.pub", authkey.name))
+            local ok, shres = sexecute(sformat("cat /nucleus/runtime/sshkeys/%s.pub", authkey.name))
             if not ok then
                 return { code = -1, msg = sformat("ssh read pub failed:%s", shres)}
             end

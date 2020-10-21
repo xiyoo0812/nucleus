@@ -27,7 +27,7 @@ local feishu_doers = {
         end
         local data = jdecode(res.body).data
         local en_name = data.en_name
-        local db_res = admin_db:find_one("users", {en_name = en_name})
+        local db_res = admin_db:find_one("users", {en_name = en_name}, {_id = 0})
         local user = {
             type = "feishu",
             en_name = en_name,
@@ -36,7 +36,6 @@ local feishu_doers = {
             empCode = data.empCode,
             dept = data.dept:sub(data.dept:find("/") + 1),
             avatar = sformat("%s/%s", avatar_url, en_name),
-            roles = {},
         }
         if not db_res then
             local ok = admin_db:insert("users", {user})

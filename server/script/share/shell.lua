@@ -3,11 +3,10 @@ local lshell    = require "resty.shell"
 
 local log_err   = logger.err
 local log_debug = logger.debug
-local sformat   = string.format
 local shrun     = lshell.run
 
 shell = {}
-local call_shell = function(cmd, timeout, max_size, stdin)
+local execute_shell = function(cmd, timeout, max_size, stdin)
     --ok, stdout, stderr, reason, status = shell.run(cmd, stdin?, timeout?, max_size?)
     local ok, stdout, stderr, reason, status = shrun(cmd, stdin, timeout, max_size)
     if not ok then
@@ -21,10 +20,4 @@ local call_shell = function(cmd, timeout, max_size, stdin)
     return true, stdout
 end
 
-local call_ansible = function(host, cmd, timeout)
-    local ansible_cmd = sformat([[ansible %s -m shell -a "%s"]], host, cmd, timeout)
-    return call_shell(ansible_cmd)
-end
-
-shell.call      = call_shell
-shell.ansible   = call_ansible
+shell.execute   = execute_shell

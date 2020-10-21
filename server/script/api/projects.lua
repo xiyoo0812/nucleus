@@ -3,7 +3,6 @@ local tinsert   = table.insert
 local sformat   = string.format
 local log_debug = logger.debug
 local serialize = logger.serialize
-local packproj  = data_pack.project
 local add_log   = utility.add_log
 
 local apidoer   = utility.apidoer
@@ -15,10 +14,10 @@ local projects_doers = {
     GET = function(req, params, session)
         --获取所有项目
         log_debug("/projects GET params: %s", serialize(params))
-        local res = admin_db:find("projects", {})
+        local res = admin_db:find("projects", {}, {_id = 0})
         local records = {}
-        for k, v in pairs(res) do
-            tinsert(records, packproj(v))
+        for _, record in pairs(res) do
+            tinsert(records, record)
         end
         return { code = 0, data = records, total = #records }
     end,

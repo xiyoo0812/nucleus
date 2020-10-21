@@ -2,7 +2,6 @@
 local tinsert   = table.insert
 local log_debug = logger.debug
 local serialize = logger.serialize
-local packproj  = data_pack.project
 
 local apidoer   = utility.apidoer
 local proj_db   = nucleus.proj_db
@@ -16,11 +15,11 @@ local owns_doers = {
         local choosed = nil
         local projects = {}
         local user = session.data.user
-        local res = admin_db:find("member_projs", {en_name = user.en_name})
+        local res = admin_db:find("member_projs", {en_name = user.en_name}, {_id = 0})
         for _, uproj in pairs(res) do
-            local proj = admin_db:find_one("projects", {id = uproj.proj_id})
+            local proj = admin_db:find_one("projects", {id = uproj.proj_id}, {_id = 0})
             if proj then
-                tinsert(projects, packproj(proj))
+                tinsert(projects, proj)
                 if not session.data.project then
                     --缓存project到session
                     choosed = proj
@@ -30,7 +29,7 @@ local owns_doers = {
                 end
             end
         end
-        return { code = 0, data = projects, proj = packproj(choosed) }
+        return { code = 0, data = projects, proj = choosed }
     end,
     POST = function(req, params, session)
         --选择当前项目
@@ -39,14 +38,14 @@ local owns_doers = {
         local user = session.data.user
         local res = admin_db:find_one("member_projs", {en_name = user.en_name, proj_id = args.proj_id})
         if res then
-            local proj = admin_db:find_one("projects", {id = res.proj_id})
+            local proj = admin_db:find_one("projects", {id = res.proj_id}, {_id = 0})
             if proj then
                 --缓存user到session
                 session.data.project = proj
                 session.data.admin = res.admin_db
                 session:save()
                 proj_db:set_db("nucleus_" .. proj.id)
-                return { code = 0, data = packproj(proj) }
+                return { code = 0, data = proj }
             end
         end
         return { code = -1, msg = "choosed project not exist" }

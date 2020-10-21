@@ -7,7 +7,6 @@ local tinsert   = table.insert
 local sformat   = string.format
 local log_debug = logger.debug
 local serialize = logger.serialize
-local packtask = data_pack.task
 
 local apidoer   = utility.apidoer
 local admin_db  = nucleus.admin_db
