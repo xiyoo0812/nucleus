@@ -114,7 +114,6 @@ export default {
         }
     },
     created(){
-        this.loadOwns()
         bus.$on('project', msg => {
             var store = this.$store.getters
             if (store.proj) {
@@ -123,18 +122,6 @@ export default {
         })
     },
     methods: {
-        loadOwns() {
-            driver.load("owns").then(res => {
-                utils.showNetRes(this, res, () => {
-                    this.$store.dispatch("InitData", ["OWNS", res.data])
-                    if (res.proj) {
-                        this.$store.dispatch("SetProj", res.proj)
-                        bus.$emit('project');
-                    }
-                    bus.$emit('owns');
-                })
-            });
-        },
         loadLogs() {
             driver.load("logs").then(res => {
                 utils.showNetRes(this, res, () => {

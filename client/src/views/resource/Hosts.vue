@@ -84,24 +84,19 @@ export default {
         this.resetForm()
         var store = this.$store.getters
         if (store.proj) {
-            this.loadHosts()
+            bus.$emit('load_hosts');
+            bus.$emit('load_authkeys')
         }
         bus.$on('project', msg => {
             if (store.proj) {
-                this.loadHosts()
+                bus.$emit('load_hosts', true);
+                bus.$emit('load_authkeys', true);
             }
         })
     },
     methods: {
         formatBool(val) {
             return utils.formatBool(val)
-        },
-        loadHosts() {
-            driver.load("hosts").then(res => {
-                utils.showNetRes(this, res, () => {
-                    this.$store.dispatch("InitData", ["HOST", res.data])
-                })
-            })
         },
         resetForm() {
             this.form = {

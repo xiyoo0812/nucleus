@@ -119,6 +119,7 @@ export default {
         if (document.body.clientWidth < 1500) {
             this.collapseChage()
         }
+        bus.$emit('load_owns')
         bus.$on('owns', msg => {
             if (this.$store.getters.proj) {
                 this.proj_id = this.$store.getters.proj.id

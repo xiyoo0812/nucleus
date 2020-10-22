@@ -35,7 +35,7 @@ local pipelines_doers = {
         pipeline.creator = session.data.user.name
         local ok, err = proj_db:update("pipelines", pipeline, { id = pipeline.id })
         if not ok then
-            return {code = -1, msg = sformat("db update failed: %s", err)}
+            return {code = -1, msg = sformat("pipeline update failed: %s", err)}
         end
         return { code = 0, data = pipeline }
     end,
@@ -49,7 +49,7 @@ local pipelines_doers = {
         pipeline.creator = session.data.user.name
         local ok, err = proj_db:insert("pipelines", { pipeline })
         if not ok then
-            return { code = -1, msg = sformat("db insert failed:%s", err)}
+            return { code = -1, msg = sformat("pipeline insert failed:%s", err)}
         end
         return { code = 0, data = pipeline }
     end,
@@ -58,7 +58,7 @@ local pipelines_doers = {
         local pipeline_id = params.args
         local ok, err = proj_db:delete("pipelines", { id = pipeline_id })
         if not ok then
-            return {code = -1, msg = sformat("db delete failed: %s", err)}
+            return {code = -1, msg = sformat("pipeline delete failed: %s", err)}
         end
         return { code = 0 }
     end,

@@ -143,10 +143,9 @@ export function confirm(view, msg, func) {
 export function array_find(array, obj_key, key) {
     for (let i = 0, len = array.length; i < len; i++) {
         if(array[i][key] == obj_key) {
-            return true
+            return array[i]
         }
     }
-    return false
 }
 
 export function array_count(array, obj_key, key) {
@@ -163,7 +162,7 @@ export function array_remove(array, obj_key, key) {
     for (let i = 0, len = array.length; i < len; i++) {
         if(array[i][key] == obj_key) {
             array.splice(i, 1)
-            break;
+            break
         }
     }
 }
@@ -172,7 +171,7 @@ export function array_update(array, obj, key) {
     for (let i = 0, len = array.length; i < len; i++) {
         if(array[i][key] == obj[key]) {
             array.splice(i, 1, obj)
-            break;
+            break
         }
     }
 }

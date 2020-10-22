@@ -7,41 +7,31 @@ local log_debug = logger.debug
 local serialize = logger.serialize
 
 local apidoer   = utility.apidoer
-local proj_db   = nucleus.proj_db
 
 --定义接口
 local pipeline_doers = {
     POST = function(req, params, session)
-        log_debug("/pipeline POST params: %s", serialize(params))
+        log_debug("/pipeline POST params1: %s", serialize(params))
         local pipeline = params.args
-        local res = proj_db:find_one("pipeline", { name = pipeline.name })
-        if res and res.id ~= pipeline.id then
-            return { code = -1, msg = "pipeline name aready exist!" }
-        end
-        local record = proj_db:find_one("pipeline", {id = pipeline.id})
-        if not record then
-            return {code = -1, msg = "pipeline not exist"}
-        end
-        pipeline.creator = session.data.user.name
-        local ok, err = proj_db:update("pipeline", pipeline, { id = pipeline.id })
-        if not ok then
-            return {code = -1, msg = sformat("db update failed: %s", err)}
-        end
         return { code = 0, data = pipeline }
     end,
     PUT = function(req, params, session)
-        log_debug("/pipeline PUT params: %s", serialize(params))
+        log_debug("/pipeline POST params1: %s", serialize(params))
         local pipeline = params.args
-        local res = proj_db:find_one("pipeline", { name = pipeline.name })
-        if res then
-            return { code = -1, msg = "pipeline name aready exist!" }
-        end
-        pipeline.creator = session.data.user.name
-        local ok, err = proj_db:insert("pipeline", { pipeline })
+        local ok, plugin = pcall(load(pipeline.script))
         if not ok then
-            return { code = -1, msg = sformat("db insert failed:%s", err)}
+            return {code = -1, msg = sformat("plugin script load failed: %s", plugin)}
         end
-        return { code = 0, data = pipeline }
+        if plugin.init then
+            local curproj = session.data.project
+            pipeline.args.path = curproj.path
+            local _ok, code, res = pcall(plugin.init, pipeline.args)
+            if not _ok or code ~= 0 then
+                return {code = -1, msg = sformat("plugin script init failed: %s", _ok and res or ok)}
+            end
+            return { code = 0, data = { args = res }}
+        end
+        return { code = 0, data = {} }
     end,
 }
 

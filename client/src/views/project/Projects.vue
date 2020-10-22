@@ -55,9 +55,7 @@ export default {
         'imp-panel': panel,
     },
     created(){
-        if (this.$store.getters.projs.length == 0) {
-            this.loadProj();
-        }
+        bus.$emit('load_projects')
     },
     data(){
         return {
@@ -135,13 +133,6 @@ export default {
                     this.loadLogs();
                 })
             })
-        },
-        loadProj() {
-            driver.load("projects").then(res => {
-                utils.showNetRes(this, res, () => {
-                    this.$store.dispatch("InitData", ["PROJ", res.data])
-                })
-            });
         },
     },
 }

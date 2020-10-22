@@ -47,6 +47,9 @@ export default {
             }
             return item[this.oplabel]
         },
+        setOptions(opts){
+            this.options = opts
+        },
         handleSelect(op_sel) {
             this.$emit("input", op_sel)
             var item = this.options.filter(e => { return e[this.opid] === op_sel })[0]

@@ -50,7 +50,7 @@ import * as driver from '../../api/driver'
 import CodeEditor from '../../components/widget/CodeEditor.vue'
 
 const example = `#ansible-playbook脚本
-- hosts : 10.100.0.48
+- hosts : $HOST
   remote_user : root
   tasks :
     - name : dir
@@ -69,10 +69,7 @@ export default {
     },
     created() {
         this.resetForm()
-        var store = this.$store.getters
-        if (store.proj) {
-            this.loadPlaybooks()
-        }
+        bus.$emit('load_playbooks')
     },
     data() {
         return {
@@ -89,13 +86,6 @@ export default {
         }
     },
     methods: {
-        loadPlaybooks() {
-            driver.load("playbooks").then(res => {
-                utils.showNetRes(this, res, () => {
-                    this.$store.dispatch("InitData", ["PLAYBOOK", res.data])
-                })
-            })
-        },
         resetForm() {
             this.form = {
                 id: '',

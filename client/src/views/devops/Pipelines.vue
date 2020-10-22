@@ -34,10 +34,10 @@
             <el-card shadow="hover" class="mgb20" style="height:600px;">
                 <div class="twt-tool-box">
                     <el-button-group>
-                        <el-button class="filter-item" type="primary" @click="handleCreatePlugin">添加插件</el-button>
+                        <el-button v-if="pipeline" class="filter-item" type="primary" @click="handleCreatePlugin">添加插件</el-button>
                     </el-button-group>
                 </div>
-                <el-table stripe v-loading="listLoading" style="width: 100%" :data="pipeline.plugins">
+                <el-table stripe v-loading="listLoading" style="width: 100%" :data="pplugins">
                     <el-table-column label="名称">
                         <template slot-scope="scope"><span >{{ scope.row.name }}</span></template>
                     </el-table-column>
@@ -71,7 +71,7 @@
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogPluginVisible" :close-on-click-modal="false" width="50%">
         <el-form ref="pluginForm" :rules="rules" :model="pform" label-position="left" label-width="80px">
             <el-form-item label="名称" prop="name">
-                <Selecter v-model="pform.id" :option="pform.id" :options="$store.getters.plugins" @change="selectPlugin"/>
+                <Selecter v-model="pform.pid" :option="pform.pid" :options="$store.getters.plugins" @change="selectPlugin"/>
             </el-form-item>
             <template v-for="arg in pform.args">
                 <el-form-item v-if="arg.type==='Input'" :label="arg.desc" :prop="args">
@@ -81,14 +81,14 @@
                     <CodeEditor v-model="arg.value" :code="arg.value" height="350px" language="text/x-sh"/>
                 </el-form-item>
                 <el-form-item v-if="arg.type==='Args'" :label="arg.desc" :prop="args">
-                    <Selecter v-model="arg.value" :option="arg.value" :options="pipeline.args[arg.custom]" @change="selectArgs($event, arg)"/>
+                    <Selecter v-model="arg.value" :option="arg.value" :options="pargs[arg.custom]"/>
                 </el-form-item>
                 <el-form-item v-if="arg.type==='Resource'" :label="arg.desc" :prop="args">
-                    <Selecter v-model="arg.value" :option="arg.value" :options="$store.getters[arg.custom]" @change="selectArgs($event, arg)"/>
+                    <Selecter v-model="arg.value" :option="arg.value" :options="$store.getters[arg.custom]"/>
                 </el-form-item>
             </template>
             <el-form-item>
-                <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">确认</el-button>
+                <el-button type="primary" @click="dialogStatus==='create'?createPlugin():updatePlugin()">确认</el-button>
                 <el-button @click="dialogPluginVisible = false">取消</el-button>
             </el-form-item>
         </el-form>
@@ -116,16 +116,19 @@ export default {
         this.resetForm()
         var store = this.$store.getters
         if (store.proj) {
-            this.loadPipelines()
+            bus.$emit('load_codes')
+            bus.$emit('load_hosts')
+            bus.$emit('load_plugins')
+            bus.$emit('load_pipelines')
+            bus.$emit('load_playbooks')
         }
         bus.$on('project', msg => {
             if (store.proj) {
-                this.loadPipelines()
-            }
-        })
-        bus.$on('project', msg => {
-            if (store.proj) {
-                this.loadPipelines()
+                bus.$emit('load_codes', true)
+                bus.$emit('load_hosts', true)
+                bus.$emit('load_plugins', true)
+                bus.$emit('load_pipelines', true)
+                bus.$emit('load_playbooks', true)
             }
         })
     },
@@ -133,10 +136,10 @@ export default {
         return {
             form: {},
             pform: {},
-            pipeline : {
-                plugins: [],
-                args: {},
-            },
+            pargs: {},
+            pplugins : [],
+            pipeline : null,
+            pluginScript: '',
             dialogStatus: '',
             listLoading: false,
             pluginLoading: false,
@@ -151,29 +154,25 @@ export default {
         }
     },
     methods: {
-        loadPipelines() {
-            driver.load("pipelines").then(res => {
-                utils.showNetRes(this, res, () => {
-                    this.$store.dispatch("InitData", ["PIPELINE", res.data])
-                })
-            })
-        },
         resetForm() {
             this.form = {
                 id: '',
                 name: '',
                 desc: '',
                 plugins: [],
-                args: [],
+                args: {},
             }
         },
         resetPForm() {
             this.pform = {
-                id: '',
+                pid: '',
                 name: '',
                 desc: '',
                 args: [],
             }
+        },
+        handleRun(row) {
+            
         },
         handleCreate() {
             this.resetForm()
@@ -184,7 +183,12 @@ export default {
             })
         },
         handleCurrent(val) {
+            this.pplugins = []
             this.pipeline = val
+            this.pargs = Object.assign({}, val.args) // copy obj
+            for (var plugin of val.plugins) {
+                this.pplugins.push(plugin)
+            }
         },
         handleCreatePlugin() {
             this.resetPForm()
@@ -193,18 +197,6 @@ export default {
             this.$nextTick(() => {
                 this.$refs['pluginForm'].clearValidate()
             })
-        },
-        selectPlugin(id, item) {
-            this.pform.args = []
-            this.pform.name = item.name
-            this.pform.desc = item.desc
-            this.pform.script = item.script
-            for (var arg of item.args) {
-                this.pform.args.push({ custom: arg.custom, name: arg.name, type: arg.type, desc: arg.desc })
-            }
-        },
-        selectArgs(id, arg) {
-
         },
         createData() {
             this.$refs['dataForm'].validate((valid) => {
@@ -219,8 +211,34 @@ export default {
                 }
             })
         },
-        handleRun(row) {
-            
+        createPlugin() {
+            this.$refs['pluginForm'].validate((valid) => {
+                if (valid) {
+                    this.formatPluginArgs()
+                    driver.insert("pipeline", {args : this.pargs, script : this.pluginScript}).then(res => {
+                        utils.showNetRes(this, res, () => {
+                            var args_res = res.data.args
+                            if (args_res) {
+                                for (var key in args_res) {
+                                    this.pargs[key] = args_res[key]
+                                }
+                            }
+                            this.pform.id = utils.newGuid()
+                            this.pplugins.push(this.pform)
+                            var form = this.buildForm()
+                            driver.update("pipelines", form).then(res => {
+                                utils.showNetRes(this, res, () => {
+                                    this.$store.dispatch("UpdateData", ["PIPELINE", res.data, "id"])
+                                    this.dialogPluginVisible = false
+                                })
+                            })
+                        })
+                        if (res.code < 0) {
+                            this.resetPForm()
+                        }
+                    })
+                }
+            })
         },
         handleUpdate(row) {
             this.form = Object.assign({}, row) // copy obj
@@ -228,6 +246,14 @@ export default {
             this.dialogFormVisible = true
             this.$nextTick(() => {
                 this.$refs['dataForm'].clearValidate()
+            })
+        },
+        handleEdit(row) {
+            this.pform = Object.assign({}, row) // copy obj
+            this.dialogStatus = 'update'
+            this.dialogPluginVisible = true
+            this.$nextTick(() => {
+                this.$refs['pluginForm'].clearValidate()
             })
         },
         updateData() {
@@ -242,6 +268,70 @@ export default {
                 }
             })
         },
+        updatePlugin() {
+            this.$refs['pluginForm'].validate((valid) => {
+                if (valid) {
+                    this.formatPluginArgs()
+                    driver.insert("pipeline", {args : this.pargs, script : this.pluginScript}).then(res => {
+                        utils.showNetRes(this, res, () => {
+                            var args_res = res.data.args
+                            if (args_res) {
+                                for (var key in args_res) {
+                                    this.pargs[key] = args_res[key]
+                                }
+                            }
+                            utils.array_update(this.pplugins, this.pform, "id")
+                            var form = this.buildForm()
+                            driver.update("pipelines", form).then(res => {
+                                utils.showNetRes(this, res, () => {
+                                    this.$store.dispatch("UpdateData", ["PIPELINE", res.data, "id"])
+                                    this.dialogFormVisible = false
+                                })
+                            })
+                        })
+                        if (res.code < 0) {
+                            this.resetPForm()
+                        }
+                    })
+                    
+                }
+            })
+        },
+        buildForm() {
+            return {
+                id: this.pipeline.id,
+                name: this.pipeline.name,
+                desc: this.pipeline.desc,
+                plugins: this.pplugins,
+                args: this.pargs,
+            }
+        },
+        formatPluginArgs() {
+            for (var arg of this.pform.args) {
+                if (arg.custom == "codes") {
+                    var code = utils.array_find(this.$store.getters.codes, arg.value, "id")
+                    if (code) {
+                        this.pargs[arg.name] = code.name
+                    }
+                } else if (arg.custom == "hosts") {
+                    var host = utils.array_find(this.$store.getters.hosts, arg.value, "id")
+                    if (host) {
+                        this.pargs[arg.name] = host.ip
+                    }
+                } else {
+                    this.pargs[arg.name] = arg.value
+                }
+            }
+        },
+        selectPlugin(id, item) {
+            this.pform.args = []
+            this.pform.name = item.name
+            this.pform.desc = item.desc
+            this.pluginScript = item.script
+            for (var arg of item.args) {
+                this.pform.args.push({ custom: arg.custom, name: arg.name, type: arg.type, desc: arg.desc })
+            }
+        },
         handleDelete(row) {
             this.$confirm('确定要删除此流水线，是否继续?', '提示', {
                 confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning'
@@ -251,6 +341,19 @@ export default {
                 driver.remove("pipelines", pipelineids).then(res => {
                     utils.showNetRes(this, res, () => {
                         this.$store.dispatch("DelData", ["PIPELINE", row.id, "id"])
+                    })
+                })
+            }).catch(() => {})
+        },
+        handleRemove(row) {
+            this.$confirm('确定要删除此插件，是否继续?', '提示', {
+                confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning'
+            }).then(() => {
+                var pluginids = []
+                pluginids.push(row.id)
+                driver.remove("pipeline", pluginids).then(res => {
+                    utils.showNetRes(this, res, () => {
+                    //    this.$store.dispatch("DelData", ["PIPELINE", row.id, "id"])
                     })
                 })
             }).catch(() => {})

@@ -91,22 +91,15 @@ export default {
         this.resetForm()
         var store = this.$store.getters
         if (store.proj) {
-            this.loadAuthkeys()
+            bus.$emit('load_authkeys')
         }
         bus.$on('project', msg => {
             if (store.proj) {
-                this.loadAuthkeys()
+                bus.$emit('load_authkeys', true)
             }
         })
     },
     methods: {
-        loadAuthkeys() {
-            driver.load("authkeys").then(res => {
-                utils.showNetRes(this, res, () => {
-                    this.$store.dispatch("InitData", ["AUTHKEY", res.data])
-                })
-            })
-        },
         parseTime(tm){
             return utils.parseTime(tm)
         },

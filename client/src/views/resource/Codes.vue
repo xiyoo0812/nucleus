@@ -112,22 +112,21 @@ export default {
         this.resetForm()
         var store = this.$store.getters
         if (store.proj) {
-            this.loadCodes()
+            bus.$emit('load_codes')
+            bus.$emit('load_hosts')
+            bus.$emit('load_authkeys')
+            bus.$emit('load_playbooks')
         }
         bus.$on('project', msg => {
             if (store.proj) {
-                this.loadCodes()
+                bus.$emit('load_codes', true)
+                bus.$emit('load_hosts', true)
+                bus.$emit('load_authkeys', true)
+                bus.$emit('load_playbooks', true)
             }
         })
     },
     methods: {
-        loadCodes() {
-            driver.load("codes").then(res => {
-                utils.showNetRes(this, res, () => {
-                    this.$store.dispatch("InitData", ["CODE", res.data])
-                })
-            })
-        },
         resetForm() {
             this.form = {
                 id: '',

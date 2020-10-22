@@ -93,40 +93,36 @@
 <script>
 import * as utils from '../../utils/index'
 import * as driver from '../../api/driver'
+import bus from '../../components/common/bus'
 import CodeEditor from '../../components/widget/CodeEditor.vue'
 
 const example = `--plugin脚本
 --插件开发使用lua语言
---execute/playbook函数可以执行shell/ansible指令
---local ok, res/err = execute(cmd, timeout?)
---local ok, res/err = playbook(book, args, timeout?)
-local execute  = shell.execute
-local playbook = ansible.playbook
+--调用shell或者ansible指令
+--local ok, res/err = shell.execute(cmd, timeout?)
+--local ok, res/err = ansible.shell(cmd, timeout?)
+--local ok, res/err = ansible.playbook(book, args, timeout?)
 
---生成动态参数
-local function build_dynamic(args)
-end
-
---init函数在插件初始化的时候执行
 local plugin = {}
+--[[
+--init函数在插件初始化的时候执行
 function plugin.init(args)
-    build_dynamic(args)
-    return args
+    local code = 0
+    local plugin_res = {}
+  	return code, plugin_res
 end
-
---config函数配置插件参数时调用
-function plugin.config(args, key, value)
-    args[key] = value
-    build_dynamic(args)
-    return args
-end
+]]
 
 --run函数在插件运行的时候执行
 function plugin.run(args)
-    return args
+    local code = 0
+    local plugin_res = {}
+	print(string.format("pipeline %s startup based on $s", args.pipeline, args.host))
+  	return code, plugin_res
 end
 
 return plugin
+
 `
 
 export default {
@@ -136,10 +132,7 @@ export default {
     },
     created() {
         this.resetForm()
-        var store = this.$store.getters
-        if (store.proj) {
-            this.loadPlugins()
-        }
+        bus.$emit('load_plugins')
     },
     data() {
         return {
@@ -159,13 +152,6 @@ export default {
         }
     },
     methods: {
-        loadPlugins() {
-            driver.load("plugins").then(res => {
-                utils.showNetRes(this, res, () => {
-                    this.$store.dispatch("InitData", ["PLUGIN", res.data])
-                })
-            })
-        },
         savePlugArg(row) {
             if(row.name.length == 0 || row.type.length == 0 || row.desc.length == 0) {
                 utils.showFailed(this, "参数不能为空")

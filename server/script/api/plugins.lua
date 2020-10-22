@@ -32,10 +32,14 @@ local plugins_doers = {
         if not record then
             return {code = -1, msg = "plugin not exist"}
         end
+        local lok, lerr = pcall(load(plugin.script))
+        if not lok then
+            return {code = -1, msg = sformat("plugin update failed: %s", lerr)}
+        end
         plugin.creator = session.data.user.name
         local ok, err = admin_db:update("plugins", plugin, { id = plugin.id })
         if not ok then
-            return {code = -1, msg = sformat("db update failed: %s", err)}
+            return {code = -1, msg = sformat("plugin update failed: %s", err)}
         end
         return { code = 0, data = plugin }
     end,
@@ -46,10 +50,14 @@ local plugins_doers = {
         if res then
             return { code = -1, msg = "plugin name aready exist!" }
         end
+        local lok, lerr = pcall(load(plugin.script))
+        if not lok then
+            return {code = -1, msg = sformat("plugin insert failed: %s", lerr)}
+        end
         plugin.creator = session.data.user.name
         local ok, err = admin_db:insert("plugins", { plugin })
         if not ok then
-            return { code = -1, msg = sformat("db insert failed:%s", err)}
+            return { code = -1, msg = sformat("plugin insert failed:%s", err)}
         end
         return { code = 0, data = plugin }
     end,
@@ -58,7 +66,7 @@ local plugins_doers = {
         local plugin_id = params.args
         local ok, err = admin_db:delete("plugins", { id = plugin_id })
         if not ok then
-            return {code = -1, msg = sformat("db delete failed: %s", err)}
+            return {code = -1, msg = sformat("plugin delete failed: %s", err)}
         end
         return { code = 0 }
     end,
