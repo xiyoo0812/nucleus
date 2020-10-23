@@ -1,6 +1,6 @@
 
 <template>
-  <codemirror class="code-mirror" v-model="code" :options="cmOption" @ready="onCmReady" @input="onCmChange" ref="vcme"/>
+  <codemirror class="code-mirror" v-model="code" :options="cmOption" @ready="onCmReady" @input="onCmInput" @changes="onCmChanged" ref="vcme"/>
 </template>
 
 <script>
@@ -77,6 +77,10 @@
             type: Boolean,
             default: false
         },
+        scrollAble: {
+            type: Boolean,
+            default: false
+        },
         language: {
             type: String,
             default: "text/x-sh"
@@ -124,9 +128,17 @@
           this.$refs.vcme.codemirror.setSize(this.width, this.height)
         }
       },
-      onCmChange(curCode) {
+      onCmInput(curCode) {
         this.$emit("input", curCode)
       },
+      onCmChanged(cm) {
+        this.$emit("changes", cm)
+        if (this.scrollAble) {
+          this.$nextTick(() => {
+            cm.scrollTo(0, cm.getScrollInfo().height)
+          })
+        }
+      }
     }
   }
 </script>

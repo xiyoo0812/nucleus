@@ -1,7 +1,6 @@
 --ansible.lua
 local json      = require "cjson.safe"
 
-local log_info  = logger.info
 local jdecode   = json.decode
 local sexecute  = shell.execute
 local sgsub     = string.gsub
@@ -26,7 +25,6 @@ local function parse_task_res(segment)
     local out_token = smatch(segment, '=> ({.+})')
     if out_token then
         local out_res = jdecode(out_token)
-        log_info("parse_task_res: %s-%s", out_token, logger.serialize(out_res))
         if not out_res.skipped then
             return {
                 msg = out_res.msg,
@@ -71,7 +69,6 @@ local call_playbook = function(book, args, timeout)
     local ansible_cmd = sformat([[cd /; export LANG=C.UTF-8; ansible-playbook %s --extra-vars "%s" -v]], book, fargs)
     local ok, std_out = sexecute(ansible_cmd, timeout)
     local res = parse_playbook_res(std_out)
-    log_info("parse_playbook_res: %s", logger.serialize(res))
     return ok, res
 end
 

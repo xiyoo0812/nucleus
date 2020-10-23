@@ -22,7 +22,7 @@
                     </el-table-column>
                     <el-table-column width="250" label="操作" align="center">
                         <template slot-scope="scope">
-                            <el-button size="mini" @click="handleRun(scope.row)">执行</el-button>
+                            <el-button size="mini" @click="handleRun(scope.row)">运行</el-button>
                             <el-button size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
                             <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
                         </template>
@@ -74,16 +74,16 @@
                 <Selecter v-model="pform.pid" :option="pform.pid" :options="$store.getters.plugins" @change="selectPlugin"/>
             </el-form-item>
             <template v-for="arg in pform.args">
-                <el-form-item v-if="arg.type==='Input'" :label="arg.desc" :prop="args">
+                <el-form-item v-if="arg.type==='Input'" :label="arg.desc" :prop="arg.name">
                     <el-input v-model="arg.value" placeholder="输入参数"/>
                 </el-form-item>
-                <el-form-item v-if="arg.type==='Shell'" :label="arg.desc" :prop="args">
+                <el-form-item v-if="arg.type==='Shell'" :label="arg.desc" :prop="arg.name">
                     <CodeEditor v-model="arg.value" :code="arg.value" height="350px" language="text/x-sh"/>
                 </el-form-item>
-                <el-form-item v-if="arg.type==='Args'" :label="arg.desc" :prop="args">
+                <el-form-item v-if="arg.type==='Args'" :label="arg.desc" :prop="arg.name">
                     <Selecter v-model="arg.value" :option="arg.value" :options="ppArgs[arg.custom]"/>
                 </el-form-item>
-                <el-form-item v-if="arg.type==='Resource'" :label="arg.desc" :prop="args">
+                <el-form-item v-if="arg.type==='Resource'" :label="arg.desc" :prop="arg.name">
                     <Selecter v-model="arg.value" :option="arg.value" :options="$store.getters[arg.custom]"/>
                 </el-form-item>
             </template>
@@ -93,8 +93,24 @@
             </el-form-item>
         </el-form>
     </el-dialog>
-    <el-dialog title="执行" :visible.sync="dialogRunVisible" :close-on-click-modal="false" width="65%">
-        
+    <el-dialog title="准备执行" :visible.sync="dialogReadyVisible" :close-on-click-modal="false" width="65%">
+        <el-form ref="readyForm" :rules="rules" :model="rform" label-position="left" label-width="80px">
+            <template v-for="arg in rform.args">
+                <el-form-item v-if="arg.type==='Input'" :label="arg.desc" :prop="arg.name">
+                    <el-input v-model="arg.value" placeholder="输入参数"/>
+                </el-form-item>
+                <el-form-item v-if="arg.type==='Args'" :label="arg.desc" :prop="arg.name">
+                    <Selecter v-model="arg.value" :option="arg.value" :options="ppArgs[arg.custom]"/>
+                </el-form-item>
+                <el-form-item v-if="arg.type==='Resource'" :label="arg.desc" :prop="arg.name">
+                    <Selecter v-model="arg.value" :option="arg.value" :options="$store.getters[arg.custom]"/>
+                </el-form-item>
+            </template>
+            <el-form-item>
+                <el-button type="primary" @click="handleTask()">执行</el-button>
+                <el-button @click="dialogPluginVisible = false">取消</el-button>
+            </el-form-item>
+        </el-form>
     </el-dialog>
 </div>
 </template>
@@ -136,6 +152,7 @@ export default {
         return {
             form: {},
             pform: {},
+            rform: {},
             ppArgs: {},
             ppPlugins : [],
             pipeline : null,
@@ -143,6 +160,7 @@ export default {
             listLoading: false,
             pluginLoading: false,
             dialogRunVisible: false,
+            dialogReadyVisible: false,
             dialogFormVisible: false,
             dialogPluginVisible: false,
             textMap: { update: '编辑', create: '新建' },
@@ -171,7 +189,56 @@ export default {
             }
         },
         handleRun(row) {
-            
+            if (!row.task_id) {
+                driver.update("pipeline", row.id).then(res => {
+                    utils.showNetRes(this, res, () => {
+                        var args_res = res.data.args
+                        if (args_res) {
+                            for (var key in args_res) {
+                                this.ppArgs[key] = args_res[key]
+                            }
+                        }
+                        this.rform = {args : []}
+                        for (var plugin in this.ppPlugins) {
+                            if (plugin.is_runtime) {
+                                for (var arg in plugin.args) {
+                                    this.rform.push(arg)
+                                }
+                            }
+                        }
+                        if (this.rform.args.length > 0) {
+                            this.dialogReadyVisible = true
+                        } else {
+                            this.handleTask()
+                        }
+                    })
+                })
+            } else {
+                this.loadTask(row.task_id)
+            }
+        },
+        handleTask() {
+            if (this.pipeline) {
+                this.formatPluginArgs(this.rform)
+                var form = {
+                    args : this.ppArgs,
+                    pipeline : this.pipeline.id,
+                }
+                driver.insert("tasks", form).then(res => {
+                    utils.showNetRes(this, res, () => {
+                        this.$store.dispatch("AddData", ["TASK", res.data])
+                        this.dialogRunVisible = true
+                    })
+                })
+            }
+        },
+        loadTask(task_id) {
+            driver.find("tasks", task_id).then(res => {
+                utils.showNetRes(this, res, () => {
+                    this.$store.dispatch("InitData", ["TASK", res.data])
+                    this.dialogRunVisible = true
+                })
+            })
         },
         handleCreate() {
             this.resetForm()
@@ -226,7 +293,7 @@ export default {
         createPlugin() {
             this.$refs['pluginForm'].validate((valid) => {
                 if (valid) {
-                    this.formatPluginArgs()
+                    this.formatPluginArgs(this.pform)
                     driver.insert("pipeline", {args : this.ppArgs, plugin : this.pform.pid}).then(res => {
                         utils.showNetRes(this, res, () => {
                             var args_res = res.data.args
@@ -283,7 +350,7 @@ export default {
         updatePlugin() {
             this.$refs['pluginForm'].validate((valid) => {
                 if (valid) {
-                    this.formatPluginArgs()
+                    this.formatPluginArgs(this.pform)
                     driver.insert("pipeline", {args : this.ppArgs, plugin : this.pform.pid}).then(res => {
                         utils.showNetRes(this, res, () => {
                             var args_res = res.data.args
@@ -319,8 +386,8 @@ export default {
             }
             return form
         },
-        formatPluginArgs() {
-            for (var arg of this.pform.args) {
+        formatPluginArgs(vform) {
+            for (var arg of vform.args) {
                 if (arg.custom == "codes") {
                     var code = utils.array_find(this.$store.getters.codes, arg.value, "id")
                     if (code) {
