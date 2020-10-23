@@ -2,18 +2,16 @@
 local json = require "cjson.safe"
 json.encode_sparse_array(true)
 
-local tinsert   = table.insert
-local ssub      = string.sub
-local sfind     = string.find
-local sformat   = string.format
-local log_debug = logger.debug
-local serialize = logger.serialize
-local sexecute  = shell.execute
-local aplaybook = ansible.playbook
+local tinsert       = table.insert
+local ssub          = string.sub
+local sfind         = string.find
+local sformat       = string.format
+local log_debug     = logger.debug
+local serialize     = logger.serialize
+local playbookid    = ansible.createbook
 
-local apidoer   = utility.apidoer
-local proj_db   = nucleus.proj_db
-local admin_db  = nucleus.admin_db
+local apidoer       = utility.apidoer
+local proj_db       = nucleus.proj_db
 
 local function format_addr(code)
     local pbegin, pend = sfind(code.addr, "http://")
@@ -25,27 +23,15 @@ local function format_addr(code)
     return code.addr
 end
 
-local function create_playbook(session, code)
-    local playbook_rd = admin_db:find_one("playbooks", {id = code.playbook}, {_id = 0})
-    if playbook_rd then
-        local script = string.gsub(playbook_rd.script, "$HOST", code.host)
-        return sexecute(sformat([[echo "%s" > /tmp/%s.yaml]], script, code.id))
-    end
-    return false
-end
-
 local function code_clone_code(session, code)
     local project = session.data.project
     local args = {
-        name = code.name,
+        module = "code",
+        code = code.name,
         path = project.path,
         addr = format_addr(code)
     }
-    local sok, sres = create_playbook(session, code)
-    if not sok then
-        return sok, sres
-    end
-    return aplaybook(sformat("/tmp/%s.yaml", code.id), args)
+    return playbookid(code.playbook, code.host, args)
 end
 
 --定义接口

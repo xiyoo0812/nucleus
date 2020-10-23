@@ -94,6 +94,30 @@
                     this.loadPipelines()
                 }
             })
+            bus.$on('load_products', fload => {
+                if (fload || this.dataLoad["load_products"] == null){
+                    this.dataLoad["load_products"] = true
+                    this.loadProducts()
+                }
+            })
+            bus.$on('load_databases', fload => {
+                if (fload || this.dataLoad["load_databases"] == null){
+                    this.dataLoad["load_databases"] = true
+                    this.loadDatabases()
+                }
+            })
+            bus.$on('load_images', fload => {
+                if (fload || this.dataLoad["load_images"] == null){
+                    this.dataLoad["load_images"] = true
+                    this.loadImages()
+                }
+            })
+            bus.$on('load_logs', fload => {
+                if (fload || this.dataLoad["load_logs"] == null){
+                    this.dataLoad["load_logs"] = true
+                    this.loadLogs()
+                }
+            })
         },
         methods: {
             loadOwns() {
@@ -114,6 +138,13 @@
                         this.$store.dispatch("InitData", ["PROJ", res.data])
                     })
                 });
+            },
+            loadDatabases() {
+                driver.load("databases").then(res => {
+                    utils.showNetRes(this, res, () => {
+                        this.$store.dispatch("InitData", ["DATABASE", res.data])
+                    })
+                })
             },
             loadHosts() {
                 driver.load("hosts").then(res => {
@@ -156,6 +187,27 @@
                         this.$store.dispatch("InitData", ["PIPELINE", res.data])
                     })
                 })
+            },
+            loadProducts() {
+                driver.load("products").then(res => {
+                    utils.showNetRes(this, res, () => {
+                        this.$store.dispatch("InitData", ["PRODUCT", res.data])
+                    })
+                })
+            },
+            loadImages() {
+                driver.load("images").then(res => {
+                    utils.showNetRes(this, res, () => {
+                        this.$store.dispatch("InitData", ["IMAGE", res.data])
+                    })
+                })
+            },
+            loadLogs() {
+                driver.load("logs").then(res => {
+                    utils.showNetRes(this, res, () => {
+                        this.$store.dispatch("InitData", ["LOG", res.data])
+                    })
+                });
             },
         },
     }

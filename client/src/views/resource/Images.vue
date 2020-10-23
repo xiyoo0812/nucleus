@@ -47,6 +47,7 @@
 <script>
 import * as utils from '../../utils/index'
 import * as driver from '../../api/driver'
+import bus from '../../components/common/bus'
 import CodeEditor from '../../components/widget/CodeEditor.vue'
 
 const example = `#dockerfile脚本
@@ -77,7 +78,7 @@ export default {
         this.resetForm()
         var store = this.$store.getters
         if (store.proj) {
-            this.loadImages()
+            bus.$emit('load_images')
         }
     },
     data() {
@@ -95,13 +96,6 @@ export default {
         }
     },
     methods: {
-        loadImages() {
-            driver.load("images").then(res => {
-                utils.showNetRes(this, res, () => {
-                    this.$store.dispatch("InitData", ["IMAGE", res.data])
-                })
-            })
-        },
         resetForm() {
             this.form = {
                 id: '',

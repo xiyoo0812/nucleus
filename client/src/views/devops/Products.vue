@@ -46,11 +46,11 @@ export default {
     created() {
         var store = this.$store.getters
         if (store.proj) {
-            this.loadProducts()
+            bus.$emit('load_products')
         }
         bus.$on('project', msg => {
             if (store.proj) {
-                this.loadProducts()
+                bus.$emit('load_products', true)
             }
         })
     },
@@ -58,20 +58,13 @@ export default {
         formatTime(val) {
             return utils.formatTime(val)
         },
-        loadProducts() {
-            driver.load("products").then(res => {
-                utils.showNetRes(this, res, () => {
-                    this.$store.dispatch("InitData", ["PRODUCT", res.data])
-                })
-            })
-        },
         handleDelete(row) {
             this.$confirm('确定要删除此制品，是否继续?', '提示', {
                 confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning'
             }).then(() => {
-                var packageids = []
-                packageids.push(row.id)
-                driver.remove("products", packageids).then(res => {
+                var productids = []
+                productids.push(row.id)
+                driver.remove("products", productids).then(res => {
                     utils.showNetRes(this, res, () => {
                         this.$store.dispatch("DelData", ["PRODUCT", row.id, "id"])
                     })

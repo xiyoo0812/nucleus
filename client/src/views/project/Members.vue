@@ -33,10 +33,10 @@
 </template>
 
 <script>
-import bus from '../../components/common/bus'
-import panel from "../../components/Panel.vue"
 import * as utils from '../../utils/index'
 import * as driver from '../../api/driver'
+import bus from '../../components/common/bus'
+import panel from "../../components/Panel.vue"
 
 export default {
     components: {

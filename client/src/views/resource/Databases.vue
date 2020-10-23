@@ -81,9 +81,9 @@
 
 <script>
 
-import bus from '../../components/common/bus'
 import * as utils from '../../utils/index'
 import * as driver from '../../api/driver'
+import bus from '../../components/common/bus'
 
 export default {
     name: 'Databases',
@@ -114,22 +114,15 @@ export default {
         this.resetForm()
         var store = this.$store.getters
         if (store.proj) {
-            this.loadDatabases()
+            bus.$emit('load_databases')
         }
         bus.$on('project', msg => {
             if (store.proj) {
-                this.loadDatabases()
+                bus.$emit('load_databases', true)
             }
         })
     },
     methods: {
-        loadDatabases() {
-            driver.load("databases").then(res => {
-                utils.showNetRes(this, res, () => {
-                    this.$store.dispatch("InitData", ["DATABASE", res.data])
-                })
-            })
-        },
         resetForm() {
             this.form = {
                 name: '',

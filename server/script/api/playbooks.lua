@@ -35,7 +35,7 @@ local playbooks_doers = {
         playbook.creator = session.data.user.name
         local ok, err = admin_db:update("playbooks", playbook, { id = playbook.id })
         if not ok then
-            return {code = -1, msg = sformat("db update failed: %s", err)}
+            return {code = -1, msg = sformat("playbook update failed: %s", err)}
         end
         return { code = 0, data = playbook }
     end,
@@ -49,7 +49,7 @@ local playbooks_doers = {
         playbook.creator = session.data.user.name
         local ok, err = admin_db:insert("playbooks", { playbook })
         if not ok then
-            return { code = -1, msg = sformat("db insert failed:%s", err)}
+            return { code = -1, msg = sformat("playbook insert failed:%s", err)}
         end
         return { code = 0, data = playbook }
     end,

@@ -39,7 +39,7 @@
                             <div class="grid-content grid-con-1">
                                 <i class="el-icon-lx-people grid-con-icon"></i>
                                 <div class="grid-cont-right">
-                                    <div class="grid-num">3</div>
+                                    <div class="grid-num">{{codeSize}}</div>
                                     <div><router-link to="/codes" class="grid-name">代码库</router-link></div>
                                 </div>
                             </div>
@@ -50,7 +50,7 @@
                             <div class="grid-content grid-con-2">
                                 <i class="el-icon-lx-notice grid-con-icon"></i>
                                 <div class="grid-cont-right">
-                                    <div class="grid-num">8</div>
+                                    <div class="grid-num">{{hostSize}}</div>
                                     <div><router-link to="/hosts" class="grid-name">主机</router-link></div>
                                 </div>
                             </div>
@@ -61,8 +61,8 @@
                             <div class="grid-content grid-con-3">
                                 <i class="el-icon-lx-goods grid-con-icon"></i>
                                 <div class="grid-cont-right">
-                                    <div class="grid-num">21</div>
-                                    <div><router-link to="/hosts" class="grid-name">流水线</router-link></div>
+                                    <div class="grid-num">{{pipelineSize}}</div>
+                                    <div><router-link to="/pipelines" class="grid-name">流水线</router-link></div>
                                 </div>
                             </div>
                         </el-card>
@@ -72,8 +72,8 @@
                             <div class="grid-content grid-con-4">
                                 <i class="el-icon-lx-goods grid-con-icon"></i>
                                 <div class="grid-cont-right">
-                                    <div class="grid-num">50</div>
-                                    <div><router-link to="/hosts" class="grid-name">制品库</router-link></div>
+                                    <div class="grid-num">{{productSize}}</div>
+                                    <div><router-link to="/products" class="grid-name">制品库</router-link></div>
                                 </div>
                             </div>
                         </el-card>
@@ -117,22 +117,34 @@ export default {
         bus.$on('project', msg => {
             var store = this.$store.getters
             if (store.proj) {
-                this.loadLogs()
+                bus.$emit('load_logs')
+                bus.$emit('load_codes')
+                bus.$emit('load_hosts')
+                bus.$emit('load_products')
+                bus.$emit('load_pipelines')
             }
         })
     },
-    methods: {
-        loadLogs() {
-            driver.load("logs").then(res => {
-                utils.showNetRes(this, res, () => {
-                    this.$store.dispatch("InitData", ["LOG", res.data])
-                })
-            });
+    computed: {
+        codeSize : function() {
+            return this.$store.getters.codes.length
         },
+        hostSize : function() {
+            return this.$store.getters.hosts.length
+        },
+        pipelineSize : function() {
+            return this.$store.getters.pipelines.length
+        },
+        productSize : function() {
+            return this.$store.getters.products.length
+        },
+    },
+    methods: {
         formatTime(val) {
             return utils.formatTime(val)
         },
         handleRefesh(){
+            bus.$emit('load_logs')
             this.loadLogs()
         },
     }
@@ -143,7 +155,6 @@ export default {
     .el-row {
         margin-bottom: 20px;
     }
-
     .user-info {
         display: flex;
         align-items: center;
@@ -151,59 +162,49 @@ export default {
         border-bottom: 2px solid #ccc;
         margin-bottom: 20px;
     }
-
     .user-avator {
         width: 100px;
         height: 100px;
         border-radius: 50%;
     }
-
     .user-info-cont {
         padding-left: 50px;
         flex: 1;
         font-size: 14px;
         color: #999;
     }
-
     .user-info-cont div:first-child {
         font-size: 30px;
         color: #222;
     }
-
     .user-info-list {
         font-size: 14px;
         color: #999;
         line-height: 30px;
     }
-
     .user-info-list span {
         margin-left: 70px;
     }
-
     .grid-content {
         display: flex;
         align-items: center;
         height: 100px;
     }
-
     .grid-cont-right {
         flex: 1;
         text-align: center;
         font-size: 14px;
         color: #999;
     }
-
     .grid-num {
         font-size: 30px;
         font-weight: bold;
     }
-
     .grid-name {
         font-size: 16px;
         font-weight: bold;
         color: #222;
     }
-
     .grid-con-icon {
         font-size: 50px;
         width: 100px;
@@ -212,50 +213,37 @@ export default {
         line-height: 100px;
         color: #fff;
     }
-
     .grid-con-1 .grid-con-icon {
         background: rgb(45, 140, 240);
     }
-
     .grid-con-1 .grid-num {
         color: rgb(45, 140, 240);
     }
-
     .grid-con-2 .grid-con-icon {
         background: rgb(100, 213, 114);
     }
-
     .grid-con-2 .grid-num {
         color: rgb(45, 140, 240);
     }
-
     .grid-con-3 .grid-con-icon {
         background: rgb(242, 94, 67);
     }
-
     .grid-con-3 .grid-num {
         color: rgb(242, 94, 67);
     }
-
     .grid-con-4 .grid-con-icon {
         background: rgb(12, 234, 241);
     }
-
     .grid-con-4 .grid-num {
         color: rgb(12, 234, 241);
     }
-
-
     .mgb20 {
         margin-bottom: 20px;
     }
-
     .proj-title {
         font-size: 20px;
     }
-
     .proj-item {
         font-size: 14px;
     }
-
 </style>

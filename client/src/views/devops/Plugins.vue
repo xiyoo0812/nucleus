@@ -25,17 +25,27 @@
         </el-table-column>
     </el-table>
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" :close-on-click-modal="false" width="65%">
-        <el-form ref="dataForm" :rules="rules" :model="form" label-position="left" label-width="80px">
-            <el-form-item label="名称" prop="name">
+        <el-form ref="dataForm" :rules="rules" :model="form" label-position="left" label-width="100px">
+            <el-form-item label="插件名称" prop="name">
                 <el-input v-model="form.name" maxlength="20" placeholder="插件名称"/>
             </el-form-item>
-            <el-form-item label="描述" prop="desc">
+            <el-form-item label="插件描述" prop="desc">
                 <el-input v-model="form.desc" maxlength="100" placeholder="插件描述"/>
             </el-form-item>
-            <el-form-item label="脚本" prop="script">
+            <el-form-item label="插件配置脚本" prop="init_book">
+                <Selecter v-model="form.init_book" :option="form.init_book" clear="true" :options="this.$store.getters.playbooks"/>
+            </el-form-item>
+            <el-form-item label="插件运行脚本" prop="run_book">
+                <Selecter v-model="form.run_book" :option="form.run_book" clear="true" :options="this.$store.getters.playbooks"/>
+            </el-form-item>
+            <el-form-item label="插件逻辑代码" prop="script">
                 <CodeEditor v-model="form.script" :code="form.script" height="400px" language="text/x-lua"/>
             </el-form-item>
-            <el-form-item label="参数" prop="args">
+            <el-form-item label="运行时配置" prop="is_runtime">
+                <el-checkbox v-model="form.is_runtime"/>
+                <span style="color:#E6A23C"> 勾选表示此插件在流水线执行时需要配置</span>
+            </el-form-item>
+            <el-form-item label="插件参数" prop="args">
                 <el-table :data="form.args" height="200" stripe border style="width: 100%;">
                     <el-table-column label="名称">
                         <template slot-scope="scope">
@@ -94,6 +104,7 @@
 import * as utils from '../../utils/index'
 import * as driver from '../../api/driver'
 import bus from '../../components/common/bus'
+import Selecter from '../../components/widget/Selecter.vue'
 import CodeEditor from '../../components/widget/CodeEditor.vue'
 
 const example = `--plugin脚本
@@ -102,23 +113,38 @@ const example = `--plugin脚本
 --local ok, res/err = shell.execute(cmd, timeout?)
 --local ok, res/err = ansible.shell(cmd, timeout?)
 --local ok, res/err = ansible.playbook(book, args, timeout?)
+--local ok, res/err = ansible.playbookid(bookid, args, timeout?)
 
 local plugin = {}
+
 --[[
+--解析输出参数
+local function parse_output_args(str)
+  	return {}	
+end
+
 --init函数在插件初始化的时候执行
-function plugin.init(args)
-    local code = 0
-    local plugin_res = {}
-  	return code, plugin_res
+function plugin.init(args, playbook)
+  	local sok, sres = ansible.playbookid(playbook, args)
+    if not sok then
+        return -1, sres
+    end
+    if sres.output then
+  		sres.args = parse_output_args(sres.output.msg)
+    	sres.output = nil
+    end
+    return 0, sres
 end
 ]]
 
 --run函数在插件运行的时候执行
-function plugin.run(args)
-    local code = 0
-    local plugin_res = {}
+function plugin.run(args, playbook)
+    local sok, sres = ansible.playbookid(playbook, args)
+    if not sok then
+        return -1, sres
+    end
 	print(string.format("pipeline %s startup based on $s", args.pipeline, args.host))
-  	return code, plugin_res
+    return 0, sres
 end
 
 return plugin
@@ -128,11 +154,13 @@ return plugin
 export default {
     name: 'Plugins',
     components:{
+        Selecter,
         CodeEditor
     },
     created() {
         this.resetForm()
         bus.$emit('load_plugins')
+        bus.$emit('load_playbooks')
     },
     data() {
         return {
@@ -183,8 +211,11 @@ export default {
                 id: '',
                 name: '',
                 desc: '',
-                args: [],
+                run_book: '',
+                init_book: '',
+                is_runtime: false,
                 script: example,
+                args: [],
             }
         },
         handleCreate() {

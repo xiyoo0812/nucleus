@@ -34,7 +34,7 @@ local plugins_doers = {
         end
         local lok, lerr = pcall(load(plugin.script))
         if not lok then
-            return {code = -1, msg = sformat("plugin update failed: %s", lerr)}
+            return {code = -1, msg = sformat("plugin load script failed: %s", lerr)}
         end
         plugin.creator = session.data.user.name
         local ok, err = admin_db:update("plugins", plugin, { id = plugin.id })
@@ -52,7 +52,7 @@ local plugins_doers = {
         end
         local lok, lerr = pcall(load(plugin.script))
         if not lok then
-            return {code = -1, msg = sformat("plugin insert failed: %s", lerr)}
+            return {code = -1, msg = sformat("plugin load script failed: %s", lerr)}
         end
         plugin.creator = session.data.user.name
         local ok, err = admin_db:insert("plugins", { plugin })

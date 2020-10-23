@@ -47,9 +47,11 @@
 <script>
 import * as utils from '../../utils/index'
 import * as driver from '../../api/driver'
+import bus from '../../components/common/bus'
 import CodeEditor from '../../components/widget/CodeEditor.vue'
 
 const example = `#ansible-playbook脚本
+#output任务用于输出
 - hosts : $HOST
   remote_user : root
   tasks :
@@ -60,6 +62,9 @@ const example = `#ansible-playbook脚本
     - name : clone
       shell : cd /root/ansible && git clone http://oauth2:BZ1whjxTNc18uTe7f5Wp@10.100.0.19/gaven.yang/quanta.git/
       when : result.stderr
+    - name : output
+      debug :
+        msg : "{{result}}"
 `
 
 export default {

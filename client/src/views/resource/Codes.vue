@@ -84,9 +84,9 @@
 
 <script>
 
-import bus from '../../components/common/bus'
 import * as utils from '../../utils/index'
 import * as driver from '../../api/driver'
+import bus from '../../components/common/bus'
 
 export default {
     name: 'Codes',
