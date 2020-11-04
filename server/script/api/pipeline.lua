@@ -15,10 +15,12 @@ local function plugin_init(session, pipeline, plugin_id)
     if not plugin_res then
         return false, sformat("plugin %s not exist: %s", plugin_id)
     end
+    log_debug("/pipeline plugin_init 1=> plugin: %s ", serialize(plugin_res.name))
     local ok, plugin = pcall(load(plugin_res.script))
     if not ok then
         return false, sformat("plugin script load failed: %s", plugin)
     end
+    log_debug("/pipeline plugin_init 2=> plugin: %s ", plugin.init)
     if plugin.init then
         pipeline.args.module = "code"
         pipeline.args.path = session.data.project.path
@@ -26,34 +28,40 @@ local function plugin_init(session, pipeline, plugin_id)
         if not _ok or code ~= 0 then
             return false, sformat("plugin script init failed: %s", _ok and res or ok)
         end
+        log_debug("/pipeline plugin_init success name:%s: res:%s", plugin_res.name, serialize(res))
         return true, res
     end
+    log_debug("/pipeline plugin_init success no res name: %s ", plugin_res.name)
     return true, {}
 end
 
 --定义接口
 local pipeline_doers = {
     POST = function(req, params, session)
-        log_debug("/pipeline POST params1: %s", serialize(params))
+        log_debug("/pipeline POST params: %s", serialize(params))
         local pipeline_id = params.args
         local pipeline = proj_db:find_one("pipelines", { id = pipeline_id}, {_id = 0})
         if not pipeline then
             return {code = -1, msg = "pipeline not exist"}
         end
         local newArgs = {}
+        local runtime = false
         for _, plugin in pairs(pipeline.plugins) do
-            local ok, res = plugin_init(session, pipeline, plugin.pid)
-            if not ok then
-                return {code = -1, msg = res}
-            end
-            for key, value in pairs(res.args) do
-                newArgs[key] = value
+            if plugin.is_runtime then
+                local ok, res = plugin_init(session, pipeline, plugin.pid)
+                if not ok then
+                    return {code = -1, msg = res}
+                end
+                for key, value in pairs(res.args or {}) do
+                    newArgs[key] = value
+                end
+                runtime = true
             end
         end
-        return { code = 0, data = { args = newArgs }}
+        return { code = 0, data = { runtime = runtime, args = newArgs }}
     end,
     PUT = function(req, params, session)
-        log_debug("/pipeline PUT params1: %s", serialize(params))
+        log_debug("/pipeline PUT params: %s", serialize(params))
         local pipeline = params.args
         local ok, res = plugin_init(session, pipeline, pipeline.plugin)
         if not ok then

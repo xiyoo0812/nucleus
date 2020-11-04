@@ -41,10 +41,6 @@
             <el-form-item label="插件逻辑代码" prop="script">
                 <CodeEditor v-model="form.script" :code="form.script" height="400px" language="text/x-lua"/>
             </el-form-item>
-            <el-form-item label="运行时配置" prop="is_runtime">
-                <el-checkbox v-model="form.is_runtime"/>
-                <span style="color:#E6A23C"> 勾选表示此插件在流水线执行时需要配置</span>
-            </el-form-item>
             <el-form-item label="插件参数" prop="args">
                 <el-table :data="form.args" height="200" stripe border style="width: 100%;">
                     <el-table-column label="名称">
@@ -213,7 +209,6 @@ export default {
                 desc: '',
                 run_book: '',
                 init_book: '',
-                is_runtime: false,
                 script: example,
                 args: [],
             }

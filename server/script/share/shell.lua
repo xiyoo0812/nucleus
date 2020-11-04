@@ -1,9 +1,9 @@
 --shell.lua
 local lshell    = require "resty.shell"
 
-local log_err   = logger.err
-local log_debug = logger.debug
 local shrun     = lshell.run
+local log_err   = logger.err
+--local log_debug = logger.debug
 
 shell = {}
 local execute_shell = function(cmd, timeout, max_size, stdin)
@@ -16,7 +16,7 @@ local execute_shell = function(cmd, timeout, max_size, stdin)
         end
         return false, reason
     end
-    log_debug("run [%s] result: status: %s, out:%s, err:%s, reason=%s", cmd, status, stdout, stderr, reason)
+    --log_debug("run [%s] result: status: %s, out:%s, err:%s, reason=%s", cmd, status, stdout, stderr, reason)
     return true, stdout
 end
 
