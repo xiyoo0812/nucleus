@@ -3,6 +3,7 @@ local json = require "cjson.safe"
 json.encode_sparse_array(true)
 
 local sformat   = string.format
+local tcopy     = table_ex.copy
 local log_debug = logger.debug
 local serialize = logger.serialize
 
@@ -15,16 +16,15 @@ local function plugin_init(session, pipeline, plugin_id)
     if not plugin_res then
         return false, sformat("plugin %s not exist: %s", plugin_id)
     end
-    log_debug("/pipeline plugin_init 1=> plugin: %s ", serialize(plugin_res.name))
     local ok, plugin = pcall(load(plugin_res.script))
     if not ok then
         return false, sformat("plugin script load failed: %s", plugin)
     end
-    log_debug("/pipeline plugin_init 2=> plugin: %s ", plugin.init)
     if plugin.init then
-        pipeline.args.module = "code"
-        pipeline.args.path = session.data.project.path
-        local _ok, code, res = pcall(plugin.init, pipeline.args, plugin_res.init_book)
+        local pbargs = tcopy(pipeline.args)
+        pbargs.module = "codes"
+        pbargs.path = session.data.project.path
+        local _ok, code, res = pcall(plugin.init, pbargs, plugin_res.init_book)
         if not _ok or code ~= 0 then
             return false, sformat("plugin script init failed: %s", _ok and res or ok)
         end

@@ -32,7 +32,7 @@
         </el-table-column>
     </el-table>
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" :close-on-click-modal="false" width="60%">
-        <el-form ref="dataForm" :rules="rules" :model="form" label-position="left" label-width="100px" style="margin-left:50px;">
+        <el-form ref="dataForm" v-loading="codeLoading" :rules="rules" :model="form" label-position="left" label-width="100px" style="margin-left:50px;">
             <el-form-item label="名称" prop="name">
                 <el-input v-model="form.name" placeholder="hive"/>
             </el-form-item>
@@ -54,15 +54,6 @@
                 <router-link :to="{ path: '/hosts' }">
                     <el-button @click="dialogFormVisible = false" type="text">> 点我前往主机管理</el-button>
                 </router-link>
-            </el-form-item>
-            <el-form-item label="Playbook" prop="playbook">
-                <el-select v-model="form.playbook" placeholder="请选择Playbook">
-                    <el-option v-for="item in this.$store.getters.playbooks" :label="item.name" :value="item.id" :key="item.id"/>
-                </el-select>
-                <router-link :to="{ path: '/playbooks' }">
-                    <el-button @click="dialogFormVisible = false" type="text">> 点我前往Playbook管理</el-button>
-                </router-link>
-                <span style="color:#E6A23C"> Playbook为构建脚本 </span>
             </el-form-item>
             <el-form-item label="是否远程仓库" prop="is_remote">
                 <el-checkbox v-model="form.is_remote"/>
@@ -95,6 +86,7 @@ export default {
             form: {},
             dialogStatus: '',
             listLoading: false,
+            codeLoading: false,
             dialogFormVisible: false,
             textMap: { update: '编辑', create: '新建' },
             codeTypes: [{ name: 'git', value: 'git' }, { name: 'svn', value: 'svn' }],
@@ -104,7 +96,6 @@ export default {
                 type :[{ required: true, message: '请选择代码类型', trigger: 'blur' },],
                 host :[{ required: true, message: '请选择主机', trigger: 'blur' },],
                 authkey: [{ required: true, message: '请选择凭证', trigger: 'change' }],
-                playbook: [{ required: true, message: '请选择Playbook', trigger: 'change' }],
             },
         }
     },
@@ -135,7 +126,6 @@ export default {
                 host: '',
                 type: '',
                 authkey: '',
-                playbook: '',
                 is_remote: true,
             }
         },
@@ -150,8 +140,10 @@ export default {
         createData() {
             this.$refs['dataForm'].validate((valid) => {
                 if (valid) {
+                    this.codeLoading = true
                     this.form.id = utils.newGuid()
                     driver.insert("codes", this.form).then(res => {
+                        this.codeLoading = false
                         utils.showNetRes(this, res, () => {
                             this.$store.dispatch("AddData", ["CODE", res.data, "id"])
                             this.dialogFormVisible = false
@@ -171,7 +163,9 @@ export default {
         updateData() {
             this.$refs['dataForm'].validate((valid) => {
                 if (valid) {
+                    this.codeLoading = true
                     driver.update("codes", this.form).then(res => {
+                        this.codeLoading = false
                         utils.showNetRes(this, res, () => {
                             this.$store.dispatch("UpdateData", ["CODE", res.data, "id"])
                             this.dialogFormVisible = false
@@ -186,7 +180,9 @@ export default {
             }).then(() => {
                 var codeids = []
                 codeids.push(row.id)
+                this.listLoading = true
                 driver.remove("codes", codeids).then(res => {
+                    this.listLoading = false
                     utils.showNetRes(this, res, () => {
                         this.$store.dispatch("DelData", ["CODE", row.id, "id"])
                     })

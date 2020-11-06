@@ -21,9 +21,9 @@ local function delete_authkeys(authkey)
         return false, err
     end
     if res.type == "SSHKey" then
-        local sok, shres = sexecute(sformat("rm -fr /nucleus/runtime/%s*", res.name))
+        local sok, stdout, stderr = sexecute(sformat("rm -fr /nucleus/runtime/%s*", res.name))
         if not sok then
-            return false, shres
+            return false, sformat("stdout: %s\nstderr: %s\n", stdout, stderr)
         end
     end
     return true

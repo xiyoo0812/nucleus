@@ -87,6 +87,11 @@ const router = new Router({
                     meta: { title: '流水线' }
                 },
                 {
+                    path: '/task',
+                    component: () => import(/* webpackChunkName: "task" */ '../views/devops/Task.vue'),
+                    meta: { title: '任务' }
+                },
+                {
                     path: '/404',
                     component: () => import(/* webpackChunkName: "404" */ '../views/404.vue'),
                     meta: { title: '404' }

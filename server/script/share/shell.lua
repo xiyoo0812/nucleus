@@ -3,7 +3,7 @@ local lshell    = require "resty.shell"
 
 local shrun     = lshell.run
 local log_err   = logger.err
---local log_debug = logger.debug
+local log_debug = logger.debug
 
 shell = {}
 local execute_shell = function(cmd, timeout, max_size, stdin)
@@ -12,12 +12,12 @@ local execute_shell = function(cmd, timeout, max_size, stdin)
     if not ok then
         log_err("run [%s] failed: status: %s, out:%s, err:%s, reason=%s", cmd, status, stdout, stderr, reason)
         if reason == "exit" then
-            return false, stderr
+            return false, stdout, stderr
         end
-        return false, reason
+        return false, stdout, reason
     end
-    --log_debug("run [%s] result: status: %s, out:%s, err:%s, reason=%s", cmd, status, stdout, stderr, reason)
-    return true, stdout
+    log_debug("run [%s] result: status: %s, out:%s, err:%s, reason=%s", cmd, status, stdout, stderr, reason)
+    return true, stdout, stderr
 end
 
 shell.execute   = execute_shell

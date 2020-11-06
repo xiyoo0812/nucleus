@@ -7,7 +7,7 @@
         </el-button-group>
         <el-collapse v-model="pipelineId" accordion>
             <template v-for="pipeline in $store.getters.pipelines">
-                <el-collapse-item :title="pipeline.name" :name="pipeline.id">
+                <el-collapse-item :title="pipeline.name + '-' + pipeline.desc" :name="pipeline.id">
                     <el-button-group style="margin-bottom:10px">
                         <el-button class="filter-item" type="primary" style="margin-right:10px;" @click="handleRun">执行</el-button>
                         <el-button class="filter-item" type="info" style="margin-right:10px;" @click="handleUpdate">编辑</el-button>
@@ -163,7 +163,21 @@ export default {
     },
     methods: {
         handleRun(row) {
-            if (!this.pipeline.task_id) {
+            var isProcess = false 
+            var taskId = this.pipeline.task
+            if (taskId) {
+                driver.find("tasks", taskId).then(res => {
+                    if (res.code == 0 && res.data.length > 0) {
+                        var task = res.data[0]
+                        if (task.status == "process") {
+                            this.$store.dispatch("SetTask", task)
+                            this.$router.push({ path: "/task" })
+                            isProcess = true
+                        }
+                    }
+                })
+            }
+            if(!isProcess) {
                 this.pipelineLoading = true
                 driver.update("pipeline", this.pipelineId).then(res => {
                     this.pipelineLoading = false
@@ -176,9 +190,9 @@ export default {
                                 }
                             }
                             var rargs = []
-                            for (var plugin in this.ppPlugins) {
+                            for (var plugin of this.ppPlugins) {
                                 if (plugin.is_runtime) {
-                                    for (var arg in plugin.args) {
+                                    for (var arg of plugin.args) {
                                         rargs.push(arg)
                                     }
                                 }
@@ -190,30 +204,19 @@ export default {
                         }
                     })
                 })
-            } else {
-                this.loadTask(this.pipeline.task_id)
             }
         },
         handleTask() {
-            if (this.pipelineId) {
-                this.formatPluginArgs(this.rform)
-                var form = {
-                    args : this.ppArgs,
-                    pipeline : this.pipelineId,
-                }
-                driver.insert("tasks", form).then(res => {
-                    utils.showNetRes(this, res, () => {
-                        this.$store.dispatch("AddData", ["TASK", res.data])
-                        this.dialogRunVisible = true
-                    })
-                })
+            this.formatPluginArgs(this.rform)
+            var form = {
+                args : this.ppArgs,
+                task : utils.newGuid(),
+                pipeline : this.pipelineId,
             }
-        },
-        loadTask(task_id) {
-            driver.find("tasks", task_id).then(res => {
+            driver.insert("tasks", form).then(res => {
                 utils.showNetRes(this, res, () => {
-                    this.$store.dispatch("InitData", ["TASK", res.data])
-                    this.dialogRunVisible = true
+                    this.$store.dispatch("SetTask", res.data)
+                    this.$router.push({ path: "/task" })
                 })
             })
         },
@@ -363,19 +366,23 @@ export default {
             })
         },
         formatPluginArgs(vform) {
-            for (var arg of vform.args) {
-                if (arg.custom == "codes") {
-                    var code = utils.array_find(this.$store.getters.codes, arg.value, "id")
-                    if (code) {
-                        this.ppArgs[arg.name] = code.name
+            if (vform.args) {
+                for (var arg of vform.args) {
+                    if (arg.custom == "codes") {
+                        var code = utils.array_find(this.$store.getters.codes, arg.value, "id")
+                        if (code) {
+                            this.ppArgs["addr"] = code.addr
+                            this.ppArgs["authkey"] = code.authkey
+                            this.ppArgs[arg.name] = code.name
+                        }
+                    } else if (arg.custom == "hosts") {
+                        var host = utils.array_find(this.$store.getters.hosts, arg.value, "id")
+                        if (host) {
+                            this.ppArgs[arg.name] = host.ip
+                        }
+                    } else {
+                        this.ppArgs[arg.name] = arg.value
                     }
-                } else if (arg.custom == "hosts") {
-                    var host = utils.array_find(this.$store.getters.hosts, arg.value, "id")
-                    if (host) {
-                        this.ppArgs[arg.name] = host.ip
-                    }
-                } else {
-                    this.ppArgs[arg.name] = arg.value
                 }
             }
         },

@@ -13,6 +13,7 @@ const store = new Vuex.Store({
     getters : {
         name: (state) => state.user.name,
         proj: (state) => state.user.proj,
+        task: (state) => state.user.task,
         dept: (state) => state.user.user.dept,
         email: (state) => state.user.user.email,
         empCode: (state) => state.user.user.empCode,

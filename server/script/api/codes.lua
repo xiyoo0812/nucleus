@@ -8,7 +8,7 @@ local sfind         = string.find
 local sformat       = string.format
 local log_debug     = logger.debug
 local serialize     = logger.serialize
-local playbookid    = ansible.createbook
+local playbookn     = ansible.playbookn
 
 local apidoer       = utility.apidoer
 local proj_db       = nucleus.proj_db
@@ -24,14 +24,18 @@ local function format_addr(code)
 end
 
 local function code_clone_code(session, code)
-    local project = session.data.project
-    local args = {
-        module = "code",
-        code = code.name,
-        path = project.path,
-        addr = format_addr(code)
-    }
-    return playbookid(code.playbook, code.host, args)
+    if code.type == "git" then
+        local project = session.data.project
+        local args = {
+            module = "codes",
+            host = code.host,
+            code = code.name,
+            path = project.path,
+            addr = format_addr(code)
+        }
+        return playbookn("gitclone", args)
+    end
+    return true
 end
 
 --定义接口
@@ -75,6 +79,12 @@ local codes_doers = {
         if res then
             return { code = -1, msg = "name aready exist!" }
         end
+        if code.is_remote then
+            local ok, ccres = code_clone_code(session, code)
+            if not ok then
+                return {code = -1, msg = sformat("code clone failed: %s", ccres)}
+            end
+        end
         local ok, err = proj_db:insert("codes", { code })
         if not ok then
             return { code = -1, msg = sformat("db insert failed:%s", err)}
@@ -84,9 +94,24 @@ local codes_doers = {
     DELETE = function(req, params, session)
         log_debug("/codes DELETE params: %s", serialize(params))
         local code_id = params.args
+        local coderes = proj_db:find_one("codes", { id = code_id })
+        if not coderes then
+            return { code = -1, msg = "code not exist!" }
+        end
         local ok, err = proj_db:delete("codes", { id = code_id })
         if not ok then
-            return {code = -1, msg = sformat("db delete failed: %s", err)}
+            return {code = -1, msg = sformat("code delete failed: %s", err)}
+        end
+        if coderes.is_remote then
+            local project = session.data.project
+            local args = {
+                host = coderes.host,
+                dir = sformat("%s/codes/%s", project.path, coderes.name),
+            }
+            local sok, shres = playbookn("rmdir", args)
+            if not sok then
+                return { code = -1, msg = sformat("delete code path failed:%s", shres)}
+            end
         end
         return { code = 0 }
     end,

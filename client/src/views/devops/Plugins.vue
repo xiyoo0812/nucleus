@@ -1,29 +1,30 @@
 <template>
 <div class="app-container">
-    <h3>插件管理</h3>
-    <el-alert :closable="false" type="success" title="负责管理系统的所有插件。"/>
-    <div class="twt-tool-box">
-        <el-button-group>
-            <el-button class="filter-item" type="primary" @click="handleCreate">添加</el-button>
-        </el-button-group>
-    </div>
-    <el-table stripe v-loading="listLoading" style="width: 100%" :data="$store.getters.plugins">
-        <el-table-column label="名称">
-            <template slot-scope="scope"><span >{{ scope.row.name }}</span></template>
-        </el-table-column>
-        <el-table-column label="描述">
-            <template slot-scope="scope"><span >{{ scope.row.desc }}</span></template>
-        </el-table-column>
-        <el-table-column label="创建者">
-            <template slot-scope="scope"><span >{{ scope.row.creator }}</span></template>
-        </el-table-column>
-        <el-table-column label="操作" align="center">
-            <template slot-scope="scope">
-                <el-button size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
-                <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
-            </template>
-        </el-table-column>
-    </el-table>
+    <el-card>
+        <el-alert :closable="false" type="success" title="负责管理系统的所有插件。"/>
+        <div class="twt-tool-box">
+            <el-button-group>
+                <el-button class="filter-item" type="primary" @click="handleCreate">添加</el-button>
+            </el-button-group>
+        </div>
+        <el-table stripe v-loading="listLoading" style="width: 100%" :data="$store.getters.plugins">
+            <el-table-column label="名称">
+                <template slot-scope="scope"><span >{{ scope.row.name }}</span></template>
+            </el-table-column>
+            <el-table-column label="描述">
+                <template slot-scope="scope"><span >{{ scope.row.desc }}</span></template>
+            </el-table-column>
+            <el-table-column label="创建者">
+                <template slot-scope="scope"><span >{{ scope.row.creator }}</span></template>
+            </el-table-column>
+            <el-table-column label="操作" align="center">
+                <template slot-scope="scope">
+                    <el-button size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
+                    <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+    </el-card>
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" :close-on-click-modal="false" width="65%">
         <el-form ref="dataForm" :rules="rules" :model="form" label-position="left" label-width="100px">
             <el-form-item label="插件名称" prop="name">
@@ -139,7 +140,6 @@ function plugin.run(args, playbook)
     if not sok then
         return -1, sres
     end
-	print(string.format("pipeline %s startup based on $s", args.pipeline, args.host))
     return 0, sres
 end
 

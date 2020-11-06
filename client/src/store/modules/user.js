@@ -1,7 +1,6 @@
 //store/modules/user.ts
 
 import * as auth from '@/utils/auth'
-import { getSessProj } from '../../utils/auth'
 
 function getName(){
     var token = auth.getLocUser()
@@ -29,6 +28,7 @@ function getProj(){
 
 const user = {
     state:  {
+        task: null,
         proj: getProj(),
         user: getUser(),
         name: getName(),
@@ -46,6 +46,9 @@ const user = {
         },
         SET_PROJ: (state, proj) => {
             state.proj = proj
+        },
+        SET_TASK: (state, task) => {
+            state.task = task
         },
     },
 
@@ -67,6 +70,10 @@ const user = {
         SetProj(context, data) {
             context.commit('SET_PROJ', data)
             auth.setSessProj(data)
+        },
+        // 当前任务
+        SetTask(context, data) {
+            context.commit('SET_TASK', data)
         },
     }
 }
