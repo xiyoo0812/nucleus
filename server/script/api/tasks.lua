@@ -69,10 +69,10 @@ local tasks_doers = {
             name = pipeline.name,
             pipeline = pipeline_id,
             status = "process",
-            output = sformat("start exec pipeline: %s", pipeline.name),
+            output = sformat("start run pipeline: %s", pipeline.name),
         }
         for index, plugin in ipairs(pipeline.plugins) do
-            task.steps[index] = {name = plugin.name, status="wait"}
+            task.steps[index] = {name = plugin.nick, status="wait"}
         end
         local tok, terr = proj_db:insert("tasks", { task })
         if not tok then
@@ -83,6 +83,7 @@ local tasks_doers = {
             local task_res = true
             for index, plugin in ipairs(pipeline.plugins) do
                 task.steps[index].status = "process"
+                task.output = sformat("%s\nstart run plugin: %s", task.output, plugin.name)
                 proj_db:update("tasks", task, { id = task.id })
                 local rok, rres = plugin_run(session, pipeline, plugin.pid)
                 if not rok then

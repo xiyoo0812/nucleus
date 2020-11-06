@@ -16,6 +16,9 @@
                     </el-button-group>
                     <el-table stripe style="height:300px;max-height:300px;width:100%" :data="pipeline.plugins">
                         <el-table-column label="名称">
+                            <template slot-scope="scope"><span >{{ scope.row.nick }}</span></template>
+                        </el-table-column>
+                        <el-table-column label="类型">
                             <template slot-scope="scope"><span >{{ scope.row.name }}</span></template>
                         </el-table-column>
                         <el-table-column label="描述">
@@ -48,7 +51,10 @@
     </el-dialog>
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogPluginVisible" :close-on-click-modal="false" width="50%">
         <el-form ref="pluginForm" v-loading="pluginLoading" :rules="rules" :model="pform" label-position="left" label-width="80px">
-            <el-form-item label="名称" prop="name">
+            <el-form-item label="名称" prop="nick">
+                <el-input v-model="pform.nick" placeholder="输入流程名称"/>
+            </el-form-item>
+            <el-form-item label="插件" prop="name">
                 <Selecter v-model="pform.pid" :option="pform.pid" :options="$store.getters.plugins" @change="selectPlugin"/>
             </el-form-item>
             <template v-for="arg in pform.args">
@@ -156,6 +162,7 @@ export default {
             dialogPluginVisible: false,
             textMap: { update: '编辑', create: '新建' },
             rules: {
+                nick: [{ required: true, message: '请填入流程名字', trigger: 'blur' },],
                 name: [{ required: true, message: '请填入流水线名字', trigger: 'blur' },],
                 desc: [{ required: true, message: '请填入流水线描述', trigger: 'blur' },],
             },
@@ -261,6 +268,7 @@ export default {
         resetPForm() {
             this.pform = {
                 pid: '',
+                nick: '',
                 name: '',
                 desc: '',
                 args: [],

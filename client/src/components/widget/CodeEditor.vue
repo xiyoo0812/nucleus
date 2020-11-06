@@ -100,11 +100,12 @@
           tabSize: 4,
           styleActiveLine: false,
           lineNumbers: true,
+          lineWrapping: true,
           styleSelectedText: false,
           line: true,
           foldGutter: true,
           gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
-          highlightSelectionMatches: { showToken: /\w/, annotateScrollbar: true },
+          //highlightSelectionMatches: { showToken: /\w/, annotateScrollbar: true },
           mode: 'text/x-sh',
           hintOptions:{
             completeSingle: false
