@@ -22,6 +22,7 @@ local function plugin_run(session, pipeline, plugin_id)
     end
     if plugin.run then
         local pbargs = tcopy(pipeline.args)
+        pbargs.time = os.time()
         pbargs.task = pipeline.task
         pbargs.path = session.data.project.path
         pbargs.module = sformat("pipelines/%s", pipeline.id)

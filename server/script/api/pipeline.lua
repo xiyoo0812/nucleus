@@ -26,7 +26,7 @@ local function plugin_init(session, pipeline, plugin_id)
         pbargs.path = session.data.project.path
         local _ok, code, res = pcall(plugin.init, pbargs, plugin_res.init_book)
         if not _ok or code ~= 0 then
-            return false, sformat("plugin script init failed: %s", _ok and res or ok)
+            return false, sformat("plugin script init failed: %s", _ok and res or code)
         end
         log_debug("/pipeline plugin_init success name:%s: res:%s", plugin_res.name, serialize(res))
         return true, res
