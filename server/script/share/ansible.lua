@@ -85,7 +85,11 @@ local function call_playbook(playbook, args, timeout)
     local book_file = sformat("/tmp/%s.yaml", playbook.name)
     local script = sgsub(playbook.script, "$HOST", args.host)
     if args.command then
-        script = sgsub(script, "$COMMAND", args.command)
+        local space = smatch(script, "%c( +)$COMMAND")
+        if space and #space > 0 then
+            local command = sgsub(args.command, "\n", "\n" .. space)
+            script = sgsub(script, "$COMMAND", command)
+        end
     end
     local real_script = sgsub(script, '"', '\\"')
     local ok, res = sexecute(sformat([[echo "%s" > %s]], real_script, book_file))

@@ -70,7 +70,7 @@ local tasks_doers = {
             name = pipeline.name,
             pipeline = pipeline_id,
             status = "process",
-            output = sformat("start run pipeline: %s", pipeline.name),
+            output = sformat("begin run pipeline: %s", pipeline.name),
         }
         for index, plugin in ipairs(pipeline.plugins) do
             task.steps[index] = {name = plugin.nick, status="wait"}
@@ -84,23 +84,25 @@ local tasks_doers = {
             local task_res = true
             for index, plugin in ipairs(pipeline.plugins) do
                 task.steps[index].status = "process"
-                task.output = sformat("%s\nstart run plugin: %s", task.output, plugin.name)
+                task.output = sformat("%s\nfinish run plugin: %s", task.output, plugin.name)
                 proj_db:update("tasks", task, { id = task.id })
                 local rok, rres = plugin_run(session, pipeline, plugin.pid)
                 if not rok then
                     task.steps[index].status = "error"
-                    task.output = sformat("%s\nstart exec plugin: %s failed: %s\n", task.output, plugin.name, rres)
+                    task.output = sformat("%s\nrun plugin: %s failed: %s\n", task.output, plugin.name, rres)
                     proj_db:update("tasks", task, { id = task.id })
                     task_res = false
                     break
                 end
                 task.steps[index].status = "success"
+                task.output = sformat("%s\nend run plugin: %s", task.output, plugin.name)
                 for _, atask in ipairs(rres) do
                     task.output = sformat("%s\n%s\n%s", task.output, atask.cmd, atask.stdout)
                 end
                 proj_db:update("tasks", task, { id = task.id })
             end
             task.status = task_res and "success" or "error"
+            task.output = sformat("%s\nfinish run pipeline: %s, status: %s", task.output, task.status)
             proj_db:update("tasks", task, { id = task.id })
             pipeline.task_id = nil
             proj_db:update("pipelines", pipeline, { id = pipeline.id })
