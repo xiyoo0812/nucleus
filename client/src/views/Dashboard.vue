@@ -14,19 +14,21 @@
                     <div class="user-info-list">邮箱：{{this.$store.getters.email}} </div>
                     <div class="user-info-list">部门：{{this.$store.getters.dept}} </div>
                 </el-card>
-                <el-card shadow="hover" style="height:480px;">
+                <el-card shadow="hover" style="height:580px;">
                     <div slot="header" class="clearfix">
-                        <span>我的项目</span>
+                        <span>任务记录</span>
+                        <el-button style="float: right;" size="small" type="primary" @click="refeshTask()">刷新</el-button>
                     </div>
-                    <el-table :data="$store.getters.owns" :show-header="false" height="380" style="width: 100%;font-size:14px;">
-                        <el-table-column>
-                            <template slot-scope="scope">
-                                <div class="proj-item">{{scope.row.name}}</div>
-                            </template>
+                    <el-table :data="$store.getters.tasks" height="480px" style="width: 100%;font-size:14px;">
+                        <el-table-column label="流水线">
+                            <template slot-scope="scope"><span >{{ scope.row.name }}</span></template>
                         </el-table-column>
-                        <el-table-column>
+                        <el-table-column label="时间">
+                            <template slot-scope="scope"><span >{{ formatTime(scope.row.time) }}</span></template>
+                        </el-table-column>
+                        <el-table-column label="操作" align="center">
                             <template slot-scope="scope">
-                                <div class="proj-item">{{scope.row.desc}}</div>
+                                <el-button size="mini" @click="handleTask(scope.row)">查看</el-button>
                             </template>
                         </el-table-column>
                     </el-table>
@@ -79,10 +81,10 @@
                         </el-card>
                     </el-col>
                 </el-row>
-                <el-card shadow="hover" style="height:680px;">
+                <el-card shadow="hover" style="height:780px;">
                     <div slot="header" class="clearfix">
                         <span>操作记录</span>
-                        <el-button style="float: right;" size="small" type="primary" @click="handleRefesh()">刷新</el-button>
+                        <el-button style="float: right;" size="small" type="primary" @click="refeshLog()">刷新</el-button>
                     </div>
                     <el-table :data="$store.getters.logs" :show-header="false" height="580" style="width: 100%;font-size:14px;">
                         <el-table-column width="120">
@@ -119,6 +121,7 @@ export default {
             if (store.proj) {
                 bus.$emit('load_logs')
                 bus.$emit('load_codes')
+                bus.$emit('load_tasks')
                 bus.$emit('load_hosts')
                 bus.$emit('load_products')
                 bus.$emit('load_pipelines')
@@ -143,9 +146,15 @@ export default {
         formatTime(val) {
             return utils.formatTime(val)
         },
-        handleRefesh(){
-            bus.$emit('load_logs')
-            this.loadLogs()
+        handleTask(row) {
+            this.$store.dispatch("SetTask", row)
+            this.$router.push({ path: "/task" })
+        },
+        refeshTask(){
+            bus.$emit('load_tasks', true)
+        },
+        refeshLog(){
+            bus.$emit('load_logs', true)
         },
     }
 }

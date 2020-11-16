@@ -64,6 +64,12 @@
                     this.loadCodes()
                 }
             })
+            bus.$on('load_tasks', fload => {
+                if (fload || this.dataLoad["load_tasks"] == null){
+                    this.dataLoad["load_tasks"] = true
+                    this.loadTasks()
+                }
+            })
             bus.$on('load_hosts', fload => {
                 if (fload || this.dataLoad["load_hosts"] == null){
                     this.dataLoad["load_hosts"] = true
@@ -94,16 +100,25 @@
                     this.loadPipelines()
                 }
             })
-            bus.$on('load_products', fload => {
-                if (fload || this.dataLoad["load_products"] == null){
-                    this.dataLoad["load_products"] = true
-                    this.loadProducts()
-                }
+            bus.$on('load_products', key => {
+                this.loadProducts(key)
             })
             bus.$on('load_databases', fload => {
                 if (fload || this.dataLoad["load_databases"] == null){
                     this.dataLoad["load_databases"] = true
                     this.loadDatabases()
+                }
+            })
+            bus.$on('load_environs', fload => {
+                if (fload || this.dataLoad["load_environs"] == null){
+                    this.dataLoad["load_environs"] = true
+                    this.loadEnvirons()
+                }
+            })
+            bus.$on('load_routers', fload => {
+                if (fload || this.dataLoad["load_routers"] == null){
+                    this.dataLoad["load_routers"] = true
+                    this.loadRouters()
                 }
             })
             bus.$on('load_images', fload => {
@@ -126,9 +141,9 @@
                         this.$store.dispatch("InitData", ["OWNS", res.data])
                         if (res.proj) {
                             this.$store.dispatch("SetProj", res.proj)
-                            bus.$emit('project');
                         }
-                        bus.$emit('owns');
+                        bus.$emit('project')
+                        bus.$emit('owns')
                     })
                 });
             },
@@ -146,10 +161,31 @@
                     })
                 })
             },
+            loadEnvirons() {
+                driver.load("environs").then(res => {
+                    utils.showNetRes(this, res, () => {
+                        this.$store.dispatch("InitData", ["ENVIRON", res.data])
+                    })
+                })
+            },
+            loadRouters() {
+                driver.load("routers").then(res => {
+                    utils.showNetRes(this, res, () => {
+                        this.$store.dispatch("InitData", ["ROUTER", res.data])
+                    })
+                })
+            },
             loadHosts() {
                 driver.load("hosts").then(res => {
                     utils.showNetRes(this, res, () => {
                         this.$store.dispatch("InitData", ["HOST", res.data])
+                    })
+                })
+            },
+            loadTasks() {
+                driver.load("tasks").then(res => {
+                    utils.showNetRes(this, res, () => {
+                        this.$store.dispatch("InitData", ["TASK", res.data])
                     })
                 })
             },
@@ -188,8 +224,8 @@
                     })
                 })
             },
-            loadProducts() {
-                driver.load("products").then(res => {
+            loadProducts(key) {
+                driver.load("products", key).then(res => {
                     utils.showNetRes(this, res, () => {
                         this.$store.dispatch("InitData", ["PRODUCT", res.data])
                     })

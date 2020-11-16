@@ -14,7 +14,7 @@
                         <el-button class="filter-item" type="danger" style="margin-right:10px;" @click="handleDelete">删除</el-button>
                         <el-button class="filter-item" type="primary" style="margin-right:10px;" @click="handleCreatePlugin">添加插件</el-button>
                     </el-button-group>
-                    <el-table stripe style="height:300px;max-height:300px;width:100%" :data="pipeline.plugins">
+                    <el-table stripe style="width:100%" :data="pipeline.plugins">
                         <el-table-column label="名称">
                             <template slot-scope="scope"><span >{{ scope.row.nick }}</span></template>
                         </el-table-column>
@@ -122,6 +122,7 @@ export default {
         if (store.proj) {
             bus.$emit('load_codes')
             bus.$emit('load_hosts')
+            bus.$emit('load_images')
             bus.$emit('load_plugins')
             bus.$emit('load_pipelines')
             bus.$emit('load_playbooks')
@@ -130,6 +131,7 @@ export default {
             if (store.proj) {
                 bus.$emit('load_codes', true)
                 bus.$emit('load_hosts', true)
+                bus.$emit('load_images', true)
                 bus.$emit('load_plugins', true)
                 bus.$emit('load_pipelines', true)
                 bus.$emit('load_playbooks', true)
@@ -170,7 +172,6 @@ export default {
     },
     methods: {
         handleRun(row) {
-            var isProcess = false 
             var taskId = this.pipeline.task
             if (taskId) {
                 driver.find("tasks", taskId).then(res => {
@@ -179,39 +180,42 @@ export default {
                         if (task.status == "process") {
                             this.$store.dispatch("SetTask", task)
                             this.$router.push({ path: "/task" })
-                            isProcess = true
+                            return
                         }
                     }
+                    this.runTask()
                 })
+            } else {
+                this.runTask()
             }
-            if(!isProcess) {
-                this.pipelineLoading = true
-                driver.update("pipeline", this.pipelineId).then(res => {
-                    this.pipelineLoading = false
-                    utils.showNetRes(this, res, () => {
-                        if (res.data.runtime) {
-                            var args_res = res.data.args
-                            if (args_res) {
-                                for (var key in args_res) {
-                                    this.ppArgs[key] = args_res[key]
-                                }
+        },
+        runTask() {
+            this.pipelineLoading = true
+            driver.update("pipeline", this.pipelineId).then(res => {
+                this.pipelineLoading = false
+                utils.showNetRes(this, res, () => {
+                    if (res.data.runtime) {
+                        var args_res = res.data.args
+                        if (args_res) {
+                            for (var key in args_res) {
+                                this.ppArgs[key] = args_res[key]
                             }
-                            var rargs = []
-                            for (var plugin of this.ppPlugins) {
-                                if (plugin.is_runtime) {
-                                    for (var arg of plugin.args) {
-                                        rargs.push(arg)
-                                    }
-                                }
-                            }
-                            this.rform = { args : rargs }
-                            this.dialogReadyVisible = true
-                        } else {
-                            this.handleTask()
                         }
-                    })
+                        var rargs = []
+                        for (var plugin of this.ppPlugins) {
+                            if (plugin.is_runtime) {
+                                for (var arg of plugin.args) {
+                                    rargs.push(arg)
+                                }
+                            }
+                        }
+                        this.rform = { args : rargs }
+                        this.dialogReadyVisible = true
+                    } else {
+                        this.handleTask()
+                    }
                 })
-            }
+            })
         },
         handleTask() {
             this.formatPluginArgs(this.rform)
@@ -222,6 +226,7 @@ export default {
             }
             driver.insert("tasks", form).then(res => {
                 utils.showNetRes(this, res, () => {
+                    this.dialogReadyVisible = false
                     this.$store.dispatch("SetTask", res.data)
                     this.$router.push({ path: "/task" })
                 })
@@ -387,6 +392,16 @@ export default {
                         var host = utils.array_find(this.$store.getters.hosts, arg.value, "id")
                         if (host) {
                             this.ppArgs[arg.name] = host.ip
+                        }
+                    } else if (arg.custom == "images") {
+                        var image = utils.array_find(this.$store.getters.images, arg.value, "id")
+                        if (image) {
+                            this.ppArgs[arg.name] = image.name
+                        }
+                    } else if (arg.custom == "products") {
+                        var product = utils.array_find(this.$store.getters.products, arg.value, "id")
+                        if (product) {
+                            this.ppArgs[arg.name] = product.name
                         }
                     } else {
                         this.ppArgs[arg.name] = arg.value

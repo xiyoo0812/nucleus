@@ -10,6 +10,9 @@ local MAX_SIZE  = 10 * 1024 * 1024
 shell = {}
 local execute_shell = function(cmd, timeout, max_size, stdin)
     --ok, stdout, stderr, reason, status = shell.run(cmd, stdin?, timeout?, max_size?)
+    if type(timeout) == "string" then
+        timeout = tonumber(timeout)
+    end
     local ok, stdout, stderr, reason, status = shrun(cmd, stdin, timeout, MAX_SIZE)
     if not ok then
         log_err("run [%s] failed: status: %s, out:%s, err:%s, reason=%s", cmd, status, stdout, stderr, reason)

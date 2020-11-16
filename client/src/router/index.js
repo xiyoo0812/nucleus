@@ -42,9 +42,19 @@ const router = new Router({
                     meta: { title: '所有项目' }
                 },
                 {
+                    path: '/owns',
+                    component: () => import(/* webpackChunkName: "owns" */ '../views/project/MeProjects.vue'),
+                    meta: { title: '我的项目' }
+                },
+                {
                     path: '/databases',
                     component: () => import(/* webpackChunkName: "databases" */ '../views/resource/Databases.vue'),
                     meta: { title: '数据库' }
+                },
+                {
+                    path: '/routers',
+                    component: () => import(/* webpackChunkName: "routers" */ '../views/resource/Routers.vue'),
+                    meta: { title: '路由列表' }
                 },
                 {
                     path: '/codes',

@@ -2,6 +2,7 @@
 <div class="app-container">
     <h3>制品管理</h3>
     <el-alert :closable="false" type="success" title="管理项目生成的制品。"/>
+    <Selecter v-model="code" :option="code" :options="$store.getters.codes"/>
     <el-table stripe v-loading="listLoading" style="width: 100%" :data="$store.getters.products">
         <el-table-column label="名称">
             <template slot-scope="scope"><span >{{ scope.row.name }}</span></template>
@@ -13,7 +14,7 @@
             <template slot-scope="scope"><span >{{ scope.row.branch }}</span></template>
         </el-table-column>
         <el-table-column label="提交日志">
-            <template slot-scope="scope"><span >{{ scope.row.logs }}</span></template>
+            <template slot-scope="scope"><span >{{ scope.row.log }}</span></template>
         </el-table-column>
         <el-table-column label="操作者">
             <template slot-scope="scope"><span >{{ scope.row.creator }}</span></template>
@@ -40,17 +41,25 @@ export default {
     name: 'Products',
     data() {
         return {
+            code : "",
             listLoading: false,
         }
     },
     created() {
         var store = this.$store.getters
         if (store.proj) {
-            bus.$emit('load_products')
+            bus.$emit('load_codes')
+            bus.$emit('load_products', this.code)
         }
+        bus.$on('product', msg => {
+            if (store.proj) {
+                bus.$emit('load_products', this.code)
+            }
+        })
         bus.$on('project', msg => {
             if (store.proj) {
-                bus.$emit('load_products', true)
+                this.code = ""
+                bus.$emit('load_products', this.code)
             }
         })
     },
@@ -64,7 +73,9 @@ export default {
             }).then(() => {
                 var productids = []
                 productids.push(row.id)
+                this.listLoading = true
                 driver.remove("products", productids).then(res => {
+                    this.listLoading = false
                     utils.showNetRes(this, res, () => {
                         this.$store.dispatch("DelData", ["PRODUCT", row.id, "id"])
                     })

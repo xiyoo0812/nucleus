@@ -1,11 +1,10 @@
 <template>
 <div class="app-container">
-    <h3>数据库管理</h3>
-    <el-alert :closable="false" type="success" title="负责管理数据库。"/>
+    <h3>游戏环境</h3>
+    <el-alert :closable="false" type="success" title="负责管理游戏环境。"/>
     <div class="twt-tool-box">
         <el-button-group>
             <el-button class="filter-item" type="primary" @click="handleCreate">添加</el-button>
-            <el-button v-waves :loading="downloadLoading" class="filter-item" @click="handleDownload">导出</el-button>
         </el-button-group>
     </div>
     <el-table stripe v-loading="listLoading" style="width: 100%" :data="$store.getters.databases">
@@ -61,7 +60,7 @@
             </el-form-item>
             <el-form-item label="部署环境" prop="quanta_deploy">
                 <el-select v-model="form.quanta_deploy" placeholder="请选择部署环境">
-                    <el-option v-for="item in $store.getters.environs" :key="item.name" :label="item.name" :value="item.name"/>
+                    <el-option v-for="item in dbEnv" :key="item" :label="item" :value="item"/>
                 </el-select>
             </el-form-item>
             <el-form-item label="Group" prop="group">
@@ -95,6 +94,7 @@ export default {
             downloadLoading: false,
             dialogFormVisible: false,
             dbType: [ "mysql", "mongo" ],
+            dbEnv: [ "publish", "develop", "local"],
             textMap: { update: '编辑', create: '新建' },
             rules: {
                 name: [{ required: true, message: '请填入数据库名', trigger: 'blur' },],
@@ -113,12 +113,10 @@ export default {
         this.resetForm()
         var store = this.$store.getters
         if (store.proj) {
-            bus.$emit('load_environs')
             bus.$emit('load_databases')
         }
         bus.$on('project', msg => {
             if (store.proj) {
-                bus.$emit('load_environs', true)
                 bus.$emit('load_databases', true)
             }
         })
@@ -189,7 +187,7 @@ export default {
             })
         },
         handleDelete(row) {
-            this.$confirm('确定要删除此主机，是否继续?', '提示', {
+            this.$confirm('确定要删除此环境，是否继续?', '提示', {
                 confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning'
             }).then(() => {
                 var dbids = []

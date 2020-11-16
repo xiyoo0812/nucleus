@@ -29,6 +29,10 @@ local MENUS = {
                 index = "projects",
                 title = "所有项目",
             },
+            {
+                index = "owns",
+                title = "我的项目",
+            },
         },
     },
     {
@@ -53,6 +57,10 @@ local MENUS = {
                 title = "代码库"
             },
             {
+                index = "routers",
+                title = "路由表"
+            },
+            {
                 index = "playbooks",
                 title = "Playbook"
             },
@@ -65,7 +73,7 @@ local MENUS = {
                 title = "节点"
             },
             {
-                index = "envs",
+                index = "environs",
                 title = "环境"
             },
         }

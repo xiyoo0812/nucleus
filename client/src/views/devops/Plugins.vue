@@ -109,8 +109,9 @@ const example = `--plugin脚本
 --调用shell或者ansible指令
 --local ok, res/err = shell.execute(cmd, timeout?)
 --local ok, res/err = ansible.shell(cmd, timeout?)
---local ok, res/err = ansible.playbook(book, args, timeout?)
---local ok, res/err = ansible.playbookid(bookid, args, timeout?)
+--local ok, res/err = ansible.playbook(book, args)
+--local ok, res/err = ansible.playbookid(bookid, args)
+--local proj_db     = nucleus.proj_db
 
 local plugin = {}
 
@@ -170,7 +171,6 @@ export default {
             rules: {
                 name: [{ required: true, message: '请填入插件名字', trigger: 'blur' },],
                 desc: [{ required: true, message: '请填入插件描述', trigger: 'blur' },],
-                args: [{ required: true, message: '请填入插件参数', trigger: 'blur' },],
                 script: [{ required: true, message: '请填入插件脚本', trigger: 'blur' },],
             },
         }

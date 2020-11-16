@@ -8,11 +8,14 @@ const project = {
         playbooks: [],
         authkeys: [],
         products: [],
+        environs: [],
         members: [],
+        routers: [],
         plugins: [],
         applys: [],
         images: [],
         codes: [],
+        tasks: [],
         projs: [],
         hosts: [],
         logs: [],
@@ -43,17 +46,53 @@ const project = {
         UPDATE_HOST: (state, args) => {
             utils.array_update(state.hosts, args[0], args[1])
         },
+        INIT_TASK: (state, tasks) => {
+            state.tasks = tasks
+        },
+        ADD_TASK: (state, task) => {
+            state.tasks.push(task)
+        },
+        DEL_TASK: (state, args) => {
+            utils.array_remove(state.tasks, args[0], args[1])
+        },
+        UPDATE_TASK: (state, args) => {
+            utils.array_update(state.tasks, args[0], args[1])
+        },
         INIT_APPLY: (state, applys) => {
             state.applys = applys
         },
         DEL_APPLY: (state, args) => {
             utils.array_remove(state.applys, args[0], args[1])
         },
+        INIT_ENVIRON: (state, environs) => {
+            state.environs = environs
+        },
+        ADD_ENVIRON: (state, environ) => {
+            state.environs.push(environ)
+        },
+        DEL_ENVIRON: (state, args) => {
+            utils.array_remove(state.environs, args[0], args[1])
+        },
+        UPDATE_ENVIRON: (state, args) => {
+            utils.array_update(state.environs, args[0], args[1])
+        },
+        INIT_ROUTER: (state, routers) => {
+            state.routers = routers
+        },
+        ADD_ROUTER: (state, router) => {
+            state.routers.push(router)
+        },
+        DEL_ROUTER: (state, args) => {
+            utils.array_remove(state.routers, args[0], args[1])
+        },
+        UPDATE_ROUTER: (state, args) => {
+            utils.array_update(state.routers, args[0], args[1])
+        },
         INIT_MEMBER: (state, members) => {
             state.members = members
         },
-        ADD_MEMBER: (state, user) => {
-            state.members.push(user)
+        ADD_MEMBER: (state, member) => {
+            state.members.push(member)
         },
         DEL_MEMBER: (state, args) => {
             utils.array_remove(state.members, args[0], args[1])

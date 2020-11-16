@@ -106,9 +106,9 @@ local codes_doers = {
             local project = session.data.project
             local args = {
                 host = coderes.host,
-                dir = sformat("%s/codes/%s", project.path, coderes.name),
+                name = sformat("%s/codes/%s", project.path, coderes.name),
             }
-            local sok, shres = playbookn("rmdir", args)
+            local sok, shres = playbookn("rmfr", args)
             if not sok then
                 return { code = -1, msg = sformat("delete code path failed:%s", shres)}
             end

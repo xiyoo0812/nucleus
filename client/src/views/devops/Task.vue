@@ -37,10 +37,14 @@ export default {
     },
     methods: {
         loadProcess(task){
-            if (task && task.status == "process") {
-                this.interval = setTimeout(() => {
-                    this.loadTask(task.id)
-                }, 1000)
+            if (task) {
+                if(task.status == "process") {
+                    this.interval = setTimeout(() => {
+                        this.loadTask(task.id)
+                    }, 1000)
+                } else {
+                    bus.$emit('product')
+                }
             }
         },
         loadTask(taskId){

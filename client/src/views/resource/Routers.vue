@@ -1,14 +1,14 @@
 <template>
 <div class="app-container">
-    <h3>数据库管理</h3>
-    <el-alert :closable="false" type="success" title="负责管理数据库。"/>
+    <h3>游戏路由</h3>
+    <el-alert :closable="false" type="success" title="负责管理游戏路由。"/>
     <div class="twt-tool-box">
         <el-button-group>
             <el-button class="filter-item" type="primary" @click="handleCreate">添加</el-button>
             <el-button v-waves :loading="downloadLoading" class="filter-item" @click="handleDownload">导出</el-button>
         </el-button-group>
     </div>
-    <el-table stripe v-loading="listLoading" style="width: 100%" :data="$store.getters.databases">
+    <el-table stripe v-loading="listLoading" style="width: 100%" :data="$store.getters.routers">
         <el-table-column label="名称">
             <template slot-scope="scope"><span >{{ scope.row.name }}</span></template>
         </el-table-column>
@@ -23,12 +23,6 @@
         </el-table-column>
         <el-table-column label="Index">
             <template slot-scope="scope"><span >{{ scope.row.index }}</span></template>
-        </el-table-column>
-        <el-table-column label="用户名">
-            <template slot-scope="scope"><span >{{ scope.row.uname }}</span></template>
-        </el-table-column>
-        <el-table-column label="类型">
-            <template slot-scope="scope"><span >{{ scope.row.type }}</span></template>
         </el-table-column>
         <el-table-column label="操作" align="center">
             <template slot-scope="scope">
@@ -47,17 +41,6 @@
             </el-form-item>
             <el-form-item label="地址" prop="addr">
                 <el-input v-model="form.addr" placeholder="192.168.0.1:27017"/>
-            </el-form-item>
-            <el-form-item label="账户" prop="uname">
-                <el-input v-model="form.uname" placeholder="root"/>
-            </el-form-item>
-            <el-form-item label="密码" prop="passwd">
-                <el-input placeholder="password" v-model="form.passwd"/>
-            </el-form-item>
-            <el-form-item label="类型" prop="type">
-                <el-select v-model="form.driver" placeholder="请选择类型">
-                    <el-option v-for="item in dbType" :key="item" :label="item" :value="item"/>
-                </el-select>
             </el-form-item>
             <el-form-item label="部署环境" prop="quanta_deploy">
                 <el-select v-model="form.quanta_deploy" placeholder="请选择部署环境">
@@ -86,7 +69,7 @@ import * as driver from '../../api/driver'
 import bus from '../../components/common/bus'
 
 export default {
-    name: 'Databases',
+    name: 'Routers',
     data() {
         return {
             form: {},
@@ -94,17 +77,16 @@ export default {
             listLoading: false,
             downloadLoading: false,
             dialogFormVisible: false,
-            dbType: [ "mysql", "mongo" ],
+            routerEnv: [ "publish", "develop", "local"],
             textMap: { update: '编辑', create: '新建' },
             rules: {
-                name: [{ required: true, message: '请填入数据库名', trigger: 'blur' },],
-                driver: [{ required: true, message: '请选型数据库类型', trigger: 'blur' }],
+                name: [{ required: true, message: '请填入路由名称', trigger: 'blur' },],
                 quanta_deploy: [{ required: true, message: '请选型部署环境', trigger: 'blur' }],
-                group: [{ required: true, message: '请填入数据库集群', trigger: 'blur' },],
-                index: [{ required: true, message: '请填入数据库索引', trigger: 'blur' },],
+                group: [{ required: true, message: '请填入路由集群', trigger: 'blur' },],
+                index: [{ required: true, message: '请填入路由索引', trigger: 'blur' },],
                 addr: [
-                    { required: true, message: '请填入数据库访问地址', trigger: 'blur' },
-                    { type: 'string', pattern: /^.+:.+$/, message: '请填写正确数据库地址，例：192.168.0.1:22' }
+                    { required: true, message: '请填入路由访问地址', trigger: 'blur' },
+                    { type: 'string', pattern: /^.+:.+$/, message: '请填写正确路由地址，例：192.168.0.1:22' }
                 ],
             },
         }
@@ -113,13 +95,13 @@ export default {
         this.resetForm()
         var store = this.$store.getters
         if (store.proj) {
+            bus.$emit('load_routers')
             bus.$emit('load_environs')
-            bus.$emit('load_databases')
         }
         bus.$on('project', msg => {
             if (store.proj) {
+                bus.$emit('load_routers', true)
                 bus.$emit('load_environs', true)
-                bus.$emit('load_databases', true)
             }
         })
     },
@@ -127,11 +109,8 @@ export default {
         resetForm() {
             this.form = {
                 name: '',
-                passwd: '',
-                uname: '',
                 ip: '',
                 port: 0,
-                driver: '',
                 quanta_deploy : '',
                 addr: '',
                 group: 0,
@@ -158,9 +137,9 @@ export default {
                 if (valid) {
                     var form = this.buildForm()
                     form.id = utils.newGuid()
-                    driver.insert("databases", form).then(res => {
+                    driver.insert("routers", form).then(res => {
                         utils.showNetRes(this, res, () => {
-                            this.$store.dispatch("AddData", ["DATABASE", res.data, "id"])
+                            this.$store.dispatch("AddData", ["ROUTER", res.data, "id"])
                             this.dialogFormVisible = false
                         })
                     })
@@ -179,9 +158,9 @@ export default {
             this.$refs['dataForm'].validate((valid) => {
                 if (valid) {
                     var form = this.buildForm()
-                    driver.update("databases", form).then(res => {
+                    driver.update("routers", form).then(res => {
                         utils.showNetRes(this, res, () => {
-                            this.$store.dispatch("UpdateData", ["DATABASE", res.data, "id"])
+                            this.$store.dispatch("UpdateData", ["ROUTER", res.data, "id"])
                             this.dialogFormVisible = false
                         })
                     })
@@ -189,14 +168,14 @@ export default {
             })
         },
         handleDelete(row) {
-            this.$confirm('确定要删除此主机，是否继续?', '提示', {
+            this.$confirm('确定要删除此路由，是否继续?', '提示', {
                 confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning'
             }).then(() => {
                 var dbids = []
                 dbids.push(row.id)
-                driver.remove("databases", dbids).then(res => {
+                driver.remove("routers", dbids).then(res => {
                     utils.showNetRes(this, res, () => {
-                        this.$store.dispatch("DelData", ["DATABASE", row.id, "id"])
+                        this.$store.dispatch("DelData", ["ROUTER", row.id, "id"])
                     })
                 })
             }).catch(() => {})

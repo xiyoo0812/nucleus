@@ -10,8 +10,10 @@ local logs_doers = {
     GET = function(req, params, session)
         --获取用户拥有的项目
         log_debug("/logs GET params: %s", serialize(params))
-        local tick = os.time() - 86400
-        local logs = proj_db:find("logs", { time = { ["$gt"] = tick }}, {_id = 0})
+        local query = {}
+        --local tick = os.time() - 86400
+        --local query = { time = { ["$gt"] = tick }}
+        local logs = proj_db:find("logs", query, {_id = 0})
         return { code = 0, data = logs }
     end,
 }

@@ -66,7 +66,7 @@ local call_shell = function(host, cmd, timeout)
     return ok, sformat("stdout: %s\nstderr: %s\n", stdout, stderr)
 end
 
-local function call_playbook_file(book_file, args, timeout)
+local function call_playbook_file(book_file, args)
     local fargs = ""
     for key, value in pairs(args or {}) do
         if type(value) ~= "table" then
@@ -74,14 +74,14 @@ local function call_playbook_file(book_file, args, timeout)
         end
     end
     local ansible_cmd = sformat([[cd /; export LANG=C.UTF-8; ansible-playbook %s --extra-vars "%s" -v]], book_file, fargs)
-    local ok, stdout, stderr = sexecute(ansible_cmd, timeout)
+    local ok, stdout, stderr = sexecute(ansible_cmd, args.timeout)
     if ok then
         return ok, parse_playbook_res(stdout, stderr)
     end
     return ok, sformat("stdout: %s\nstderr: %s\n", stdout, stderr)
 end
 
-local function call_playbook(playbook, args, timeout)
+local function call_playbook(playbook, args)
     local book_file = sformat("/tmp/%s.yaml", playbook.name)
     local script = sgsub(playbook.script, "$HOST", args.host)
     if args.command then
@@ -91,28 +91,39 @@ local function call_playbook(playbook, args, timeout)
             script = sgsub(script, "$COMMAND", command)
         end
     end
-    local real_script = sgsub(script, '"', '\\"')
-    local ok, res = sexecute(sformat([[echo "%s" > %s]], real_script, book_file))
+    local yaml_script = sgsub(script, '"', '\\"')
+    local ok, res = sexecute(sformat([[echo "%s" > %s]], yaml_script, book_file))
     if not ok then
         return false, res
     end
-    return call_playbook_file(book_file, args, timeout)
+    local dockerfile = args.dockerfile
+    if dockerfile then
+        local dockerimage = admin_db:find_one("images", {name = dockerfile}, {_id = 0})
+        if dockerimage then
+            local docker_script = sgsub(dockerimage.script, '"', '\\"')
+            local dok, dres = sexecute(sformat([[echo "%s" > /tmp/Dockerfile]], docker_script))
+            if not dok then
+                return false, dres
+            end
+        end
+    end
+    return call_playbook_file(book_file, args)
 end
 
-local function call_playbook_name(book_name, args, timeout)
+local function call_playbook_name(book_name, args)
     local playbook = admin_db:find_one("playbooks", {name = book_name}, {_id = 0})
     if not playbook then
         return false, "playbook config not exist!"
     end
-    return call_playbook(playbook, args, timeout)
+    return call_playbook(playbook, args)
 end
 
-local function call_playbook_id(book_id, args, timeout)
+local function call_playbook_id(book_id, args)
     local playbook = admin_db:find_one("playbooks", {id = book_id}, {_id = 0})
     if not playbook then
         return false, "playbook config not exist!"
     end
-    return call_playbook(playbook, args, timeout)
+    return call_playbook(playbook, args)
 end
 
 ansible.shell       = call_shell

@@ -2,8 +2,9 @@
 local json = require "cjson.safe"
 json.encode_sparse_array(true)
 
-local sformat   = string.format
+local tinsert   = table.insert
 local tcopy     = table_ex.copy
+local sformat   = string.format
 local log_debug = logger.debug
 local serialize = logger.serialize
 
@@ -24,6 +25,7 @@ local function plugin_run(session, pipeline, plugin_id)
         local pbargs = tcopy(pipeline.args)
         pbargs.time = os.time()
         pbargs.task = pipeline.task
+        pbargs.creator = session.data.user.name
         pbargs.path = session.data.project.path
         pbargs.module = sformat("pipelines/%s", pipeline.id)
         local _ok, code, res = pcall(plugin.run, pbargs, plugin_res.run_book)
@@ -43,11 +45,12 @@ local tasks_doers = {
         log_debug("/tasks GET params: %s", serialize(params))
         local task_id = params.key
         local query = (#task_id > 0) and {id = task_id} or {}
-        local res = proj_db:find_one("tasks", query, {_id = 0})
-        if not res then
-            return {code = -1, msg = "task not exist"}
+        local res = proj_db:find("tasks", query, {_id = 0})
+        local records = {}
+        for _, record in pairs(res) do
+            tinsert(records, record)
         end
-        return { code = 0, data = { res } }
+        return { code = 0, data = records }
     end,
     PUT = function(req, params, session)
         log_debug("/tasks PUT params: %s", serialize(params))
@@ -84,25 +87,26 @@ local tasks_doers = {
             local task_res = true
             for index, plugin in ipairs(pipeline.plugins) do
                 task.steps[index].status = "process"
-                task.output = sformat("%s\nfinish run plugin: %s", task.output, plugin.name)
+                task.output = sformat("%s\nbegin run plugin: %s", task.output, plugin.name)
                 proj_db:update("tasks", task, { id = task.id })
                 local rok, rres = plugin_run(session, pipeline, plugin.pid)
-                if not rok then
+                if rok then
+                    task.steps[index].status = "success"
+                    task.output = sformat("%s\nfinish run plugin: %s", task.output, plugin.name)
+                    for _, atask in ipairs(rres) do
+                        task.output = sformat("%s\n%s\n%s", task.output, atask.cmd, atask.stdout)
+                    end
+                else
+                    proj_db:update("tasks", task, { id = task.id })
                     task.steps[index].status = "error"
                     task.output = sformat("%s\nrun plugin: %s failed: %s\n", task.output, plugin.name, rres)
                     proj_db:update("tasks", task, { id = task.id })
                     task_res = false
                     break
                 end
-                task.steps[index].status = "success"
-                task.output = sformat("%s\nend run plugin: %s", task.output, plugin.name)
-                for _, atask in ipairs(rres) do
-                    task.output = sformat("%s\n%s\n%s", task.output, atask.cmd, atask.stdout)
-                end
-                proj_db:update("tasks", task, { id = task.id })
             end
             task.status = task_res and "success" or "error"
-            task.output = sformat("%s\nfinish run pipeline: %s, status: %s", task.output, task.status)
+            task.output = sformat("%s\nfinish run pipeline: %s, status: %s", task.output, pipeline.name, task.status)
             proj_db:update("tasks", task, { id = task.id })
             pipeline.task_id = nil
             proj_db:update("pipelines", pipeline, { id = pipeline.id })
