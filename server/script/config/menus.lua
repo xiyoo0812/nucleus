@@ -76,6 +76,10 @@ local MENUS = {
                 index = "environs",
                 title = "环境"
             },
+            {
+                index = "templates",
+                title = "配置模板"
+            },
         }
     },
     {

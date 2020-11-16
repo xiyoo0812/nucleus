@@ -49,17 +49,17 @@ export default {
         var store = this.$store.getters
         if (store.proj) {
             bus.$emit('load_codes')
-            bus.$emit('load_products', this.code)
+            bus.$emit('load_products')
         }
         bus.$on('product', msg => {
             if (store.proj) {
-                bus.$emit('load_products', this.code)
+                bus.$emit('load_products', true)
             }
         })
         bus.$on('project', msg => {
             if (store.proj) {
                 this.code = ""
-                bus.$emit('load_products', this.code)
+                bus.$emit('load_products', true)
             }
         })
     },

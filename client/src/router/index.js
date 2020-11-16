@@ -52,6 +52,16 @@ const router = new Router({
                     meta: { title: '数据库' }
                 },
                 {
+                    path: '/environs',
+                    component: () => import(/* webpackChunkName: "environs" */ '../views/resource/Environs.vue'),
+                    meta: { title: '环境' }
+                },
+                {
+                    path: '/templates',
+                    component: () => import(/* webpackChunkName: "templates" */ '../views/resource/Templates.vue'),
+                    meta: { title: '环境' }
+                },
+                {
                     path: '/routers',
                     component: () => import(/* webpackChunkName: "routers" */ '../views/resource/Routers.vue'),
                     meta: { title: '路由列表' }

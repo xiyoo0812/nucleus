@@ -35,6 +35,7 @@ const store = new Vuex.Store({
         environs: (state) => state.project.environs,
         products: (state) => state.project.products,
         authkeys: (state) => state.project.authkeys,
+        templates: (state) => state.project.templates,
         playbooks: (state) => state.project.playbooks,
         pipelines: (state) => state.project.pipelines,
         databases: (state) => state.project.databases,

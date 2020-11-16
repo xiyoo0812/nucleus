@@ -100,8 +100,11 @@
                     this.loadPipelines()
                 }
             })
-            bus.$on('load_products', key => {
-                this.loadProducts(key)
+            bus.$on('load_products', fload => {
+                if (fload || this.dataLoad["load_products"] == null){
+                    this.dataLoad["load_products"] = true
+                    this.loadProducts()
+                }
             })
             bus.$on('load_databases', fload => {
                 if (fload || this.dataLoad["load_databases"] == null){
@@ -113,6 +116,12 @@
                 if (fload || this.dataLoad["load_environs"] == null){
                     this.dataLoad["load_environs"] = true
                     this.loadEnvirons()
+                }
+            })
+            bus.$on('load_templates', fload => {
+                if (fload || this.dataLoad["load_templates"] == null){
+                    this.dataLoad["load_templates"] = true
+                    this.loadTemplates()
                 }
             })
             bus.$on('load_routers', fload => {
@@ -165,6 +174,13 @@
                 driver.load("environs").then(res => {
                     utils.showNetRes(this, res, () => {
                         this.$store.dispatch("InitData", ["ENVIRON", res.data])
+                    })
+                })
+            },
+            loadTemplates() {
+                driver.load("templates").then(res => {
+                    utils.showNetRes(this, res, () => {
+                        this.$store.dispatch("InitData", ["TEMPLATE", res.data])
                     })
                 })
             },
@@ -224,8 +240,8 @@
                     })
                 })
             },
-            loadProducts(key) {
-                driver.load("products", key).then(res => {
+            loadProducts() {
+                driver.load("products").then(res => {
                     utils.showNetRes(this, res, () => {
                         this.$store.dispatch("InitData", ["PRODUCT", res.data])
                     })

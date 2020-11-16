@@ -6,6 +6,7 @@ const project = {
         databases: [],
         pipelines: [],
         playbooks: [],
+        templates: [],
         authkeys: [],
         products: [],
         environs: [],
@@ -75,6 +76,18 @@ const project = {
         },
         UPDATE_ENVIRON: (state, args) => {
             utils.array_update(state.environs, args[0], args[1])
+        },
+        INIT_TEMPLATE: (state, templates) => {
+            state.templates = templates
+        },
+        ADD_TEMPLATE: (state, template) => {
+            state.templates.push(template)
+        },
+        DEL_TEMPLATE: (state, args) => {
+            utils.array_remove(state.templates, args[0], args[1])
+        },
+        UPDATE_TEMPLATE: (state, args) => {
+            utils.array_update(state.templates, args[0], args[1])
         },
         INIT_ROUTER: (state, routers) => {
             state.routers = routers
