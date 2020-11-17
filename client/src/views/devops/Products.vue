@@ -2,10 +2,8 @@
 <div class="app-container">
     <el-card>
         <el-alert :closable="false" type="success" title="管理项目生成的制品。"/>
-        <el-button-group style="margin-bottom:10px">
-            <div class="filter">代码库筛选: 
-                <Selecter v-model="code" :option="code" :options="$store.getters.codes"/>
-            </div>
+        <el-button-group style="margin-top:10px; margin-bottom:10px;">
+            <Selecter v-model="code" :option="code" clear="true" opid="name" placeholder="请选择代码库" :options="$store.getters.codes"/>
         </el-button-group>
         <el-table stripe v-loading="listLoading" style="width: 100%" :data="filterProducts">
             <el-table-column label="名称">
@@ -17,16 +15,18 @@
             <el-table-column label="分支">
                 <template slot-scope="scope"><span >{{ scope.row.branch }}</span></template>
             </el-table-column>
-            <el-table-column label="提交日志">
-                <template slot-scope="scope"><span >{{ scope.row.log }}</span></template>
-            </el-table-column>
             <el-table-column label="操作者">
                 <template slot-scope="scope"><span >{{ scope.row.creator }}</span></template>
             </el-table-column>
             <el-table-column label="生成时间">
                 <template slot-scope="scope"><span >{{ formatTime(scope.row.time) }}</span></template>
             </el-table-column>
-            <el-table-column label="操作" align="center">
+            <el-table-column label="最后提交" width="350">
+                <template slot-scope="scope">
+                    <div class="name-wrapper"><p v-for="item in scope.row.log.split(' ')" :key="item">{{ item }}</p></div>
+                </template>
+            </el-table-column>
+            <el-table-column label="操作">
                 <template slot-scope="scope">
                     <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
                 </template>
@@ -75,10 +75,7 @@ export default {
     computed: {
         filterProducts() {
             return this.$store.getters.products.filter(product => {
-                if (this.code != "" && product.code != this.code){
-                    return false
-                }
-                return true
+                return (this.code == "" || product.code == this.code)
             })
         }
     },

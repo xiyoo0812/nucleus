@@ -2,7 +2,7 @@
 <div class="app-container">
     <el-card>
         <el-alert :closable="false" type="success" title="负责管理游戏环境。"/>
-        <el-button-group style="margin-bottom:10px">
+        <el-button-group style="margin-top:10px; margin-bottom:10px;">
             <el-button class="filter-item" type="primary" style="margin-right:10px;" @click="handleCreate">添加</el-button>
             <el-button class="filter-item" type="primary" style="margin-right:10px;" @click="handleDownload">导出</el-button>
         </el-button-group>
@@ -19,7 +19,7 @@
             <el-table-column label="描述">
                 <template slot-scope="scope"><span >{{ scope.row.desc }}</span></template>
             </el-table-column>
-            <el-table-column label="操作" align="center">
+            <el-table-column label="操作">
                 <template slot-scope="scope">
                     <el-button size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
                     <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>

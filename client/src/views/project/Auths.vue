@@ -2,7 +2,7 @@
 <div class="app-container">
     <el-card>
         <el-alert :closable="false" type="success" title="负责管理项目的所有密钥。"/>
-        <el-button-group style="margin-bottom:10px">
+        <el-button-group style="margin-top:10px; margin-bottom:10px;">
             <el-button class="filter-item" type="primary" style="margin-right:10px;" @click="handleNew">添加</el-button>
         </el-button-group>
         <el-table :data="$store.getters.projs" border style="width: 100%" :v-loading="listLoading">

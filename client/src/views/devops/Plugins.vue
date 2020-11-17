@@ -19,6 +19,7 @@
             </el-table-column>
             <el-table-column label="操作" align="center">
                 <template slot-scope="scope">
+                    <el-button size="mini" @click="handleCopy(scope.row)">复制</el-button>
                     <el-button size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
                     <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
                 </template>
@@ -215,6 +216,21 @@ export default {
         },
         handleCreate() {
             this.resetForm()
+            this.dialogStatus = 'create'
+            this.dialogFormVisible = true
+            this.$nextTick(() => {
+                this.$refs['dataForm'].clearValidate()
+            })
+        },
+        handleCopy(row) {
+            this.form = Object.assign({}, row) // copy obj
+            this.form.name = ""
+            this.form.id = null
+            this.form.args = []
+            this.argEdit = false
+            for (var arg of row.args) {
+                this.form.args.push({ edit: false, custom: arg.custom, name: arg.name, type: arg.type, desc: arg.desc })
+            }
             this.dialogStatus = 'create'
             this.dialogFormVisible = true
             this.$nextTick(() => {

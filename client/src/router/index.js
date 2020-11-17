@@ -54,12 +54,12 @@ const router = new Router({
                 {
                     path: '/environs',
                     component: () => import(/* webpackChunkName: "environs" */ '../views/resource/Environs.vue'),
-                    meta: { title: '环境' }
+                    meta: { title: '运行环境' }
                 },
                 {
                     path: '/templates',
                     component: () => import(/* webpackChunkName: "templates" */ '../views/resource/Templates.vue'),
-                    meta: { title: '环境' }
+                    meta: { title: '配置模板' }
                 },
                 {
                     path: '/routers',
@@ -74,17 +74,17 @@ const router = new Router({
                 {
                     path: '/hosts',
                     component: () => import(/* webpackChunkName: "hosts" */ '../views/resource/Hosts.vue'),
-                    meta: { title: '主机' }
+                    meta: { title: '主机配置' }
                 },
                 {
                     path: '/authkeys',
                     component: () => import(/* webpackChunkName: "authkeys" */ '../views/resource/AuthKeys.vue'),
-                    meta: { title: '凭据' }
+                    meta: { title: '密钥配置' }
                 },
                 {
                     path: '/images',
                     component: () => import(/* webpackChunkName: "images" */ '../views/resource/Images.vue'),
-                    meta: { title: '镜像' }
+                    meta: { title: 'Docker镜像' }
                 },
                 {
                     path: '/playbooks',
@@ -94,12 +94,12 @@ const router = new Router({
                 {
                     path: '/plugins',
                     component: () => import(/* webpackChunkName: "plugins" */ '../views/devops/Plugins.vue'),
-                    meta: { title: '插件' }
+                    meta: { title: '插件管理' }
                 },
                 {
                     path: '/products',
                     component: () => import(/* webpackChunkName: "products" */ '../views/devops/Products.vue'),
-                    meta: { title: '制品库' }
+                    meta: { title: '制品管理' }
                 },
                 {
                     path: '/pipelines',

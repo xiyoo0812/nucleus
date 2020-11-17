@@ -24,9 +24,9 @@ local environs_doers = {
     POST = function(req, params, session)
         log_debug("/environs POST params: %s", serialize(params))
         local environ = params.args
-        local res = proj_db:find_one("environs", { name = environ.name })
+        local res = proj_db:find_one("environs", { variable = environ.variable })
         if res and res.id ~= environ.id then
-            return { code = -1, msg = "environ name aready exist!" }
+            return { code = -1, msg = "environ variable aready exist!" }
         end
         local record = proj_db:find_one("environs", {id = environ.id})
         if not record then
@@ -41,13 +41,14 @@ local environs_doers = {
     PUT = function(req, params, session)
         log_debug("/environs PUT params: %s", serialize(params))
         local environ = params.args
-        local res = proj_db:find_one("environs", { name = environ.name })
+        local res = proj_db:find_one("environs", { variable = environ.variable })
         if res then
-            return { code = -1, msg = "environ name aready exist!" }
+            return { code = -1, msg = "environ variable aready exist!" }
         end
+        environ.creator = session.data.user.name
         local ok, err = proj_db:insert("environs", { environ })
         if not ok then
-            return { code = -1, msg = sformat("db insert failed:%s", err)}
+            return { code = -1, msg = sformat("environ insert failed:%s", err)}
         end
         return { code = 0, data = environ }
     end,
@@ -56,7 +57,7 @@ local environs_doers = {
         local dbid = params.args
         local ok, err = proj_db:delete("environs", { id = dbid })
         if not ok then
-            return {code = -1, msg = sformat("db delete failed: %s", err)}
+            return {code = -1, msg = sformat("environ delete failed: %s", err)}
         end
         return { code = 0 }
     end,

@@ -3,19 +3,20 @@
     <el-card v-loading="pipelineLoading">
         <el-alert :closable="false" type="success" title="负责管理项目的所有流水线。"/>
         <el-button-group style="margin-top:10px; margin-bottom:10px;">
-            <el-button class="filter-item" type="primary" @click="handleCreate">添加流水线</el-button>
+            <el-button type="primary" @click="handleCreate">添加流水线</el-button>
         </el-button-group>
         <el-collapse v-model="pipelineId" accordion>
             <template v-for="pipeline in $store.getters.pipelines">
-                <el-collapse-item :title="pipeline.name + '-' + pipeline.desc" :name="pipeline.id">
-                    <el-card shadow="hover" class="mgb20" style="height:350px;">
-                        <el-button-group style="margin-bottom:10px">
-                            <el-button class="filter-item" type="primary" style="margin-right:10px;" @click="handleRun">执行</el-button>
-                            <el-button class="filter-item" type="info" style="margin-right:10px;" @click="handleUpdate">编辑</el-button>
-                            <el-button class="filter-item" type="danger" style="margin-right:10px;" @click="handleDelete">删除</el-button>
-                            <el-button class="filter-item" type="primary" style="margin-right:10px;" @click="handleCreatePlugin">添加插件</el-button>
+                <el-collapse-item :title="pipeline.name" :name="pipeline.id">
+                    <el-card shadow="hover" class="mgb20" style="height:400px;">
+                        <el-alert :closable="false" type="success" :title="pipeline.desc"/>
+                        <el-button-group style="margin-top:5px; margin-bottom:5px;">
+                            <el-button type="primary" style="margin-right:10px;" @click="handleRun">执行</el-button>
+                            <el-button type="info" style="margin-right:10px;" @click="handleUpdate">编辑</el-button>
+                            <el-button type="danger" style="margin-right:10px;" @click="handleDelete">删除</el-button>
+                            <el-button type="primary" style="margin-right:10px;" @click="handleCreatePlugin">添加插件</el-button>
                         </el-button-group>
-                        <el-table stripe style="width:100%" height="400px" :data="pipeline.plugins">
+                        <el-table :data="pipeline.plugins" height="280px" style="width: 100%;font-size:14px;">
                             <el-table-column label="名称">
                                 <template slot-scope="scope"><span >{{ scope.row.nick }}</span></template>
                             </el-table-column>
@@ -450,3 +451,11 @@ export default {
     }
 }
 </script>
+
+<style>
+    .el-collapse-item__header {
+        font-size: 18px;
+        font-weight: bold;
+        color: rgb(28, 97, 247);
+    }
+</style>

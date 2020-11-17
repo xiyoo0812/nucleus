@@ -2,14 +2,11 @@
 <div class="app-container">
     <el-card>
         <el-alert :closable="false" type="success" title="负责管理配置模板。"/>
-        <el-button-group style="margin-bottom:10px">
-            <el-button class="filter-item" type="primary" style="margin-right:10px;" @click="handleCreate">添加</el-button>
-            <el-button class="filter-item" type="primary" style="margin-right:10px;" @click="handleDownload">导出</el-button>
-            <div class="filter">环境筛选: 
-                <Selecter v-model="environ" :option="environ" :options="$store.getters.environs"/>
-            </div>
+        <el-button-group style="margin-top:10px; margin-bottom:10px;">
+            <el-button type="primary" style="margin-right:10px;" @click="handleCreate">添加</el-button>
+            <Selecter v-model="environ" :option="environ" clear="true" opid="name" placeholder="请选择环境" :options="$store.getters.environs"/>
         </el-button-group>
-        <el-table stripe v-loading="listLoading" style="width: 100%" :data="$store.getters.templates">
+        <el-table stripe v-loading="listLoading" style="width: 100%" :data="filterTemplates">
             <el-table-column label="名称">
                 <template slot-scope="scope"><span >{{ scope.row.name }}</span></template>
             </el-table-column>
@@ -24,7 +21,9 @@
             </el-table-column>
             <el-table-column label="操作" align="center">
                 <template slot-scope="scope">
+                    <el-button size="mini" @click="handleCooy(scope.row)">复制</el-button>
                     <el-button size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
+                    <el-button size="mini" @click="handleDownload(scope.row)">导出</el-button>
                     <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
                 </template>
             </el-table-column>
@@ -42,10 +41,10 @@
                 <el-input v-model="form.desc" placeholder="输入描述"/>
             </el-form-item>
             <el-form-item label="环境" prop="environ">
-                <Selecter v-model="form.environ" :option="form.environ" :options="$store.getters.codes"/>
+                <Selecter v-model="form.environ" :option="form.environ" :options="$store.getters.environs"/>
             </el-form-item>
             <el-form-item label="模板参数" prop="args">
-                <el-table :data="form.args" height="200" stripe border style="width: 100%;">
+                <el-table :data="form.args" height="300" stripe border style="width: 100%;">
                     <el-table-column label="名称">
                         <template slot-scope="scope">
                             <span v-if="!scope.row.edit" slot="reference" class="name-wrapper">{{ scope.row.name }}</span>
@@ -77,14 +76,6 @@
                                 <el-select v-model="scope.row.type" placeholder="变量类型" clearable filterable>
                                     <el-option v-for="item in variableTypes" :key="item" :label="item" :value="item"/>
                                 </el-select>
-                            </span>
-                        </template>
-                    </el-table-column>
-                    <el-table-column label="变量描述">
-                        <template slot-scope="scope">
-                            <span v-if="!scope.row.edit" slot="reference" class="name-wrapper">{{ scope.row.desc }}</span>
-                            <span v-if="scope.row.edit" class="cell">
-                                <el-input v-model="scope.row.desc" placeholder="输入变量描述"></el-input>
                             </span>
                         </template>
                     </el-table-column>
@@ -151,9 +142,16 @@ export default {
             }
         })
     },
+    computed: {
+        filterTemplates() {
+            return this.$store.getters.templates.filter(template => {
+                return (this.environ == "" || template.environ == this.environ)
+            })
+        }
+    },
     methods: {
         savePlugArg(row) {
-            if(row.name.length == 0 || row.type.length == 0 || row.desc.length == 0 || row.value.length == 0 || row.variable.length == 0) {
+            if(row.name == "" || row.type == "" || row.value == "" || row.variable == "") {
                 utils.showFailed(this, "参数不能为空")
                 return
             }
@@ -170,7 +168,7 @@ export default {
         },
         addPlugArg() {
             this.argEdit = true
-            this.form.args.push({ edit: true, variable: "", name: "", type: "", value : "", desc: "" })
+            this.form.args.push({ edit: true, variable: "", name: "", type: "", value : "" })
         },
         editPlugArg(row) {
             if (!this.argEdit) {
@@ -202,8 +200,8 @@ export default {
             var fargs = []
             var form = Object.assign({}, this.form) // copy obj
             for (var arg of form.args) {
-                if (arg.type.length > 0 && arg.name.length > 0 && arg.desc.length > 0) {
-                    fargs.push({type: arg.type, value: arg.value, variable: arg.variable, name: arg.name, desc: arg.desc })
+                if (arg.type != "" && arg.name != "" && arg.value != "" && arg.variable != "") {
+                    fargs.push({type: arg.type, value: arg.value, variable: arg.variable, name: arg.name })
                 }
             }
             form.args = fargs
@@ -222,10 +220,27 @@ export default {
                 }
             })
         },
+        handleCooy(row) {
+            this.resetForm()
+            this.argEdit = false
+            this.form.id = null
+            for (var arg of row.args) {
+                this.form.args.push({edit: false, type: arg.type, value: arg.value, variable: arg.variable, name: arg.name })
+            }
+            this.dialogStatus = 'create'
+            this.dialogFormVisible = true
+            this.$nextTick(() => {
+                this.$refs['dataForm'].clearValidate()
+            }) 
+        },
         handleUpdate(row) {
             this.form = Object.assign({}, row) // copy obj
-            this.dialogStatus = 'update'
+            this.form.args = []
             this.argEdit = false
+            for (var arg of row.args) {
+                this.form.args.push({edit: false, type: arg.type, value: arg.value, variable: arg.variable, name: arg.name })
+            }
+            this.dialogStatus = 'update'
             this.dialogFormVisible = true
             this.$nextTick(() => {
                 this.$refs['dataForm'].clearValidate()

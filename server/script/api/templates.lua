@@ -45,9 +45,10 @@ local templates_doers = {
         if res then
             return { code = -1, msg = "template name aready exist!" }
         end
+        template.creator = session.data.user.name
         local ok, err = proj_db:insert("templates", { template })
         if not ok then
-            return { code = -1, msg = sformat("db insert failed:%s", err)}
+            return { code = -1, msg = sformat("template insert failed:%s", err)}
         end
         return { code = 0, data = template }
     end,
@@ -56,7 +57,7 @@ local templates_doers = {
         local dbid = params.args
         local ok, err = proj_db:delete("templates", { id = dbid })
         if not ok then
-            return {code = -1, msg = sformat("db delete failed: %s", err)}
+            return {code = -1, msg = sformat("template delete failed: %s", err)}
         end
         return { code = 0 }
     end,

@@ -70,9 +70,10 @@ local tasks_doers = {
             steps = {},
             id = form.task,
             time = os.time(),
+            status = "process",
             name = pipeline.name,
             pipeline = pipeline_id,
-            status = "process",
+            creator = session.data.user.name,
             output = sformat("begin run pipeline: %s", pipeline.name),
         }
         for index, plugin in ipairs(pipeline.plugins) do

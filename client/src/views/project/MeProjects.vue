@@ -1,7 +1,8 @@
 <template>
 <div class="app-container">
     <el-card>
-        <el-alert :closable="false" type="success" title="负责管理我的所有项目。"/><el-button-group style="margin-bottom:10px">
+        <el-alert :closable="false" type="success" title="负责管理我的所有项目。"/>
+        <el-button-group style="margin-top:10px; margin-bottom:10px;">
             <el-button class="filter-item" type="primary" style="margin-right:10px;" @click="handleNew">创建项目</el-button>
         </el-button-group>
         <el-table :data="$store.getters.owns" border style="width: 100%" :v-loading="listLoading">

@@ -2,7 +2,7 @@
 <div class="app-container">
     <el-card>
         <el-alert :closable="false" type="success" title="负责展示当前项目的所有资源。"/>
-        <el-button-group style="margin-bottom:10px">
+        <el-button-group style="margin-top:10px; margin-bottom:10px;">
             <el-button icon="plus" type="primary" style="margin-right:10px;" @click="handleNew">新增资源</el-button>
             <el-button type="danger" icon="delete" style="margin-right:10px;" @click="batchDelete">批量删除</el-button>
         </el-button-group>

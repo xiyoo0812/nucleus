@@ -42,11 +42,11 @@ local MENUS = {
         subs =  {
             {
                 index = "hosts",
-                title = "主机"
+                title = "主机配置"
             },
             {
                 index = "authkeys",
-                title = "凭证"
+                title = "密钥配置"
             },
             {
                 index = "databases",
@@ -58,7 +58,7 @@ local MENUS = {
             },
             {
                 index = "routers",
-                title = "路由表"
+                title = "路由配置"
             },
             {
                 index = "playbooks",
@@ -66,15 +66,15 @@ local MENUS = {
             },
             {
                 index = "images",
-                title = "镜像"
+                title = "Docker镜像"
             },
             {
                 index = "nodes",
-                title = "节点"
+                title = "运行节点"
             },
             {
                 index = "environs",
-                title = "环境"
+                title = "运行环境"
             },
             {
                 index = "templates",
@@ -89,7 +89,7 @@ local MENUS = {
         subs =  {
             {
                 index = "plugins",
-                title = "插件"
+                title = "插件管理"
             },
             {
                 index = "pipelines",
@@ -97,7 +97,7 @@ local MENUS = {
             },
             {
                 index = "products",
-                title = "制品库"
+                title = "制品管理"
             },
             {
                 index = "gmcmd",

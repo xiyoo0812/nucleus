@@ -2,7 +2,7 @@
 <div class="app-container">
     <el-card>
         <el-alert type="success" :closable="false" title="代码管理负责管理git代码仓库，可以利用其代码打包。需要本机有权限能够拉取到git仓库代码。"/>
-        <el-button-group style="margin-bottom:10px">
+        <el-button-group style="margin-top:10px; margin-bottom:10px;">
             <el-button class="filter-item" type="primary" @click="handleCreate">添加</el-button>
         </el-button-group>
         <el-table v-loading="listLoading" stripe style="width: 100%" :element-loading-text="listLoadingText" :data="$store.getters.codes">

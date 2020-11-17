@@ -2,7 +2,7 @@
 <div class="app-container">
     <el-card>
         <el-alert :closable="false" type="success" title="密钥管理负责管理通过ssh方式访问主机，请将对应的公钥放入要访问主机的.ssh/authorized_keys。"/>
-        <el-button-group style="margin-bottom:10px">
+        <el-button-group style="margin-top:10px; margin-bottom:10px;">
             <el-button class="filter-item" type="primary" @click="handleCreate">添加</el-button>
         </el-button-group>
         <el-table stripe v-loading="listLoading" style="width: 100%" :data="$store.getters.authkeys">
