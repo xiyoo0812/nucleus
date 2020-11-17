@@ -1,32 +1,38 @@
 <template>
 <div class="app-container">
-    <h3>配置模板</h3>
-    <el-alert :closable="false" type="success" title="负责管理配置模板。"/>
-    <div class="twt-tool-box">
-        <el-button-group>
-            <el-button class="filter-item" type="primary" @click="handleCreate">添加</el-button>
+    <el-card>
+        <el-alert :closable="false" type="success" title="负责管理配置模板。"/>
+        <el-button-group style="margin-bottom:10px">
+            <el-button class="filter-item" type="primary" style="margin-right:10px;" @click="handleCreate">添加</el-button>
+            <el-button class="filter-item" type="primary" style="margin-right:10px;" @click="handleDownload">导出</el-button>
+            <div class="filter">环境筛选: 
+                <Selecter v-model="environ" :option="environ" :options="$store.getters.environs"/>
+            </div>
         </el-button-group>
-    </div>
-    <el-table stripe v-loading="listLoading" style="width: 100%" :data="$store.getters.templates">
-        <el-table-column label="名称">
-            <template slot-scope="scope"><span >{{ scope.row.name }}</span></template>
-        </el-table-column>
-        <el-table-column label="描述">
-            <template slot-scope="scope"><span >{{ scope.row.desc }}</span></template>
-        </el-table-column>
-        <el-table-column label="创建者">
-            <template slot-scope="scope"><span >{{ scope.row.creator }}</span></template>
-        </el-table-column>
-        <el-table-column label="操作" align="center">
-            <template slot-scope="scope">
-                <el-button size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
-                <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
-            </template>
-        </el-table-column>
-    </el-table>
-    <div class="pagination-container">
-        <el-pagination v-show="total>0" :total="total" layout="total"/>
-    </div>
+        <el-table stripe v-loading="listLoading" style="width: 100%" :data="$store.getters.templates">
+            <el-table-column label="名称">
+                <template slot-scope="scope"><span >{{ scope.row.name }}</span></template>
+            </el-table-column>
+            <el-table-column label="描述">
+                <template slot-scope="scope"><span >{{ scope.row.desc }}</span></template>
+            </el-table-column>
+            <el-table-column label="环境">
+                <template slot-scope="scope"><span >{{ scope.row.environ }}</span></template>
+            </el-table-column>
+            <el-table-column label="创建者">
+                <template slot-scope="scope"><span >{{ scope.row.creator }}</span></template>
+            </el-table-column>
+            <el-table-column label="操作" align="center">
+                <template slot-scope="scope">
+                    <el-button size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
+                    <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+        <div class="pagination-container">
+            <el-pagination v-show="total>0" :total="total" layout="total"/>
+        </div>
+    </el-card>
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" :close-on-click-modal="false" >
         <el-form ref="dataForm" :rules="rules" :model="form" label-position="left" label-width="80px">
             <el-form-item label="名称" prop="name">
@@ -34,6 +40,9 @@
             </el-form-item>
             <el-form-item label="描述" prop="desc">
                 <el-input v-model="form.desc" placeholder="输入描述"/>
+            </el-form-item>
+            <el-form-item label="环境" prop="environ">
+                <Selecter v-model="form.environ" :option="form.environ" :options="$store.getters.codes"/>
             </el-form-item>
             <el-form-item label="模板参数" prop="args">
                 <el-table :data="form.args" height="200" stripe border style="width: 100%;">
@@ -103,12 +112,17 @@
 import * as utils from '../../utils/index'
 import * as driver from '../../api/driver'
 import bus from '../../components/common/bus'
+import Selecter from '../../components/widget/Selecter.vue'
 
 export default {
     name: 'Templates',
+    components:{
+        Selecter,
+    },
     data() {
         return {
             form: {},
+            environ: "",
             argEdit: false,
             dialogStatus: '',
             listLoading: false,
@@ -119,6 +133,7 @@ export default {
                 args: [{ required: true, message: '请填入模板参数', trigger: 'blur' },],
                 name: [{ required: true, message: '请填入名称', trigger: 'blur' },],
                 desc: [{ required: true, message: '请填入描述', trigger: 'blur' },],
+                environ: [{ required: true, message: '请选择环境', trigger: 'blur' },],
             },
         }
     },
@@ -126,10 +141,12 @@ export default {
         this.resetForm()
         var store = this.$store.getters
         if (store.proj) {
+            bus.$emit('load_environs')
             bus.$emit('load_templates')
         }
         bus.$on('project', msg => {
             if (store.proj) {
+                bus.$emit('load_environs', true)
                 bus.$emit('load_templates', true)
             }
         })
@@ -169,6 +186,7 @@ export default {
             this.form = {
                 name: '',
                 desc: '',
+                environ: "",
                 args: [],
             }
         },

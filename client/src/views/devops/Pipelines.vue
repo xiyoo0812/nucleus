@@ -8,29 +8,31 @@
         <el-collapse v-model="pipelineId" accordion>
             <template v-for="pipeline in $store.getters.pipelines">
                 <el-collapse-item :title="pipeline.name + '-' + pipeline.desc" :name="pipeline.id">
-                    <el-button-group style="margin-bottom:10px">
-                        <el-button class="filter-item" type="primary" style="margin-right:10px;" @click="handleRun">执行</el-button>
-                        <el-button class="filter-item" type="info" style="margin-right:10px;" @click="handleUpdate">编辑</el-button>
-                        <el-button class="filter-item" type="danger" style="margin-right:10px;" @click="handleDelete">删除</el-button>
-                        <el-button class="filter-item" type="primary" style="margin-right:10px;" @click="handleCreatePlugin">添加插件</el-button>
-                    </el-button-group>
-                    <el-table stripe style="width:100%" :data="pipeline.plugins">
-                        <el-table-column label="名称">
-                            <template slot-scope="scope"><span >{{ scope.row.nick }}</span></template>
-                        </el-table-column>
-                        <el-table-column label="类型">
-                            <template slot-scope="scope"><span >{{ scope.row.name }}</span></template>
-                        </el-table-column>
-                        <el-table-column label="描述">
-                            <template slot-scope="scope"><span >{{ scope.row.desc }}</span></template>
-                        </el-table-column>
-                        <el-table-column label="操作">
-                            <template slot-scope="scope">
-                                <el-button size="mini" @click="handleEdit(scope.row)">编辑</el-button>
-                                <el-button size="mini" type="danger" @click="handleRemove(scope.row)">删除</el-button>
-                            </template>
-                        </el-table-column>
-                    </el-table>
+                    <el-card shadow="hover" class="mgb20" style="height:350px;">
+                        <el-button-group style="margin-bottom:10px">
+                            <el-button class="filter-item" type="primary" style="margin-right:10px;" @click="handleRun">执行</el-button>
+                            <el-button class="filter-item" type="info" style="margin-right:10px;" @click="handleUpdate">编辑</el-button>
+                            <el-button class="filter-item" type="danger" style="margin-right:10px;" @click="handleDelete">删除</el-button>
+                            <el-button class="filter-item" type="primary" style="margin-right:10px;" @click="handleCreatePlugin">添加插件</el-button>
+                        </el-button-group>
+                        <el-table stripe style="width:100%" height="400px" :data="pipeline.plugins">
+                            <el-table-column label="名称">
+                                <template slot-scope="scope"><span >{{ scope.row.nick }}</span></template>
+                            </el-table-column>
+                            <el-table-column label="类型">
+                                <template slot-scope="scope"><span >{{ scope.row.name }}</span></template>
+                            </el-table-column>
+                            <el-table-column label="描述">
+                                <template slot-scope="scope"><span >{{ scope.row.desc }}</span></template>
+                            </el-table-column>
+                            <el-table-column label="操作">
+                                <template slot-scope="scope">
+                                    <el-button size="mini" @click="handleEdit(scope.row)">编辑</el-button>
+                                    <el-button size="mini" type="danger" @click="handleRemove(scope.row)">删除</el-button>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                    </el-card>
                 </el-collapse-item>
             </template>
         </el-collapse>

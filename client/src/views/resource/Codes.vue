@@ -1,36 +1,35 @@
 <template>
 <div class="app-container">
-    <h3>代码管理</h3>
-    <el-alert type="success" :closable="false" title="代码管理负责管理git代码仓库，可以利用其代码打包。需要本机有权限能够拉取到git仓库代码。"/>
-    <div class="tool-box">
-        <el-button-group>
+    <el-card>
+        <el-alert type="success" :closable="false" title="代码管理负责管理git代码仓库，可以利用其代码打包。需要本机有权限能够拉取到git仓库代码。"/>
+        <el-button-group style="margin-bottom:10px">
             <el-button class="filter-item" type="primary" @click="handleCreate">添加</el-button>
         </el-button-group>
-    </div>
-    <el-table v-loading="listLoading" stripe style="width: 100%" :element-loading-text="listLoadingText" :data="$store.getters.codes">
-        <el-table-column label="名称" width="150">
-            <template slot-scope="scope">
-                <router-link :to="{ path: '/package', query: {id:scope.row.id} }">
-                    <el-button type="text"><span >{{ scope.row.name }}</span></el-button>
-                </router-link>
-            </template>
-        </el-table-column>
-        <el-table-column label="类型" width="150">
-            <template slot-scope="scope"><span >{{ scope.row.type }}</span></template>
-        </el-table-column>
-        <el-table-column label="主机" width="150">
-            <template slot-scope="scope"><span >{{ scope.row.host }}</span></template>
-        </el-table-column>
-        <el-table-column label="地址">
-            <template slot-scope="scope"><span >{{ scope.row.addr }}</span></template>
-        </el-table-column>
-        <el-table-column label="操作" width="150" align="center">
-            <template slot-scope="scope">
-            <el-button size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
-            <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
-            </template>
-        </el-table-column>
-    </el-table>
+        <el-table v-loading="listLoading" stripe style="width: 100%" :element-loading-text="listLoadingText" :data="$store.getters.codes">
+            <el-table-column label="名称" width="150">
+                <template slot-scope="scope">
+                    <router-link :to="{ path: '/package', query: {id:scope.row.id} }">
+                        <el-button type="text"><span >{{ scope.row.name }}</span></el-button>
+                    </router-link>
+                </template>
+            </el-table-column>
+            <el-table-column label="类型" width="150">
+                <template slot-scope="scope"><span >{{ scope.row.type }}</span></template>
+            </el-table-column>
+            <el-table-column label="主机" width="150">
+                <template slot-scope="scope"><span >{{ scope.row.host }}</span></template>
+            </el-table-column>
+            <el-table-column label="地址">
+                <template slot-scope="scope"><span >{{ scope.row.addr }}</span></template>
+            </el-table-column>
+            <el-table-column label="操作" width="150" align="center">
+                <template slot-scope="scope">
+                <el-button size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
+                <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+    </el-card>
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" :close-on-click-modal="false" width="60%">
         <el-form ref="dataForm" v-loading="codeLoading" :rules="rules" :model="form" label-position="left" label-width="100px" style="margin-left:50px;">
             <el-form-item label="名称" prop="name">

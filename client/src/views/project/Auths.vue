@@ -1,32 +1,30 @@
 <template>
 <div class="app-container">
-    <imp-panel>
-        <h3>项目管理</h3>
-        <h3 class="box-title" slot="header" style="width: 100%;">
-            <el-button type="primary" icon="plus" @click="handleNew()">创建项目</el-button>
-        </h3>
-        <div slot="body">
-            <el-table :data="$store.getters.projs" border style="width: 100%" :v-loading="listLoading">
-                <el-table-column prop="id" width="50"></el-table-column>
-                <el-table-column prop="name" label="名称"></el-table-column>
-                <el-table-column prop="admin" label="管理员"></el-table-column>
-                <el-table-column prop="desc" label="简介"></el-table-column>
-                <el-table-column label="操作" width="300">
-                    <template slot-scope="scope">
-                        <el-button size="small" type="info" icon="setting" @click="handleModify(scope.row)">修改信息</el-button>
-                        <el-button size="small" type="danger" @click="handleDelete(scope.row)">删除</el-button>
-                    </template>
-                </el-table-column>
-            </el-table>
-            <el-pagination @size-change="handleSizeChange" @current-change="handlePageChange"
-                layout="total, sizes, prev, pager, next, jumper"
-                :page-size="pagination.pageSize"
-                :current-page="pagination.pageNo"
-                :page-sizes="[5, 10, 20]"
-                :total="pagination.total">
-            </el-pagination>
-        </div>
-    </imp-panel>
+    <el-card>
+        <el-alert :closable="false" type="success" title="负责管理项目的所有密钥。"/>
+        <el-button-group style="margin-bottom:10px">
+            <el-button class="filter-item" type="primary" style="margin-right:10px;" @click="handleNew">添加</el-button>
+        </el-button-group>
+        <el-table :data="$store.getters.projs" border style="width: 100%" :v-loading="listLoading">
+            <el-table-column prop="id" width="50"></el-table-column>
+            <el-table-column prop="name" label="名称"></el-table-column>
+            <el-table-column prop="admin" label="管理员"></el-table-column>
+            <el-table-column prop="desc" label="简介"></el-table-column>
+            <el-table-column label="操作" width="300">
+                <template slot-scope="scope">
+                    <el-button size="small" type="info" icon="setting" @click="handleModify(scope.row)">修改信息</el-button>
+                    <el-button size="small" type="danger" @click="handleDelete(scope.row)">删除</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+        <el-pagination @size-change="handleSizeChange" @current-change="handlePageChange"
+            layout="total, sizes, prev, pager, next, jumper"
+            :page-size="pagination.pageSize"
+            :current-page="pagination.pageNo"
+            :page-sizes="[5, 10, 20]"
+            :total="pagination.total">
+        </el-pagination>
+    </el-card>
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogVisible" :close-on-click-modal="false" width="60%">
         <el-card class="box-card">
             <el-form :model="form" :rules="rules" ref="form">
@@ -49,12 +47,8 @@
 import * as utils from '../../utils/index'
 import * as driver from '../../api/driver'
 import bus from '../../components/common/bus'
-import panel from "../../components/Panel.vue"
 
 export default {
-    components: {
-        'imp-panel': panel,
-    },
     data(){
         return {
             dialogVisible:false,

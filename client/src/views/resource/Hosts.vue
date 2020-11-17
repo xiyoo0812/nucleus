@@ -1,32 +1,31 @@
 <template>
 <div class="app-container">
-    <h3>主机管理</h3>
-    <el-alert :closable="false" type="success" title="主机管理负责管理通过ssh方式访问的主机，主机可用作部署机和打包机。"/>
-    <div class="twt-tool-box">
-        <el-button-group>
+    <el-card>
+        <el-alert :closable="false" type="success" title="主机管理负责管理通过ssh方式访问的主机，主机可用作部署机和打包机。"/>
+        <el-button-group style="margin-bottom:10px">
             <el-button class="filter-item" type="primary" @click="handleCreate">添加</el-button>
         </el-button-group>
-    </div>
-    <el-table stripe v-loading="listLoading" style="width: 100%" :data="$store.getters.hosts">
-        <el-table-column label="名称">
-            <template slot-scope="scope"><span >{{ scope.row.name }}</span></template>
-        </el-table-column>
-        <el-table-column label="IP">
-            <template slot-scope="scope"><span >{{ scope.row.ip }}</span></template>
-        </el-table-column>
-        <el-table-column label="端口">
-            <template slot-scope="scope"><span >{{ scope.row.port }}</span></template>
-        </el-table-column>
-        <el-table-column label="是否打包机">
-            <template slot-scope="scope"><span >{{ formatBool(scope.row.can_pack) }}</span></template>
-        </el-table-column>
-        <el-table-column label="操作" align="center">
-            <template slot-scope="scope">
-                <el-button size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
-                <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
-            </template>
-        </el-table-column>
-    </el-table>
+        <el-table stripe v-loading="listLoading" style="width: 100%" :data="$store.getters.hosts">
+            <el-table-column label="名称">
+                <template slot-scope="scope"><span >{{ scope.row.name }}</span></template>
+            </el-table-column>
+            <el-table-column label="IP">
+                <template slot-scope="scope"><span >{{ scope.row.ip }}</span></template>
+            </el-table-column>
+            <el-table-column label="端口">
+                <template slot-scope="scope"><span >{{ scope.row.port }}</span></template>
+            </el-table-column>
+            <el-table-column label="是否打包机">
+                <template slot-scope="scope"><span >{{ formatBool(scope.row.can_pack) }}</span></template>
+            </el-table-column>
+            <el-table-column label="操作" align="center">
+                <template slot-scope="scope">
+                    <el-button size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
+                    <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+    </el-card>
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" :close-on-click-modal="false" >
         <el-form ref="dataForm" :rules="rules" :model="form" label-position="left" label-width="80px">
             <el-form-item label="名称" prop="name">

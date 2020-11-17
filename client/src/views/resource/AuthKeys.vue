@@ -1,33 +1,34 @@
 <template>
 <div class="app-container">
-    <h3>密钥管理</h3>
-    <el-alert :closable="false" type="success" title="密钥管理负责管理通过ssh方式访问主机，请将对应的公钥放入要访问主机的.ssh/authorized_keys。"/>
-    <div class="tool-box">
-        <el-button class="filter-item" type="primary" @click="handleCreate">添加</el-button>
-    </div>
-    <el-table stripe v-loading="listLoading" style="width: 100%" :data="$store.getters.authkeys">
-        <el-table-column label="名称">
-            <template slot-scope="scope"><span >{{ scope.row.name }}</span></template>
-        </el-table-column>
-        <el-table-column label="描述">
-            <template slot-scope="scope"><span >{{ scope.row.desc }}</span></template>
-        </el-table-column>
-        <el-table-column label="类型">
-            <template slot-scope="scope"><span>{{ scope.row.type }}</span></template>
-        </el-table-column>
-        <el-table-column label="创建时间">
-            <template slot-scope="scope"><span>{{ parseTime(scope.row.time) }}</span></template>
-        </el-table-column>
-        <el-table-column label="操作">
-            <template slot-scope="scope">
-                <el-button size="mini" type="Info" v-if="scope.row.type==='SSHKey'" 
-                    @click="handleCopy(scope.row.sshkey_pub, $event)">拷贝公钥
-                </el-button>
-                <el-button size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
-                <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
-            </template>
-        </el-table-column>
-    </el-table>
+    <el-card>
+        <el-alert :closable="false" type="success" title="密钥管理负责管理通过ssh方式访问主机，请将对应的公钥放入要访问主机的.ssh/authorized_keys。"/>
+        <el-button-group style="margin-bottom:10px">
+            <el-button class="filter-item" type="primary" @click="handleCreate">添加</el-button>
+        </el-button-group>
+        <el-table stripe v-loading="listLoading" style="width: 100%" :data="$store.getters.authkeys">
+            <el-table-column label="名称">
+                <template slot-scope="scope"><span >{{ scope.row.name }}</span></template>
+            </el-table-column>
+            <el-table-column label="描述">
+                <template slot-scope="scope"><span >{{ scope.row.desc }}</span></template>
+            </el-table-column>
+            <el-table-column label="类型">
+                <template slot-scope="scope"><span>{{ scope.row.type }}</span></template>
+            </el-table-column>
+            <el-table-column label="创建时间">
+                <template slot-scope="scope"><span>{{ parseTime(scope.row.time) }}</span></template>
+            </el-table-column>
+            <el-table-column label="操作">
+                <template slot-scope="scope">
+                    <el-button size="mini" type="Info" v-if="scope.row.type==='SSHKey'" 
+                        @click="handleCopy(scope.row.sshkey_pub, $event)">拷贝公钥
+                    </el-button>
+                    <el-button size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
+                    <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+    </el-card>
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" :close-on-click-modal="false" width="60%">
         <el-form ref="dataForm" :rules="rules" :model="form" label-width="100px">
             <el-form-item label="名称" prop="name">

@@ -1,42 +1,41 @@
 <template>
 <div class="app-container">
-    <imp-panel>
-        <h3 class="box-title" slot="header" style="width: 100%;">
-            <el-button type="primary" icon="plus" @click="handleNew()">新增资源</el-button>
-            <el-button type="danger" icon="delete" @click="batchDelete">批量删除</el-button>
-        </h3>
-        <div slot="body">
-            <el-table :data="resourceList" border style="width: 100%" :v-loading="listLoading" @selection-change="handleResourceSelect">
-                <el-table-column prop="id" type="selection" width="50"></el-table-column>
-                <el-table-column prop="path" label="路径"></el-table-column>
-                <el-table-column prop="name" label="名称"></el-table-column>
-                <el-table-column prop="remarks" label="备注"></el-table-column>
-                <el-table-column label="METHOD">
-                    <template slot-scope="scope">
-                        <div slot="reference" class="name-wrapper">{{ scope.row.method.join(",") }}</div>
-                    </template>
-                </el-table-column>
-                <el-table-column label="项目">
-                    <template slot-scope="scope">
-                        <div slot="reference" class="name-wrapper">{{ formatProject(scope.row.project) }}</div>
-                    </template>
-                </el-table-column>
-                <el-table-column label="操作" width="300">
-                    <template slot-scope="scope">
-                        <el-button size="small" type="info" icon="setting" @click="handleModify(scope.row)">编辑</el-button>
-                        <el-button size="small" type="danger" @click="handleDelete(scope.row)">删除</el-button>
-                    </template>
-                </el-table-column>
-            </el-table>
-            <el-pagination @size-change="handleSizeChange" @current-change="handlePageChange"
-                layout="total, sizes, prev, pager, next, jumper"
-                :page-size="pagination.pageSize"
-                :current-page="pagination.pageNo"
-                :page-sizes="[5, 10, 20]"
-                :total="pagination.total">
-            </el-pagination>
-        </div>
-    </imp-panel>
+    <el-card>
+        <el-alert :closable="false" type="success" title="负责展示当前项目的所有资源。"/>
+        <el-button-group style="margin-bottom:10px">
+            <el-button icon="plus" type="primary" style="margin-right:10px;" @click="handleNew">新增资源</el-button>
+            <el-button type="danger" icon="delete" style="margin-right:10px;" @click="batchDelete">批量删除</el-button>
+        </el-button-group>
+        <el-table :data="resourceList" border style="width: 100%" :v-loading="listLoading" @selection-change="handleResourceSelect">
+            <el-table-column prop="id" type="selection" width="50"></el-table-column>
+            <el-table-column prop="path" label="路径"></el-table-column>
+            <el-table-column prop="name" label="名称"></el-table-column>
+            <el-table-column prop="remarks" label="备注"></el-table-column>
+            <el-table-column label="METHOD">
+                <template slot-scope="scope">
+                    <div slot="reference" class="name-wrapper">{{ scope.row.method.join(",") }}</div>
+                </template>
+            </el-table-column>
+            <el-table-column label="项目">
+                <template slot-scope="scope">
+                    <div slot="reference" class="name-wrapper">{{ formatProject(scope.row.project) }}</div>
+                </template>
+            </el-table-column>
+            <el-table-column label="操作" width="300">
+                <template slot-scope="scope">
+                    <el-button size="small" type="info" icon="setting" @click="handleModify(scope.row)">编辑</el-button>
+                    <el-button size="small" type="danger" @click="handleDelete(scope.row)">删除</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+        <el-pagination @size-change="handleSizeChange" @current-change="handlePageChange"
+            layout="total, sizes, prev, pager, next, jumper"
+            :page-size="pagination.pageSize"
+            :current-page="pagination.pageNo"
+            :page-sizes="[5, 10, 20]"
+            :total="pagination.total">
+        </el-pagination>
+    </el-card>
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogVisible" :close-on-click-modal="false" width="60%">
         <el-card class="box-card">
             <el-form :model="form" :rules="rules" ref="form">
@@ -70,14 +69,11 @@
 </template>
 <script>
 
-import panel from "../../components/Panel.vue"
-import * as utils from '../../utils/index';
-import * as resource_api from '../../api/resource';
+import * as utils from '../../utils/index'
+import * as driver from '../../api/driver'
+import bus from '../../components/common/bus'
 
 export default {
-    components: {
-        'imp-panel': panel,
-    },
     data(){
         return {
             resourceList: [],
@@ -137,7 +133,7 @@ export default {
         handleDelete(row){
             utils.confirm(this, "确定删除?", () => {
                 var resources = [row.id];
-                resource_api.resourceDelete(resources).then(res => {
+                driver.resourceDelete(resources).then(res => {
                     if (res.code != 0){
                         utils.showFailed(this, res.msg);
                         return;
@@ -153,7 +149,7 @@ export default {
                 return;
             }
             utils.confirm(this, "确定删除?", () => {
-                resource_api.resourceDelete(this.resourceSelect).then(res => {
+                driver.resourceDelete(this.resourceSelect).then(res => {
                     if (res.code != 0){
                         utils.showFailed(this, res.msg);
                         return;
@@ -173,7 +169,7 @@ export default {
                     return;
                 }
                 this.form.id = utils.newGuid()
-                resource_api.resourceAdd(this.form).then(res => {
+                driver.resourceAdd(this.form).then(res => {
                     if (res.code != 0){
                         utils.showFailed(this, res.msg);
                         return;
@@ -190,7 +186,7 @@ export default {
                     utils.showFailed(this, "必须配置一个方法");
                     return;
                 }
-                resource_api.resourceUpdate(this.form).then(res => {
+                driver.resourceUpdate(this.form).then(res => {
                     if (res.code != 0){
                         utils.showFailed(this, res.msg);
                         return;
@@ -214,7 +210,7 @@ export default {
             this.loadRole();
         },
         loadResource(){
-            resource_api.getResources().then(res=>{
+            driver.getResources().then(res=>{
                 if (res.code == 0) {
                     this.resourceList = res.data;
                 }

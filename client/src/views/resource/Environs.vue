@@ -1,35 +1,35 @@
 <template>
 <div class="app-container">
-    <h3>游戏环境</h3>
-    <el-alert :closable="false" type="success" title="负责管理游戏环境。"/>
-    <div class="twt-tool-box">
-        <el-button-group>
-            <el-button class="filter-item" type="primary" @click="handleCreate">添加</el-button>
+    <el-card>
+        <el-alert :closable="false" type="success" title="负责管理游戏环境。"/>
+        <el-button-group style="margin-bottom:10px">
+            <el-button class="filter-item" type="primary" style="margin-right:10px;" @click="handleCreate">添加</el-button>
+            <el-button class="filter-item" type="primary" style="margin-right:10px;" @click="handleDownload">导出</el-button>
         </el-button-group>
-    </div>
-    <el-table stripe v-loading="listLoading" style="width: 100%" :data="$store.getters.environs">
-        <el-table-column label="名称">
-            <template slot-scope="scope"><span >{{ scope.row.name }}</span></template>
-        </el-table-column>
-        <el-table-column label="变量名">
-            <template slot-scope="scope"><span >{{ scope.row.variable }}</span></template>
-        </el-table-column>
-        <el-table-column label="创建者">
-            <template slot-scope="scope"><span >{{ scope.row.creator }}</span></template>
-        </el-table-column>
-        <el-table-column label="描述">
-            <template slot-scope="scope"><span >{{ scope.row.desc }}</span></template>
-        </el-table-column>
-        <el-table-column label="操作" align="center">
-            <template slot-scope="scope">
-                <el-button size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
-                <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
-            </template>
-        </el-table-column>
-    </el-table>
-    <div class="pagination-container">
-        <el-pagination v-show="total>0" :total="total" layout="total"/>
-    </div>
+        <el-table stripe v-loading="listLoading" style="width: 100%" :data="$store.getters.environs">
+            <el-table-column label="名称">
+                <template slot-scope="scope"><span >{{ scope.row.name }}</span></template>
+            </el-table-column>
+            <el-table-column label="变量名">
+                <template slot-scope="scope"><span >{{ scope.row.variable }}</span></template>
+            </el-table-column>
+            <el-table-column label="创建者">
+                <template slot-scope="scope"><span >{{ scope.row.creator }}</span></template>
+            </el-table-column>
+            <el-table-column label="描述">
+                <template slot-scope="scope"><span >{{ scope.row.desc }}</span></template>
+            </el-table-column>
+            <el-table-column label="操作" align="center">
+                <template slot-scope="scope">
+                    <el-button size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
+                    <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+        <div class="pagination-container">
+            <el-pagination v-show="total>0" :total="total" layout="total"/>
+        </div>
+    </el-card>
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" :close-on-click-modal="false" >
         <el-form ref="dataForm" :rules="rules" :model="form" label-position="left" label-width="80px">
             <el-form-item label="名称" prop="name">

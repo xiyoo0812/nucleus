@@ -1,39 +1,38 @@
 <template>
 <div class="app-container">
-    <h3>游戏路由</h3>
-    <el-alert :closable="false" type="success" title="负责管理游戏路由。"/>
-    <div class="twt-tool-box">
-        <el-button-group>
-            <el-button class="filter-item" type="primary" @click="handleCreate">添加</el-button>
-            <el-button v-waves :loading="downloadLoading" class="filter-item" @click="handleDownload">导出</el-button>
+    <el-card>
+        <el-alert :closable="false" type="success" title="负责管理游戏路由。"/>
+        <el-button-group style="margin-bottom:10px">
+            <el-button class="filter-item" type="primary" style="margin-right:10px;" @click="handleCreate">添加</el-button>
+            <el-button class="filter-item" type="primary" style="margin-right:10px;" @click="handleDownload">导出</el-button>
         </el-button-group>
-    </div>
-    <el-table stripe v-loading="listLoading" style="width: 100%" :data="$store.getters.routers">
-        <el-table-column label="名称">
-            <template slot-scope="scope"><span >{{ scope.row.name }}</span></template>
-        </el-table-column>
-        <el-table-column label="IP">
-            <template slot-scope="scope"><span >{{ scope.row.ip }}</span></template>
-        </el-table-column>
-        <el-table-column label="端口">
-            <template slot-scope="scope"><span >{{ scope.row.port }}</span></template>
-        </el-table-column>
-        <el-table-column label="Group">
-            <template slot-scope="scope"><span >{{ scope.row.group }}</span></template>
-        </el-table-column>
-        <el-table-column label="Index">
-            <template slot-scope="scope"><span >{{ scope.row.index }}</span></template>
-        </el-table-column>
-        <el-table-column label="操作" align="center">
-            <template slot-scope="scope">
-                <el-button size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
-                <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
-            </template>
-        </el-table-column>
-    </el-table>
-    <div class="pagination-container">
-        <el-pagination v-show="total>0" :total="total" layout="total"/>
-    </div>
+        <el-table stripe v-loading="listLoading" style="width: 100%" :data="$store.getters.routers">
+            <el-table-column label="名称">
+                <template slot-scope="scope"><span >{{ scope.row.name }}</span></template>
+            </el-table-column>
+            <el-table-column label="IP">
+                <template slot-scope="scope"><span >{{ scope.row.ip }}</span></template>
+            </el-table-column>
+            <el-table-column label="端口">
+                <template slot-scope="scope"><span >{{ scope.row.port }}</span></template>
+            </el-table-column>
+            <el-table-column label="Group">
+                <template slot-scope="scope"><span >{{ scope.row.group }}</span></template>
+            </el-table-column>
+            <el-table-column label="Index">
+                <template slot-scope="scope"><span >{{ scope.row.index }}</span></template>
+            </el-table-column>
+            <el-table-column label="操作" align="center">
+                <template slot-scope="scope">
+                    <el-button size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
+                    <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+        <div class="pagination-container">
+            <el-pagination v-show="total>0" :total="total" layout="total"/>
+        </div>
+    </el-card>
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" :close-on-click-modal="false" >
         <el-form ref="dataForm" :rules="rules" :model="form" label-position="left" label-width="80px">
             <el-form-item label="名称" prop="name">

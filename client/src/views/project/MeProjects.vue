@@ -1,26 +1,23 @@
 <template>
 <div class="app-container">
-    <imp-panel>
-        <h3>我的项目</h3>
-        <h3 class="box-title" slot="header" style="width: 100%;">
-            <el-button type="primary" icon="plus" @click="handleNew()">创建项目</el-button>
-        </h3>
-        <div slot="body">
-            <el-table :data="$store.getters.owns" border style="width: 100%" :v-loading="listLoading">
-                <el-table-column prop="name" label="项目名称" width="120"></el-table-column>
-                <el-table-column prop="appid" label="APPID" width="100"></el-table-column>
-                <el-table-column prop="path" label="项目路径" width="200"></el-table-column>
-                <el-table-column prop="creator" label="项目创建者" width="120"></el-table-column>
-                <el-table-column prop="desc" label="项目简介"></el-table-column>
-                <el-table-column label="操作" width="250">
-                    <template slot-scope="scope">
-                        <el-button size="small" type="primary" @click="handleUpdate(scope.row)">编辑</el-button>
-                        <el-button size="small" type="danger" @click="handleDelete(scope.row)">删除</el-button>
-                    </template>
-                </el-table-column>
-            </el-table>
-        </div>
-    </imp-panel>
+    <el-card>
+        <el-alert :closable="false" type="success" title="负责管理我的所有项目。"/><el-button-group style="margin-bottom:10px">
+            <el-button class="filter-item" type="primary" style="margin-right:10px;" @click="handleNew">创建项目</el-button>
+        </el-button-group>
+        <el-table :data="$store.getters.owns" border style="width: 100%" :v-loading="listLoading">
+            <el-table-column prop="name" label="项目名称" width="120"></el-table-column>
+            <el-table-column prop="appid" label="APPID" width="100"></el-table-column>
+            <el-table-column prop="path" label="项目路径" width="200"></el-table-column>
+            <el-table-column prop="creator" label="项目创建者" width="120"></el-table-column>
+            <el-table-column prop="desc" label="项目简介"></el-table-column>
+            <el-table-column label="操作" width="250">
+                <template slot-scope="scope">
+                    <el-button size="small" type="primary" @click="handleUpdate(scope.row)">编辑</el-button>
+                    <el-button size="small" type="danger" @click="handleDelete(scope.row)">删除</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+    </el-card>
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogVisible" :close-on-click-modal="false" width="60%">
         <el-card class="box-card">
             <el-form :model="form" :rules="rules" ref="form">
@@ -50,12 +47,8 @@
 import * as utils from '../../utils/index'
 import * as driver from '../../api/driver'
 import bus from '../../components/common/bus'
-import panel from "../../components/Panel.vue"
 
 export default {
-    components: {
-        'imp-panel': panel,
-    },
     created(){
         bus.$emit('load_owns')
     },
