@@ -34,7 +34,7 @@ local environs_doers = {
         end
         local ok, err = proj_db:update("environs", environ, { id = environ.id })
         if not ok then
-            return {code = -1, msg = sformat("db update failed: %s", err)}
+            return {code = -1, msg = sformat("environ update failed: %s", err)}
         end
         return { code = 0, data = environ }
     end,

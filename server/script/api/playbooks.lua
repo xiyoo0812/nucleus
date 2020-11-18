@@ -58,7 +58,7 @@ local playbooks_doers = {
         local playbook_id = params.args
         local ok, err = admin_db:delete("playbooks", { id = playbook_id })
         if not ok then
-            return {code = -1, msg = sformat("db delete failed: %s", err)}
+            return {code = -1, msg = sformat("playbook delete failed: %s", err)}
         end
         return { code = 0 }
     end,

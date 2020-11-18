@@ -55,7 +55,7 @@ local authkeys_doers = {
         authkey.sshkey = record.sshkey
         local ok, err = proj_db:update("authkeys", authkey, { id = authkey.id })
         if not ok then
-            return {code = -1, msg = sformat("db update failed: %s", err)}
+            return {code = -1, msg = sformat("authkey update failed: %s", err)}
         end
         return { code = 0, data = authkey }
     end,
@@ -83,7 +83,7 @@ local authkeys_doers = {
         authkey.time = os.time()
         local ok, err = proj_db:insert("authkeys", { authkey })
         if not ok then
-            return { code = -1, msg = sformat("db insert failed:%s", err)}
+            return { code = -1, msg = sformat("authkey insert failed:%s", err)}
         end
         return { code = 0, data = authkey }
     end,
@@ -92,7 +92,7 @@ local authkeys_doers = {
         local authkey_id = params.args
         local ok, err = delete_authkeys(authkey_id)
         if not ok then
-            return {code = -1, msg = sformat("db delete failed: %s", err)}
+            return {code = -1, msg = sformat("authkey delete failed: %s", err)}
         end
         return { code = 0 }
     end,

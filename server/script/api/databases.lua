@@ -34,7 +34,7 @@ local databases_doers = {
         end
         local ok, err = proj_db:update("databases", database, { id = database.id })
         if not ok then
-            return {code = -1, msg = sformat("db update failed: %s", err)}
+            return {code = -1, msg = sformat("database update failed: %s", err)}
         end
         return { code = 0, data = database }
     end,
@@ -47,7 +47,7 @@ local databases_doers = {
         end
         local ok, err = proj_db:insert("databases", { database })
         if not ok then
-            return { code = -1, msg = sformat("db insert failed:%s", err)}
+            return { code = -1, msg = sformat("database insert failed:%s", err)}
         end
         return { code = 0, data = database }
     end,
@@ -56,7 +56,7 @@ local databases_doers = {
         local dbid = params.args
         local ok, err = proj_db:delete("databases", { id = dbid })
         if not ok then
-            return {code = -1, msg = sformat("db delete failed: %s", err)}
+            return {code = -1, msg = sformat("database delete failed: %s", err)}
         end
         return { code = 0 }
     end,

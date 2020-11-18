@@ -29,7 +29,7 @@ local members_doers = {
         end
         local ok, err = proj_db:update("members", member, {en_name = member.en_name})
         if not ok then
-            return {code = -1, msg = sformat("db update failed: %s", err)}
+            return {code = -1, msg = sformat("member update failed: %s", err)}
         end
         return { code = 0, data = member }
     end,
@@ -39,7 +39,7 @@ local members_doers = {
         local en_name = params.args
         local ok, err = proj_db:delete("members", {en_name = en_name })
         if not ok then
-            return {code = -1, msg = sformat("db delete failed: %s", err)}
+            return {code = -1, msg = sformat("member delete failed: %s", err)}
         end
         return { code = 0 }
     end,

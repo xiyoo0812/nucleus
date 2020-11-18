@@ -30,7 +30,7 @@ local applys_doers = {
         end
         local ok, err = proj_db:delete("applys", {en_name = apply.en_name })
         if not ok then
-            return {code = -1, msg = sformat("db update failed: %s", err)}
+            return {code = -1, msg = sformat("apply update failed: %s", err)}
         end
         if apply.sure then
             local project = session.data.project

@@ -87,7 +87,7 @@ local codes_doers = {
         end
         local ok, err = proj_db:insert("codes", { code })
         if not ok then
-            return { code = -1, msg = sformat("db insert failed:%s", err)}
+            return { code = -1, msg = sformat("code insert failed:%s", err)}
         end
         return { code = 0, data = code }
     end,

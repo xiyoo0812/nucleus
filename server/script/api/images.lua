@@ -35,7 +35,7 @@ local images_doers = {
         image.creator = session.data.user.name
         local ok, err = admin_db:update("images", image, { id = image.id })
         if not ok then
-            return {code = -1, msg = sformat("db update failed: %s", err)}
+            return {code = -1, msg = sformat("image update failed: %s", err)}
         end
         return { code = 0, data = image }
     end,
@@ -49,7 +49,7 @@ local images_doers = {
         image.creator = session.data.user.name
         local ok, err = admin_db:insert("images", { image })
         if not ok then
-            return { code = -1, msg = sformat("db insert failed:%s", err)}
+            return { code = -1, msg = sformat("image insert failed:%s", err)}
         end
         return { code = 0, data = image }
     end,
@@ -58,7 +58,7 @@ local images_doers = {
         local image_id = params.args
         local ok, err = admin_db:delete("images", { id = image_id })
         if not ok then
-            return {code = -1, msg = sformat("db delete failed: %s", err)}
+            return {code = -1, msg = sformat("image delete failed: %s", err)}
         end
         return { code = 0 }
     end,

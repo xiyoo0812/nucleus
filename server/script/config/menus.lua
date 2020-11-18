@@ -49,16 +49,8 @@ local MENUS = {
                 title = "密钥配置"
             },
             {
-                index = "databases",
-                title = "数据库"
-            },
-            {
                 index = "codes",
                 title = "代码库"
-            },
-            {
-                index = "routers",
-                title = "路由配置"
             },
             {
                 index = "playbooks",
@@ -67,19 +59,7 @@ local MENUS = {
             {
                 index = "images",
                 title = "Docker镜像"
-            },
-            {
-                index = "nodes",
-                title = "运行节点"
-            },
-            {
-                index = "environs",
-                title = "运行环境"
-            },
-            {
-                index = "templates",
-                title = "配置模板"
-            },
+            }
         }
     },
     {
@@ -100,12 +80,8 @@ local MENUS = {
                 title = "制品管理"
             },
             {
-                index = "gmcmd",
-                title = "GM指令"
-            },
-            {
-                index = "onlog",
-                title = "在线日志"
+                index = "host_monitor",
+                title = "主机监控"
             },
             {
                 index = "offlog",
@@ -116,8 +92,40 @@ local MENUS = {
     {
         index = 4,
         icon = "el-icon-lx-service",
-        title = "运营",
+        title = "Quanta",
         subs =  {
+            {
+                index = "environs",
+                title = "运行环境"
+            },
+            {
+                index = "databases",
+                title = "数据库"
+            },
+            {
+                index = "nodes",
+                title = "运行节点"
+            },
+            {
+                index = "routers",
+                title = "路由配置"
+            },
+            {
+                index = "templates",
+                title = "模板配置"
+            },
+            {
+                index = "gmcmd",
+                title = "GM指令"
+            },
+            {
+                index = "onlog",
+                title = "在线日志"
+            },
+            {
+                index = "node_monitor",
+                title = "节点监控"
+            },
             {
                 index = "platform",
                 title = "平台配置"
@@ -128,7 +136,7 @@ local MENUS = {
             },
             {
                 index = "notice",
-                title = "公告"
+                title = "系统公告"
             },
             {
                 index = "marquee",
@@ -146,21 +154,6 @@ local MENUS = {
                 index = "emial",
                 title = "邮件管理"
             }
-        },
-    },
-    {
-        index = 5,
-        icon = "el-icon-lx-service",
-        title = "监控",
-        subs =  {
-            {
-                index = "host_monitor",
-                title = "主机监控"
-            },
-            {
-                index = "node_monitor",
-                title = "节点监控"
-            },
         },
     },
 }

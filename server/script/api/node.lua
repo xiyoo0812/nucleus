@@ -31,7 +31,7 @@ local node_doers = {
         end
         local ok, err = admin_db:update("nodes", node, { name = node.name })
         if not ok then
-            return {node = -1, msg = sformat("db update failed: %s", err)}
+            return {node = -1, msg = sformat("node update failed: %s", err)}
         end
         return { node = 0, data = node }
     end,
@@ -44,7 +44,7 @@ local node_doers = {
         end
         local ok, err = admin_db:insert("nodes", { node })
         if not ok then
-            return { node = -1, msg = sformat("db insert failed:%s", err)}
+            return { node = -1, msg = sformat("node insert failed:%s", err)}
         end
         return { node = 0, data = node }
     end,
@@ -54,13 +54,13 @@ local node_doers = {
         if type(nodes) == "string" then
             local ok, err = admin_db:delete("nodes", { name = nodes })
             if not ok then
-                return {node = -1, msg = sformat("db delete failed: %s", err)}
+                return {node = -1, msg = sformat("node delete failed: %s", err)}
             end
         else
             for _, cname in pairs(nodes) do
                 local ok, err = admin_db:delete("nodes", { name = cname })
                 if not ok then
-                    return {node = -1, msg = sformat("db delete failed: %s", err)}
+                    return {node = -1, msg = sformat("node delete failed: %s", err)}
                 end
             end
         end

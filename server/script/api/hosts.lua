@@ -34,7 +34,7 @@ local hosts_doers = {
         end
         local ok, err = proj_db:update("hosts", host, { id = host.id })
         if not ok then
-            return {code = -1, msg = sformat("db update failed: %s", err)}
+            return {code = -1, msg = sformat("host update failed: %s", err)}
         end
         return { code = 0, data = host }
     end,
@@ -47,7 +47,7 @@ local hosts_doers = {
         end
         local ok, err = proj_db:insert("hosts", { host })
         if not ok then
-            return { code = -1, msg = sformat("db insert failed:%s", err)}
+            return { code = -1, msg = sformat("host insert failed:%s", err)}
         end
         return { code = 0, data = host }
     end,
@@ -56,7 +56,7 @@ local hosts_doers = {
         local host_id = params.args
         local ok, err = proj_db:delete("hosts", { id = host_id })
         if not ok then
-            return {code = -1, msg = sformat("db delete failed: %s", err)}
+            return {code = -1, msg = sformat("host delete failed: %s", err)}
         end
         return { code = 0 }
     end,

@@ -4,7 +4,7 @@
         <el-alert :closable="false" type="success" title="负责管理配置模板。"/>
         <el-button-group style="margin-top:10px; margin-bottom:10px;">
             <el-button type="primary" style="margin-right:10px;" @click="handleCreate">添加</el-button>
-            <Selecter v-model="environ" :option="environ" clear="true" opid="name" placeholder="请选择环境" :options="$store.getters.environs"/>
+            <Selecter v-model="environ" :option="environ" clear="true" placeholder="请选择环境" :options="$store.getters.environs"/>
         </el-button-group>
         <el-table stripe v-loading="listLoading" style="width: 100%" :data="filterTemplates">
             <el-table-column label="名称">
@@ -14,7 +14,7 @@
                 <template slot-scope="scope"><span >{{ scope.row.desc }}</span></template>
             </el-table-column>
             <el-table-column label="环境">
-                <template slot-scope="scope"><span >{{ scope.row.environ }}</span></template>
+                <template slot-scope="scope"><span >{{ formatEnviron(scope.row) }}</span></template>
             </el-table-column>
             <el-table-column label="创建者">
                 <template slot-scope="scope"><span >{{ scope.row.creator }}</span></template>
@@ -150,6 +150,13 @@ export default {
         }
     },
     methods: {
+        formatEnviron(row) {
+            var environ = utils.array_find(this.$store.getters.environs, row.environ, "id")
+            if (environ) {
+                return environ.name
+            }
+            return row.environ
+        },
         savePlugArg(row) {
             if(row.name == "" || row.type == "" || row.value == "" || row.variable == "") {
                 utils.showFailed(this, "参数不能为空")
