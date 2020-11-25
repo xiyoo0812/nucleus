@@ -249,7 +249,7 @@ export default {
         resetForm() {
             this.argEdit = false
             this.form = {
-                index: 0,
+                index: 1,
                 name: '',
                 desc: '',
                 host: null,
