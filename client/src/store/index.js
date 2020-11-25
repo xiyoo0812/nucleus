@@ -22,6 +22,7 @@ const store = new Vuex.Store({
         avatar: (state) => state.user.avatar,
         owns: (state) => state.project.owns,
         logs: (state) => state.project.logs,
+        nodes: (state) => state.project.nodes,
         codes: (state) => state.project.codes,
         projs: (state) => state.project.projs,
         users: (state) => state.project.users,

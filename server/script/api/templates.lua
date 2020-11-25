@@ -46,8 +46,8 @@ local templates_doers = {
     end,
     DELETE = function(req, params, session)
         log_debug("/templates DELETE params: %s", serialize(params))
-        local dbid = params.args
-        local ok, err = proj_db:delete("templates", { id = dbid })
+        local templateid = params.args
+        local ok, err = proj_db:delete("templates", { id = templateid })
         if not ok then
             return {code = -1, msg = sformat("template delete failed: %s", err)}
         end

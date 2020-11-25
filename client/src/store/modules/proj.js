@@ -18,6 +18,7 @@ const project = {
         codes: [],
         tasks: [],
         projs: [],
+        nodes: [],
         hosts: [],
         logs: [],
         owns: [],
@@ -208,6 +209,18 @@ const project = {
         },
         UPDATE_CODE: (state, args) => {
             utils.array_update(state.codes, args[0], args[1])
+        },
+        INIT_NODE: (state, nodes) => {
+            state.nodes = nodes
+        },
+        ADD_NODE: (state, node) => {
+            state.nodes.push(node)
+        },
+        DEL_NODE: (state, args) => {
+            utils.array_remove(state.nodes, args[0], args[1])
+        },
+        UPDATE_NODE: (state, args) => {
+            utils.array_update(state.nodes, args[0], args[1])
         },
         INIT_PROJ: (state, projs) => {
             state.projs = projs

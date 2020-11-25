@@ -5,7 +5,7 @@
         <el-button-group style="margin-top:10px; margin-bottom:10px;">
             <el-button type="primary" style="margin-right:10px;" @click="handleCreate">添加</el-button>
         </el-button-group>
-        <el-table stripe v-loading="listLoading" style="width: 100%" :data="filterTemplates">
+        <el-table stripe v-loading="listLoading" style="width: 100%" :data="$store.getters.templates">
             <el-table-column label="名称">
                 <template slot-scope="scope"><span >{{ scope.row.name }}</span></template>
             </el-table-column>
@@ -86,13 +86,9 @@
 import * as utils from '../../utils/index'
 import * as driver from '../../api/driver'
 import bus from '../../components/common/bus'
-import Selecter from '../../components/widget/Selecter.vue'
 
 export default {
     name: 'Templates',
-    components:{
-        Selecter,
-    },
     data() {
         return {
             form: {},
@@ -115,31 +111,15 @@ export default {
         this.resetForm()
         var store = this.$store.getters
         if (store.proj) {
-            bus.$emit('load_environs')
             bus.$emit('load_templates')
         }
         bus.$on('project', msg => {
             if (store.proj) {
-                bus.$emit('load_environs', true)
                 bus.$emit('load_templates', true)
             }
         })
     },
-    computed: {
-        filterTemplates() {
-            return this.$store.getters.templates.filter(template => {
-                return (this.environ == "" || template.environ == this.environ)
-            })
-        }
-    },
     methods: {
-        formatEnviron(row) {
-            var environ = utils.array_find(this.$store.getters.environs, row.environ, "id")
-            if (environ) {
-                return environ.name
-            }
-            return row.environ
-        },
         savePlugArg(row) {
             if(row.value == "" || row.variable == "") {
                 utils.showFailed(this, "参数不能为空")
@@ -170,7 +150,6 @@ export default {
             this.form = {
                 name: '',
                 desc: '',
-                environ: "",
                 args: [],
             }
         },

@@ -4,12 +4,12 @@ local MENUS = {
     {
         icon = "el-icon-lx-home",
         index = "dashboard",
-        title = "主页"
+        title = "Home"
     },
     {
         index = 1,
-        icon = "el-icon-lx-service",
-        title = "项目",
+        icon = "el-icon-lx-calendar",
+        title = "Project",
         subs =  {
             {
                 index = "members",
@@ -38,7 +38,7 @@ local MENUS = {
     {
         index = 2,
         icon = "el-icon-lx-apps",
-        title = "资源",
+        title = "Resource",
         subs =  {
             {
                 index = "hosts",
@@ -64,8 +64,8 @@ local MENUS = {
     },
     {
         index = 3,
-        icon = "el-icon-lx-service",
-        title = "运维",
+        icon = "el-icon-lx-sort",
+        title = "Devops",
         subs =  {
             {
                 index = "plugins",
@@ -78,21 +78,13 @@ local MENUS = {
             {
                 index = "products",
                 title = "制品管理"
-            },
-            {
-                index = "host_monitor",
-                title = "主机监控"
-            },
-            {
-                index = "offlog",
-                title = "离线日志"
             }
         }
     },
     {
         index = 4,
-        icon = "el-icon-lx-service",
-        title = "Quanta",
+        icon = "el-icon-lx-settings",
+        title = "Quanta运维",
         subs =  {
             {
                 index = "environs",
@@ -100,11 +92,11 @@ local MENUS = {
             },
             {
                 index = "databases",
-                title = "数据库"
+                title = "数据库配置"
             },
             {
                 index = "nodes",
-                title = "运行节点"
+                title = "节点配置"
             },
             {
                 index = "routers",
@@ -115,8 +107,8 @@ local MENUS = {
                 title = "模板配置"
             },
             {
-                index = "gmcmd",
-                title = "GM指令"
+                index = "offlog",
+                title = "离线日志"
             },
             {
                 index = "onlog",
@@ -127,12 +119,19 @@ local MENUS = {
                 title = "节点监控"
             },
             {
-                index = "platform",
-                title = "平台配置"
-            },
-            {
                 index = "partition",
                 title = "小区配置"
+            },
+        },
+    },
+    {
+        index = 5,
+        icon = "el-icon-lx-service",
+        title = "Quanta运营",
+        subs =  {
+            {
+                index = "gmcmd",
+                title = "GM指令"
             },
             {
                 index = "notice",

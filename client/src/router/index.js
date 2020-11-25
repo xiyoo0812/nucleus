@@ -77,6 +77,11 @@ const router = new Router({
                     meta: { title: '主机配置' }
                 },
                 {
+                    path: '/nodes',
+                    component: () => import(/* webpackChunkName: "nodes" */ '../views/resource/Nodes.vue'),
+                    meta: { title: '节点配置' }
+                },
+                {
                     path: '/authkeys',
                     component: () => import(/* webpackChunkName: "authkeys" */ '../views/resource/AuthKeys.vue'),
                     meta: { title: '密钥配置' }

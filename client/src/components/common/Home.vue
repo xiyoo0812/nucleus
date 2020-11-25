@@ -64,6 +64,12 @@
                     this.loadCodes()
                 }
             })
+            bus.$on('load_nodes', fload => {
+                if (fload || this.dataLoad["load_nodes"] == null){
+                    this.dataLoad["load_nodes"] = true
+                    this.loadNodes()
+                }
+            })
             bus.$on('load_tasks', fload => {
                 if (fload || this.dataLoad["load_tasks"] == null){
                     this.dataLoad["load_tasks"] = true
@@ -202,6 +208,13 @@
                 driver.load("tasks").then(res => {
                     utils.showNetRes(this, res, () => {
                         this.$store.dispatch("InitData", ["TASK", res.data])
+                    })
+                })
+            },
+            loadNodes() {
+                driver.load("nodes").then(res => {
+                    utils.showNetRes(this, res, () => {
+                        this.$store.dispatch("InitData", ["NODE", res.data])
                     })
                 })
             },
